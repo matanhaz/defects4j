@@ -263,7 +263,7 @@ sub _check_t2v2 {
 
         # Run t2 and get number of failing tests
         my $file = "$project->{prog_root}/v2.fail"; `>$file`;
-
+	print $file
         $project->run_tests($file) or die;
 
         # Filter out invalid test names, such as testEncode[0].
