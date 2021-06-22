@@ -1108,7 +1108,7 @@ sub _ant_call {
     # Set up environment before running ant
     my $cmd = " cd $self->{prog_root}" .
               " && $ant_cmd" .
-                " -f $D4J_BUILD_FILE" .
+                "-q -f $D4J_BUILD_FILE" .
                 " -Dd4j.home=$BASE_DIR" .
                 " -Dd4j.dir.projects=$PROJECTS_DIR" .
                 " -Dbasedir=$self->{prog_root} ${option_str} $target 2>&1";
