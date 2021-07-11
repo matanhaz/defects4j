@@ -162,6 +162,9 @@ my $EXPECT_PASS = 0;
 my $EXPECT_FAIL = 1;
 
 my @bids = _get_bug_ids($BID);
+if (defined $BI) {
+	@bids = _get_bug_ids_by_indices($BI);
+}
 foreach my $bid (@bids) {
     printf ("%4d: $project->{prog_name}\n", $bid);
 
@@ -257,6 +260,44 @@ sub _get_bug_ids {
     my $min_id;
     my $max_id;
     if (defined($target_bid) && $target_bid =~ /(\d+)(:(\d+))?/) {
+        $min_id = $max_id = $1;
+        $max_id = $3 if defined $3;
+    }
+
+    my $sth_exists = $dbh_trigger->prepare("SELECT * FROM $TAB_TRIGGER WHERE $PROJECT=? AND $ID=?") or die $dbh_trigger->errstr;
+
+    # Select all version ids from previous step in workflow
+    my $sth = $dbh_revs->prepare("SELECT $ID FROM $TAB_REV_PAIRS WHERE $PROJECT=? "
+                . "AND $COMP_T2V1=1") or die $dbh_revs->errstr;
+    $sth->execute($PID) or die "Cannot query database: $dbh_revs->errstr";
+    my @bids = ();
+    foreach (@{$sth->fetchall_arrayref}) {
+        my $bid = $_->[0];
+        # Skip if project & ID already exist in DB file
+        $sth_exists->execute($PID, $bid);
+        next if ($sth_exists->rows !=0);
+
+        # Filter ids if necessary
+        next if (defined $min_id && ($bid<$min_id || $bid>$max_id));
+
+        # Add id to result array
+        push(@bids, $bid);
+    }
+    $sth->finish();
+
+    return @bids;
+}
+
+
+#
+# Get bug ids from TAB_REV_PAIRS
+#
+sub _get_bug_ids_by_indices{
+    my $target_bid = shift;
+
+    my $min_id;
+    my $max_id;
+    if (defined($target_bid) && $target_bid =~ =~ /^\d+$/) {
         $min_id = $max_id = $1;
         $max_id = $3 if defined $3;
     }
