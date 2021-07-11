@@ -201,7 +201,7 @@ if (defined $BID) {
     }
 }
 if (defined $BI) {
-	if ( $BI =~ /^\d+$/) {
+	if ($BI =~ /^\d+$/) {
 		@ids = grep { ($BI == $_) } @ids;
 	}
 }
