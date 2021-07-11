@@ -114,7 +114,7 @@ use DB;
 use Utils;
 
 my %cmd_opts;
-getopts('p:w:g:t:b:', \%cmd_opts) or pod2usage(1);
+getopts('p:w:g:t:b:i', \%cmd_opts) or pod2usage(1);
 
 pod2usage(1) unless defined $cmd_opts{p} and defined $cmd_opts{w}
                     and defined $cmd_opts{g} and defined $cmd_opts{t};
@@ -176,7 +176,7 @@ if (defined $BID) {
     }
 }
 
-elsif {defined $BI} {
+if (defined $BI) {
 	if ( $BI =~ /^\d+$/) {
 		@ids = grep { ($BI == $_) } @ids;
 	}
