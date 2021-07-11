@@ -31,7 +31,7 @@ F<work_dir/$TAB_REV_PAIRS>, or a single version (or range).
 
 =head1 SYNOPSIS
 
-get-trigger.pl -p project_id -w work_dir [-b bug_id]
+get-trigger.pl -p project_id -w work_dir [-b bug_id]  [-i bug_index]
 
 =head1 OPTIONS
 
@@ -48,6 +48,11 @@ The working directory used for the bug-mining process.
 =item B<-b C<bug_id>>
 
 Only analyze this bug id. The bug_id has to follow the format B<(\d+)(:(\d+))?>.
+Per default all bug ids, listed in the active-bugs csv, are considered.
+
+=item B<-i C<bug_index>>
+
+Only analyze this bug id by index. The bug_id has to follow the format B<(\d+)(:(\d+))?>.
 Per default all bug ids, listed in the active-bugs csv, are considered.
 
 =head1 DESCRIPTION
@@ -106,6 +111,7 @@ pod2usage(1) unless defined $cmd_opts{p} and defined $cmd_opts{w};
 
 my $PID = $cmd_opts{p};
 my $BID = $cmd_opts{b};
+my $BI = $cmd_opts{i};
 my $WORK_DIR = abs_path($cmd_opts{w});
 
 # Check format of target bug id

@@ -30,7 +30,7 @@ analyze-project.pl -- Determine all suitable candidates listed in the active-bug
 
 =head1 SYNOPSIS
 
-analyze-project.pl -p project_id -w work_dir -g tracker_name -t tracker_project_id [-b bug_id]
+analyze-project.pl -p project_id -w work_dir -g tracker_name -t tracker_project_id [-b bug_id] [-i bug_index]
 
 =head1 OPTIONS
 
@@ -57,6 +57,11 @@ commons-lang project is LANG.
 =item B<-b C<bug_id>>
 
 Only analyze this bug id. The bug_id has to follow the format B<(\d+)(:(\d+))?>.
+Per default all bug ids, listed in the active-bugs csv, are considered.
+
+=item B<-i C<bug_index>>
+
+Only analyze this bug id by index. The bug_id has to follow the format B<(\d+)(:(\d+))?>.
 Per default all bug ids, listed in the active-bugs csv, are considered.
 
 =back
@@ -116,6 +121,7 @@ pod2usage(1) unless defined $cmd_opts{p} and defined $cmd_opts{w}
 
 my $PID = $cmd_opts{p};
 my $BID = $cmd_opts{b};
+my $BI = $cmd_opts{i};
 my $WORK_DIR = abs_path($cmd_opts{w});
 my $TRACKER_ID = $cmd_opts{t};
 my $TRACKER_NAME = $cmd_opts{g};
@@ -169,6 +175,13 @@ if (defined $BID) {
         @ids = grep { ($BID == $_) } @ids;
     }
 }
+
+elsif {defined $BI} {
+	if ( $BI =~ /^\d+$/) {
+		@ids = grep { ($BI == $_) } @ids;
+	}
+}
+
 
 my $sth = $dbh->prepare("SELECT * FROM $TAB_REV_PAIRS WHERE $PROJECT=? AND $ID=?") or die $dbh->errstr;
 foreach my $bid (@ids) {

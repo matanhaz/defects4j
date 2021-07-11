@@ -31,7 +31,7 @@ layout and perform a sanity check for each revision.
 
 =head1 SYNOPSIS
 
-initialize-revisions.pl -p project_id -w work_dir [-s subproject] [ -b bug_id] 
+initialize-revisions.pl -p project_id -w work_dir [-s subproject] [ -b bug_id] [ -i bug_index]
 
 =head1 OPTIONS
 
@@ -52,6 +52,11 @@ The subproject to be mined (if not the root directory)
 =item B<-b C<bug_id>>
 
 Only analyze this bug id. The bug_id has to follow the format B<(\d+)(:(\d+))?>.
+Per default all bug ids, listed in the active-bugs csv, are considered.
+
+=item B<-i C<bug_index>>
+
+Only analyze this bug id by index. The bug_id has to follow the format B<(\d+)(:(\d+))?>.
 Per default all bug ids, listed in the active-bugs csv, are considered.
 
 =back
@@ -77,6 +82,7 @@ pod2usage(1) unless defined $cmd_opts{p} and defined $cmd_opts{w};
 
 my $PID = $cmd_opts{p};
 my $BID = $cmd_opts{b};
+my $BI = $cmd_opts{i};
 my $WORK_DIR = abs_path($cmd_opts{w});
 my $SUBPROJ = $cmd_opts{s};
 
@@ -194,6 +200,12 @@ if (defined $BID) {
         @ids = grep { ($BID == $_) } @ids;
     }
 }
+elsif {defined $BI} {
+	if ( $BI =~ /^\d+$/) {
+		@ids = grep { ($BI == $_) } @ids;
+	}
+}
+
 foreach my $bid (@ids) {
     printf ("%4d: $project->{prog_name}\n", $bid);
 
