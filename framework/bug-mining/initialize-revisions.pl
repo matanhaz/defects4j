@@ -76,7 +76,7 @@ use DB;
 use Utils;
 
 my %cmd_opts;
-getopts('p:b:w:s:', \%cmd_opts) or pod2usage(1);
+getopts('p:b:w:s:i:', \%cmd_opts) or pod2usage(1);
 
 pod2usage(1) unless defined $cmd_opts{p} and defined $cmd_opts{w};
 
