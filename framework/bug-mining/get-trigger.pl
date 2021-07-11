@@ -103,6 +103,7 @@ use Constants;
 use Project;
 use DB;
 use Utils;
+use experimental 'smartmatch';
 
 my %cmd_opts;
 getopts('p:b:w:i:', \%cmd_opts) or pod2usage(1);
