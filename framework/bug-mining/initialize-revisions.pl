@@ -35,7 +35,7 @@ initialize-revisions.pl -p project_id -w work_dir [-s subproject] [ -b bug_id] [
 
 =head1 OPTIONS
 
-=over 4
+=over 5
 
 =item B<-p C<project_id>>
 
