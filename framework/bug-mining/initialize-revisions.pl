@@ -49,7 +49,7 @@ The working directory used for the bug-mining process.
 
 The subproject to be mined (if not the root directory)
 
-=item B<-e C<bug_index>>
+=item B<-i C<bug_index>>
 
 Only analyze this bug id by index. The bug_id has to follow the format B<(\d+)(:(\d+))?>.
 Per default all bug ids, listed in the active-bugs csv, are considered.
@@ -77,7 +77,7 @@ pod2usage(1) unless defined $cmd_opts{p} and defined $cmd_opts{w};
 
 my $PID = $cmd_opts{p};
 my $BID = $cmd_opts{b};
-my $BI = $cmd_opts{e};
+my $BI = $cmd_opts{i};
 my $WORK_DIR = abs_path($cmd_opts{w});
 my $SUBPROJ = $cmd_opts{s};
 
