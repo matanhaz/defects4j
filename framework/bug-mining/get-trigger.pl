@@ -297,7 +297,7 @@ sub _get_bug_ids_by_indices{
 
     my $min_id;
     my $max_id;
-    if (defined($target_bid) && $target_bid =~ =~ /^\d+$/) {
+    if (defined($target_bid) && $target_bid =~ /^\d+$/) {
         $min_id = $max_id = $1;
         $max_id = $3 if defined $3;
     }
