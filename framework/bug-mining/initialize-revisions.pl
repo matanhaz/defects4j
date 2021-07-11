@@ -49,6 +49,11 @@ The working directory used for the bug-mining process.
 
 The subproject to be mined (if not the root directory)
 
+=item B<-b C<bug_id>>
+
+Only analyze this bug id. The bug_id has to follow the format B<(\d+)(:(\d+))?>.
+Per default all bug ids, listed in the active-bugs csv, are considered.
+
 =item B<-i C<bug_index>>
 
 Only analyze this bug id by index. The bug_id has to follow the format B<(\d+)(:(\d+))?>.
