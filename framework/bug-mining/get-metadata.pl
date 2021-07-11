@@ -158,10 +158,7 @@ system("mkdir -p $TMP_DIR");
 my $project = Project::create_project($PID);
 $project->{prog_root} = $TMP_DIR;
 
-my @bids = _get_bug_ids($BID);
-if (defined $BI) {
-	@bids = _get_bug_ids_by_indices($BI);
-}
+my @bids = _get_bug_ids_by_indices($BI);
 foreach my $bid (@bids) {
     # Lookup revision ids
     my $v1  = $project->lookup("${bid}b");
