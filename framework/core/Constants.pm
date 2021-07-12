@@ -149,7 +149,7 @@ The directory that contains project repositoriy clones (I<C<BASE_DIR>/project_re
 
 =cut
 
-our $REPO_DIR = ($ENV{'REPO_DIR'} // "~/project_repos");
+our $REPO_DIR = ($ENV{'REPO_DIR'} // abs_path("~/project_repos"));
 
 =pod
 
