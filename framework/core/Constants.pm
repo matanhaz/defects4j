@@ -145,7 +145,7 @@ our $BASE_DIR = ($ENV{'BASE_DIR'} // abs_path("$SCRIPT_DIR/../"));
 
 =item C<REPO_DIR>
 
-The directory that contains project repositoriy clones (I<C<BASE_DIR>/project_repos>)
+The directory that contains project repositoriy clones (I<C<BASE_DIR>/../../project_repos>)
 
 =cut
 
@@ -229,8 +229,8 @@ our $GRADLE_LOCAL_HOME_DIR = ($ENV{'GRADLE_LOCAL_HOME_DIR'} // ".gradle_local_ho
 # - Major mutation framework available?
 # - External libraries (test generation) available?
 #
--e "$REPO_DIR/README"
-        or die("Couldn't find project repositories! Did you (re)run 'defects4j/init.sh'?\n\n");
+# -e "$REPO_DIR/README"
+#         or die("Couldn't find project repositories! Did you (re)run 'defects4j/init.sh'?\n\n");
 -e "$MAJOR_ROOT/bin/ant"
         or die("Couldn't find Major mutation framework! Did you (re)run 'defects4j/init.sh'?\n\n");
 -d "$TESTGEN_LIB_DIR"
