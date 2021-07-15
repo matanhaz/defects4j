@@ -344,6 +344,7 @@ sub _check_t2v1 {
 #
 sub _read_file {
     my $fn = shift;
+    printf("read_file:\n");
     printf("read_file: %s\n", $fn);
 	open(FH, "<$fn") or confess "Could not open file: $!";
     my @lines = <FH>;
