@@ -179,6 +179,7 @@ if (defined $BID) {
 if (defined $BI) {
 	if ( $BI =~ /^\d+$/) {
 		@ids = grep { ($BI == $_) } @ids;
+		print "@ids\n";
 	}
 }
 
