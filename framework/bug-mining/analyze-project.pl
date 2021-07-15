@@ -177,12 +177,12 @@ if (defined $BID) {
 }
 
 if (defined $BI) {
-	if ( $BI =~ /^\d+$/) {
+	printf("defined BI \n");
+	if ($BI =~ /^\d+$/) {
 		@ids = grep { ($BI == $_) } @ids;
-		print "@ids\n";
 	}
 }
-
+print "@ids\n";
 
 my $sth = $dbh->prepare("SELECT * FROM $TAB_REV_PAIRS WHERE $PROJECT=? AND $ID=?") or die $dbh->errstr;
 foreach my $bid (@ids) {
