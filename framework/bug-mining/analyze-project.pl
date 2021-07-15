@@ -176,8 +176,9 @@ if (defined $BID) {
     }
 }
 
+print "@ids\n";
 if (defined $BI) {
-	printf("defined BI \n");
+	printf("defined BI: %s \n", $BI);
 	if ($BI =~ /^\d+$/) {
 		@ids = grep { ($BI == $_) } @ids;
 	}
