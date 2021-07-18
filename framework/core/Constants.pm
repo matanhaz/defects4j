@@ -159,7 +159,7 @@ The temporary root directory, used to checkout a program version (I</tmp>)
 
 =cut
 
-our $D4J_TMP_DIR = ($ENV{'D4J_TMP_DIR'} // "/tmp");
+our $D4J_TMP_DIR = ($ENV{'D4J_TMP_DIR'} // "/tmp/versions");
 
 =pod
 
