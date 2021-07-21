@@ -13,9 +13,9 @@
 		<property name='coverage.generator.exclude' val=''/>
 		<property name='coverage.generator.caller_include' val=''/>
 		<property name='coverage.generator.caller_exclude' val=''/>
-		<property name='coverage.created.date' val='2021-07-19'/>
-		<property name='coverage.created.time' val='13:20:45'/>
-		<property name='coverage.generator.fullversion' val='3.0os.beta-2 built: 10 June 2020'/>
+		<property name='coverage.created.date' val='2021-07-21'/>
+		<property name='coverage.created.time' val='16:14:18'/>
+		<property name='coverage.generator.fullversion' val='3.0os.beta-2 built: 21 July 2021'/>
 		<property name='coverage.generator.name' val='jcov'/>
 		<property name='coverage.generator.version' val='3.0'/>
 		<property name='coverage.spec.version' val='1.3'/>

@@ -71,9 +71,9 @@ class Signature(object):
 
 class HitInformation(object):
     def __init__(self, method_name, lst):
-        assert len(lst) == 3
+        assert len(lst) == 4
         self.method_name = method_name
-        self.count, self.previous_slot, self.parent = lst
+        self.count, self.previous_slot, self.parent , self.test_slot = lst
 
     def set_previous_method(self, method_name_by_id):
         self.previous_method = method_name_by_id.get(self.previous_slot, 'None')
@@ -139,6 +139,8 @@ class Trace(object):
         g.add_edges_from(self.get_call_graph_edges())
         tests_nodes = list(filter(lambda x: x.split('.')[-2].endswith('Test') and x.split('.')[-1].startswith('test'), list(g.node)))
         traces = {}
+        for test in tests_nodes:
+            g.remove_edges_from(list(g.in_edges(test)))
         for test in tests_nodes:
             test_name = test.split('(')[0].lower()
             successors = list(nx.dfs_successors(g, test))
