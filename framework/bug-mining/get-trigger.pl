@@ -155,6 +155,7 @@ my $DEP_TEST_FILE            = "$PROJECTS_DIR/$PID/dependent_tests";
 
 # Temporary files used for saving failed test results in
 my $FAILED_TESTS_FILE        = "$TMP_DIR/test.run";
+my $TESTS_FILE        = "$TMP_DIR/test2.run";
 my $FAILED_TESTS_FILE_SINGLE = "$FAILED_TESTS_FILE.single";
 
 # Isolation constants
@@ -396,10 +397,10 @@ sub _trace_tests {
               " && python Tracer.py ${root} start 2>&1";
 	my $log;
 	printf ("Execute ${cmd}\n");
-    my $ret = Utils::exec_cmd($cmd, "Running Tracer start", \$log);
+	my $ret = Utils::exec_cmd($cmd, "Running Tracer start", \$log);
 
     # Run tests and get number of failing tests
-    $project->run_tests($FAILED_TESTS_FILE) or die;
+    # $project->run_tests($TESTS_FILE) or die;
 	
 	
 	# Set up environment before running ant
