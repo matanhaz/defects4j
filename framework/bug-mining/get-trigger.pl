@@ -386,19 +386,17 @@ sub _trace_tests {
     $project->{prog_root} = $root;
 
     $project->checkout_vid($vid, $root, 1) or die;
-	
-	
+
+    # Compile src and test
+    $project->compile() or die;
+    $project->compile_tests() or die;
+
 	# Set up environment before running ant
     my $cmd = " cd tracing" .
               " && python Tracer.py ${root} start 2>&1";
 	my $log;
 	printf ("Execute ${cmd}\n");
     my $ret = Utils::exec_cmd($cmd, "Running Tracer start", \$log);
-
-
-    # Compile src and test
-    $project->compile() or die;
-    $project->compile_tests() or die;
 
     # Run tests and get number of failing tests
     $project->run_tests($FAILED_TESTS_FILE) or die;
