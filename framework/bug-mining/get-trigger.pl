@@ -396,6 +396,7 @@ sub _trace_tests {
 	my $log;
 	printf ("Execute ${cmd}\n");
 	my $ret = Utils::exec_cmd($cmd, "Running Tracer start", \$log);
+	print($log);
 
     # Run tests and get number of failing tests
     # $project->run_tests($TESTS_FILE) or die;
@@ -407,6 +408,7 @@ sub _trace_tests {
 	my $log2;
 	printf ("Execute ${cmd2}\n");
     my $ret2 = Utils::exec_cmd($cmd2, "Running Tracer stop", \$log2);
+	print($log2);
 }
 
 #
