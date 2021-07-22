@@ -110,6 +110,7 @@ class Tracer:
             return False
 
     def execute_jcov_process(self):
+        print(self.template_creator_cmd_line())
         Popen(self.template_creator_cmd_line()).communicate()
         for path in [self.path_to_classes_file, self.path_to_out_template]:
             if path:
