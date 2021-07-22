@@ -113,7 +113,7 @@ class Tracer:
 
     def execute_jcov_process(self):
         print(self.template_creator_cmd_line())
-        print(Popen(self.template_creator_cmd_line(), stdout=PIPE, stderr=PIPE).communicate())
+        Popen(self.template_creator_cmd_line()).communicate()
         for path in [self.path_to_classes_file, self.path_to_out_template]:
             if path:
                 with open(path) as f:
