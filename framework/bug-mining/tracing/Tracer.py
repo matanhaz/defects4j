@@ -85,7 +85,7 @@ class Tracer:
         return all_classes
 
     def template_creator_cmd_line(self):
-        cmd_line = [os.path.join(os.environ['JAVA_HOME'], "bin\java.exe"), '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'tmplgen', '-verbose']
+        cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'tmplgen', '-verbose']
         cmd_line.extend(['-t', Tracer.path_to_out_template])
         cmd_line.extend(['-c', Tracer.path_to_classes_file])
         cmd_line.extend(['-type', 'method'])
@@ -93,7 +93,7 @@ class Tracer:
         return cmd_line
 
     def grabber_cmd_line(self):
-            cmd_line = [os.path.join(os.environ['JAVA_HOME'], "bin\java.exe"), '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'grabber', '-vv', '-port', self.agent_port, '-command_port', self.command_port]
+            cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'grabber', '-vv', '-port', self.agent_port, '-command_port', self.command_port]
             cmd_line.extend(['-t', Tracer.path_to_out_template])
             cmd_line.extend(['-o', self.path_to_result_file])
             return list(map(str, cmd_line))
