@@ -163,8 +163,7 @@ if __name__ == '__main__':
     print(t.__dict__)
     if len(sys.argv) == 3:
         if sys.argv[-1] == 'start':
-            # t.execute_jcov_process()
-            pass
+            t.execute_jcov_process()
         else:
             # t.stop_grabber()
             pass
