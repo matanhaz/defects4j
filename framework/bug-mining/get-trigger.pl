@@ -244,7 +244,7 @@ foreach my $bid (@bids) {
         }
     }
 
-	_trace_tests($project, "$TMP_DIR/v1", "${bid}b");
+	# _trace_tests($project, "$TMP_DIR/v1", "${bid}b");
     # Add data
     _add_row(\%data);
 }
