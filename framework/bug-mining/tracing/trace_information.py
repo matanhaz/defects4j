@@ -119,6 +119,19 @@ class TraceElement(object):
     def get_call_graph_edges(self):
         return list(map(lambda hit: hit.call_graph_edge, self.hits_information))
 
+    def split_by_tests_slots(self):
+        traces = {}
+        tests = {}
+        for h in self.hits_information:
+            if h.test_slot != -1:
+                tests.setdefault(h.test_slot, []).append(h)
+        for t in tests:
+            trace = TraceElement(self.jcov_data, {self.id : self.method_name})
+            trace.hits_information = tests[t]
+            trace.count = sum(list(map(lambda h: h.count, tests[t])))
+            traces[t] = (trace.id, trace)
+        return traces
+
 
 class Trace(object):
     def __init__(self, test_name, trace):
@@ -135,18 +148,17 @@ class Trace(object):
         return reduce(list.__add__, list(map(lambda element: element.get_call_graph_edges(), self.trace.values())), [])
 
     def split_to_subtraces(self):
-        g = nx.DiGraph()
-        g.add_edges_from(self.get_call_graph_edges())
-        tests_nodes = list(filter(lambda x: x.split('.')[-2].endswith('Test') and x.split('.')[-1].startswith('test'), list(g.node)))
+        tests = list(filter(lambda x: x.method_name.split('.')[-2].endswith('Test') and x.method_name.split('.')[-1].startswith('test'), list(self.trace.values())))
+        tests_slots = dict(list(map(lambda x: (x.id, x), tests)) + list(map(lambda x: (x.extra_slot, x), tests)))
+        test_traces = {}
         traces = {}
-        for test in tests_nodes:
-            g.remove_edges_from(list(g.in_edges(test)))
-        for test in tests_nodes:
-            test_name = test.split('(')[0].lower()
-            successors = list(nx.dfs_successors(g, test))
-            trace_ = {}
-            for n in self.trace:
-                if self.trace[n].method_name in successors:
-                    trace_[n] = self.trace[n]
-            traces[test_name] = Trace(test_name, trace_)
+        for t in tests:
+            test_traces[t.method_name] = []
+        for trace in self.trace:
+            sub_traces = self.trace[trace].split_by_tests_slots()
+            for st in sub_traces:
+                if tests_slots.get(st):
+                    test_traces[tests_slots[st].method_name].append(sub_traces[st])
+        for t in test_traces:
+            traces[t] = Trace(t, dict(test_traces[t]))
         return traces

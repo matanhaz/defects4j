@@ -123,10 +123,10 @@ class Tracer:
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-stop", '-command_port', str(self.command_port)]).communicate()
         traces = list(JcovParser(os.path.dirname(Tracer.path_to_result_file), True, True).parse(False))[0].split_to_subtraces()
         self.observe_tests()
-        relevant_traces = list(filter(lambda t: t in self.test_results, traces))
+        relevant_traces = list(filter(lambda t: t.split('(')[0].lower() in self.test_results, traces))
         tests_details = []
         for t in relevant_traces:
-            tests_details.append((t, traces[t].get_trace(), 0 if self.test_results[t].outcome == 'pass' else 1))
+            tests_details.append((t, traces[t].get_trace(), 0 if self.test_results[t.split('(')[0].lower()].outcome == 'pass' else 1))
         with open(Tracer.path_to_tests_details, "w") as f:
             json.dump(tests_details, f)
 
