@@ -399,7 +399,7 @@ sub _trace_tests {
 	print($log);
 
     # Run tests and get number of failing tests
-    # $project->run_tests($TESTS_FILE) or die;
+    $project->run_tests($TESTS_FILE) or die;
 
 	# Set up environment before running ant
     my $cmd2 = " cd tracing" .
