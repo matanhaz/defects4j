@@ -5,7 +5,7 @@ import socket
 import json
 from junitparser.junitparser import Error, Failure, Skipped
 from junitparser import JUnitXml
-from subprocess import Popen
+from subprocess import Popen, PIPE
 from jcov_parser import JcovParser
 et.register_namespace('', "http://maven.apache.org/POM/4.0.0")
 et.register_namespace('xsi', "http://www.w3.org/2001/XMLSchema-instance")
@@ -111,7 +111,7 @@ class Tracer:
 
     def execute_jcov_process(self):
         print(self.template_creator_cmd_line())
-        Popen(self.template_creator_cmd_line()).communicate()
+        print(Popen(self.template_creator_cmd_line(), stdout=PIPE, stderr=PIPE).communicate())
         for path in [self.path_to_classes_file, self.path_to_out_template]:
             if path:
                 with open(path) as f:
