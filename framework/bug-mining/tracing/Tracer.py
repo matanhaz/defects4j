@@ -40,8 +40,6 @@ class Tracer:
     JCOV_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "jcov.jar")
     path_to_classes_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "classes")
     path_to_out_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "template")
-    path_to_result_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "results", "result.xml")
-    path_to_tests_details = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test_details.json")
 
     def __init__(self, xml_path):
         self.classes_dir = None
@@ -51,6 +49,10 @@ class Tracer:
         self.element_tree = et.parse(self.xml_path)
         self.set_junit_formatter()
         self.element_tree.write(self.xml_path, xml_declaration=True)
+        p = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+        bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0], 'framework', 'projects')
+        self.path_to_result_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "result.xml"))
+        self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "test_details.json"))
         self.test_results = {}
 
     def set_junit_formatter(self):
@@ -93,7 +95,7 @@ class Tracer:
     def grabber_cmd_line(self):
             cmd_line = [os.path.join(os.environ['JAVA_HOME'], "bin\java.exe"), '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'grabber', '-vv', '-port', self.agent_port, '-command_port', self.command_port]
             cmd_line.extend(['-t', Tracer.path_to_out_template])
-            cmd_line.extend(['-o', Tracer.path_to_result_file])
+            cmd_line.extend(['-o', self.path_to_result_file])
             return list(map(str, cmd_line))
 
     def check_if_grabber_is_on(self):
@@ -121,13 +123,13 @@ class Tracer:
     def stop_grabber(self):
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-save", '-command_port', str(self.command_port)]).communicate()
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-stop", '-command_port', str(self.command_port)]).communicate()
-        traces = list(JcovParser(os.path.dirname(Tracer.path_to_result_file), True, True).parse(False))[0].split_to_subtraces()
+        traces = list(JcovParser(os.path.dirname(self.path_to_result_file), True, True).parse(False))[0].split_to_subtraces()
         self.observe_tests()
         relevant_traces = list(filter(lambda t: t.split('(')[0].lower() in self.test_results, traces))
         tests_details = []
         for t in relevant_traces:
             tests_details.append((t, traces[t].get_trace(), 0 if self.test_results[t.split('(')[0].lower()].outcome == 'pass' else 1))
-        with open(Tracer.path_to_tests_details, "w") as f:
+        with open(self.path_to_tests_details, "w") as f:
             json.dump(tests_details, f)
 
     def get_xml_files(self):
