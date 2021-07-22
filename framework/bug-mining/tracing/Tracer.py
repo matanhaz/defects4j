@@ -154,7 +154,7 @@ class Tracer:
 
 
 if __name__ == '__main__':
-    t = Tracer(os.path.abspath(sys.argv[1]))
+    t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'))
     if len(sys.argv) == 3:
         if sys.argv[-1] == 'start':
             t.execute_jcov_process()

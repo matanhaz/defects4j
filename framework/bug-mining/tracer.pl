@@ -173,7 +173,7 @@ foreach my $bid (@bids) {
     $data{$ID} = $bid;
 
     # V1 must not have failing test classes but at least one failing test method
-    _run_tests($project, "$TMP_DIR/v1", "${bid}b");
+    _trace_tests($project, "$TMP_DIR/v1", "${bid}b");
 }
 
 $dbh_trigger->disconnect();
@@ -258,7 +258,7 @@ sub _get_bug_ids_by_indices{
 #
 # Get a list of all failing tests
 #
-sub _run_tests {
+sub _trace_tests {
     my ($project, $root, $vid) = @_;
 
     # Clean output file
@@ -266,6 +266,14 @@ sub _run_tests {
     $project->{prog_root} = $root;
 
     $project->checkout_vid($vid, $root, 1) or die;
+	
+	
+	# Set up environment before running ant
+    my $cmd = " cd tracing" .
+              " && python Tracer.py ${root} start 2>&1";
+	my $log;
+    my $ret = Utils::exec_cmd($cmd, "Running ant ($target)", \$log);
+
 
     # Compile src and test
     $project->compile() or die;
@@ -273,6 +281,16 @@ sub _run_tests {
 
     # Run tests and get number of failing tests
     $project->run_tests($FAILED_TESTS_FILE) or die;
+	
+	
+	# Set up environment before running ant
+    my $cmd2 = " cd tracing" .
+              " && python Tracer.py ${root} stop 2>&1";
+
+	my $log2;
+    my $ret2 = Utils::exec_cmd($cmd2, "Running ant ($target)", \$log2);
+
+
 }
 
 =pod
