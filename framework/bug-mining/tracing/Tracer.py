@@ -49,7 +49,7 @@ class Tracer:
         self.element_tree = et.parse(self.xml_path)
         self.set_junit_formatter()
         self.element_tree.write(self.xml_path, xml_declaration=True)
-        p = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+        p = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
         bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0], 'framework', 'projects')
         self.path_to_result_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "result.xml"))
         self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "test_details.json"))
@@ -158,6 +158,7 @@ class Tracer:
 
 if __name__ == '__main__':
     t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'))
+    print(t.__dict__)
     if len(sys.argv) == 3:
         if sys.argv[-1] == 'start':
             t.execute_jcov_process()
