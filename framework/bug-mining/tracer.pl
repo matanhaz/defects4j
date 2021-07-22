@@ -174,63 +174,6 @@ foreach my $bid (@bids) {
 
     # V1 must not have failing test classes but at least one failing test method
     _run_tests($project, "$TMP_DIR/v1", "${bid}b");
-    
-
-    # Isolation part of workflow
-    $list = $list->{methods}; # we only care about the methods from here on.
-    my @fail_in_order = @$list; # list to compare isolated tests with
-
-    # Make sure there are no duplicates.
-    my %seen;
-    for (@$list) {
-        die "Duplicate test case failure: $_. Build is probably broken" unless ++$seen{$_} < 2;
-    }
-
-    print "List of test methods: \n" . join ("\n",  @$list) . "\n";
-    # Run triggering test(s) in isolation on v2 -> tests should pass. Any test not
-    # passing is excluded from further processing.
-    $list = _run_tests_isolation("$TMP_DIR/v2", $list, $EXPECT_PASS);
-    $data{$PASS_ISO_V2} = scalar(@$list);
-    print "List of test methods: (passed in isolation on v2)\n" . join ("\n", @$list) . "\n";
-
-    # Run triggering test(s) in isolation on v1 -> tests should fail. Any test not
-    # failing is excluded from further processing.
-    $list = _run_tests_isolation("$TMP_DIR/v1", $list, $EXPECT_FAIL);
-    $data{$FAIL_ISO_V1} = scalar(@$list);
-    print "List of test methods: (failed in isolation on v1)\n" . join ("\n", @$list) . "\n";
-
-     # Save non-dependent triggering tests to $OUT_DIR/$bid
-    if (scalar(@{$list}) > 0) {
-        system("cp $FAILED_TESTS_FILE $OUT_DIR/$bid");
-    } else {
-        print("No triggering test case has been found. This could either mean that no test" .
-              " has been executed or that all test cases pass (e.g., a javadoc change could" .
-              " be considered bugfix however it might not be captured by any unit test case)\n");
-    }
-
-    # Save dependent tests to $DEP_TEST_FILE
-    
-    # Get contents of current dependent tests file
-    my @old_dep_tests;
-
-    if (-e $DEP_TEST_FILE){
-        open my $contents, '<', $DEP_TEST_FILE or die "Cannot open dependent tests file: $!\n";
-        my @old_dep_tests = <$contents>;
-        close $contents;    
-    }
-
-    my @dependent_tests = grep { !($_ ~~  @{$list}) } @fail_in_order;
-    for my $dependent_test (@dependent_tests) {
-        # Add the test unless it is already in the list.
-        unless ($dependent_test ~~ @old_dep_tests) {
-            print " ## Warning: Dependent test ($dependent_test) is being added to list.\n";
-            system("echo '--- $dependent_test' >> $DEP_TEST_FILE");
-            push @old_dep_tests, $dependent_test;
-        }
-    }
-
-    # Add data
-    _add_row(\%data);
 }
 
 $dbh_trigger->disconnect();
@@ -330,48 +273,6 @@ sub _run_tests {
 
     # Run tests and get number of failing tests
     $project->run_tests($FAILED_TESTS_FILE) or die;
-}
-
-#
-# Run tests in isolation and check for pass/fail
-#
-sub _run_tests_isolation {
-    my ($root, $list, $expect_fail) = @_;
-
-    # Clean output file
-    system(">$FAILED_TESTS_FILE");
-    $project->{prog_root} = $root;
-
-    my @succeeded_tests = ();
-
-    foreach my $test (@$list) {
-        # Clean single test output
-        system(">$FAILED_TESTS_FILE_SINGLE");
-        $project->run_tests($FAILED_TESTS_FILE_SINGLE, $test) or die;
-        my $fail = Utils::get_failing_tests($FAILED_TESTS_FILE_SINGLE);
-        if (scalar(@{$fail->{methods}}) == $expect_fail) {
-            push @succeeded_tests, $test;
-            system("cat $FAILED_TESTS_FILE_SINGLE >> $FAILED_TESTS_FILE"); # save results of single test to overall file.
-        }
-    }
-
-    # Return reference to the list of methods passed/failed.
-    \@succeeded_tests;
-}
-
-#
-# Add a row to the database table
-#
-sub _add_row {
-    my $data = shift;
-
-    my @tmp;
-    foreach (@COLS) {
-        push (@tmp, $dbh_trigger->quote((defined $data->{$_} ? $data->{$_} : "-")));
-    }
-
-    my $row = join(",", @tmp);
-    $dbh_trigger->do("INSERT INTO $TAB_TRIGGER VALUES ($row)");
 }
 
 =pod
