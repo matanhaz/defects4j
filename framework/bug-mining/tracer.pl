@@ -173,14 +173,8 @@ foreach my $bid (@bids) {
     $data{$ID} = $bid;
 
     # V1 must not have failing test classes but at least one failing test method
-    $list = _get_failing_tests($project, "$TMP_DIR/v1", "${bid}b");
-    my $fail_c = scalar(@{$list->{"classes"}}); $data{$FAIL_C_V1} = $fail_c;
-    my $fail_m = scalar(@{$list->{"methods"}}); $data{$FAIL_M_V1} = $fail_m;
-    if ($fail_c !=0 or $fail_m == 0) {
-        print("Expected at least one failing test method on ${PID}-${bid}b\n");
-        _add_row(\%data);
-        next;
-    }
+    _run_tests($project, "$TMP_DIR/v1", "${bid}b");
+    
 
     # Isolation part of workflow
     $list = $list->{methods}; # we only care about the methods from here on.
@@ -321,7 +315,7 @@ sub _get_bug_ids_by_indices{
 #
 # Get a list of all failing tests
 #
-sub _get_failing_tests {
+sub _run_tests {
     my ($project, $root, $vid) = @_;
 
     # Clean output file
@@ -336,8 +330,6 @@ sub _get_failing_tests {
 
     # Run tests and get number of failing tests
     $project->run_tests($FAILED_TESTS_FILE) or die;
-    # Return failing tests
-    return Utils::get_failing_tests($FAILED_TESTS_FILE);
 }
 
 #
