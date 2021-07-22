@@ -47,6 +47,7 @@ class Tracer:
         self.agent_port = 5551
         self.xml_path = xml_path
         self.element_tree = et.parse(self.xml_path)
+        print('self.element_tree')
         self.set_junit_formatter()
         self.element_tree.write(self.xml_path, xml_declaration=True)
         p = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -56,6 +57,7 @@ class Tracer:
         self.test_results = {}
 
     def set_junit_formatter(self):
+        print('set_junit_formatter')
         junit = list(filter(lambda x: x.tag == 'junit', self.element_tree.iter()))
         if junit:
             for j in junit:
