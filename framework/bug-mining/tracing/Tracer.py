@@ -39,7 +39,7 @@ class TestResult(object):
 class Tracer:
     JCOV_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "jcov.jar")
     path_to_classes_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "classes")
-    path_to_out_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "template")
+    path_to_out_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "template.xml")
 
     def __init__(self, xml_path):
         self.classes_dir = None
@@ -84,20 +84,16 @@ class Tracer:
                 if f.endswith('class'):
                     all_classes.add(root)
                     break
+        print(all_classes)
         return all_classes
 
     def template_creator_cmd_line(self):
-        cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'tmplgen', '-verbose']
-        cmd_line.extend(['-t', Tracer.path_to_out_template])
-        cmd_line.extend(['-c', Tracer.path_to_classes_file])
-        cmd_line.extend(['-type', 'method'])
+        cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'tmplgen', '-verbose', '-t', Tracer.path_to_out_template, '-c', Tracer.path_to_classes_file, '-type', 'method']
         cmd_line.extend(self.get_classes_path())
         return cmd_line
 
     def grabber_cmd_line(self):
-            cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'grabber', '-vv', '-port', self.agent_port, '-command_port', self.command_port]
-            cmd_line.extend(['-t', Tracer.path_to_out_template])
-            cmd_line.extend(['-o', self.path_to_result_file])
+            cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'grabber', '-vv', '-port', self.agent_port, '-command_port', self.command_port, '-t', Tracer.path_to_out_template, '-o', self.path_to_result_file]
             return list(map(str, cmd_line))
 
     def check_if_grabber_is_on(self):
@@ -113,7 +109,7 @@ class Tracer:
 
     def execute_jcov_process(self):
         print(self.template_creator_cmd_line())
-        Popen(self.template_creator_cmd_line()).communicate()
+        # Popen(self.template_creator_cmd_line()).communicate()
         for path in [self.path_to_classes_file, self.path_to_out_template]:
             if path:
                 with open(path) as f:
