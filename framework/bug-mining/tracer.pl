@@ -272,7 +272,7 @@ sub _trace_tests {
     my $cmd = " cd tracing" .
               " && python Tracer.py ${root} start 2>&1";
 	my $log;
-    my $ret = Utils::exec_cmd($cmd, "Running ant ($target)", \$log);
+    my $ret = Utils::exec_cmd($cmd, "Running Tracer start", \$log);
 
 
     # Compile src and test
@@ -288,7 +288,7 @@ sub _trace_tests {
               " && python Tracer.py ${root} stop 2>&1";
 
 	my $log2;
-    my $ret2 = Utils::exec_cmd($cmd2, "Running ant ($target)", \$log2);
+    my $ret2 = Utils::exec_cmd($cmd2, "Running Tracer stop", \$log2);
 
 
 }
