@@ -236,7 +236,7 @@ foreach my $bid (@bids) {
     _export_relevant_tests($bid);
 }
 # Remove temporary directory
-# system("rm -rf $TMP_DIR");
+system("rm -rf $TMP_DIR");
 
 #
 # Determine all suitable version ids:

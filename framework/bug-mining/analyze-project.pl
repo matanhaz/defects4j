@@ -209,7 +209,7 @@ foreach my $bid (@ids) {
     _add_row(\%data);
 }
 $dbh->disconnect();
-# system("rm -rf $TMP_DIR");
+system("rm -rf $TMP_DIR");
 
 #
 # Check size of src diff, which is created by initialize-revisions.pl script,
