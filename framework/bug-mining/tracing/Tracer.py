@@ -105,13 +105,15 @@ class Tracer:
         except:
             return False
 
-    def execute_jcov_process(self):
+    def execute_template_process(self):
         print(self.template_creator_cmd_line())
         run(self.template_creator_cmd_line())
         for path in [self.path_to_classes_file, self.path_to_out_template]:
             if path:
                 with open(path) as f:
                     assert f.read(), "{0} is empty".format(path)
+
+    def execute_grabber_process(self):
         print(self.grabber_cmd_line())
         p = Popen(self.grabber_cmd_line())
         assert p.poll() is None
@@ -156,8 +158,10 @@ if __name__ == '__main__':
     t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'))
     print(t.__dict__)
     if len(sys.argv) == 3:
-        if sys.argv[-1] == 'start':
-            t.execute_jcov_process()
+        if sys.argv[-1] == 'template':
+            t.execute_template_process()
+        elif sys.argv[-1] == 'grabber':
+            t.execute_grabber_process()
         elif sys.argv[-1] == 'formatter':
             t.set_junit_formatter()
         else:
