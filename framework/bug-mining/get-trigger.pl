@@ -390,8 +390,17 @@ sub _trace_tests {
     $project->compile() or die;
     $project->compile_tests() or die;
 
-	# Set up environment before running ant
-    my $cmd = " cd tracing" .
+	my $cmd1 = " cd tracing" .
+              " && python Tracer.py ${root} formatter 2>&1";
+	my $log1;
+	printf ("Execute ${cmd1}\n");
+	`$cmd1`;
+	system($cmd1);
+	exec($cmd1);
+	my $ret1 = Utils::exec_cmd($cmd1, "Running Tracer formatter", \$log1);
+	print($log1);
+	
+	my $cmd = " cd tracing" .
               " && python Tracer.py ${root} start 2>&1";
 	my $log;
 	printf ("Execute ${cmd}\n");

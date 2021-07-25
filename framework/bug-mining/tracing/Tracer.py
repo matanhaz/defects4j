@@ -46,10 +46,6 @@ class Tracer:
         self.command_port = 5552
         self.agent_port = 5551
         self.xml_path = xml_path
-        self.element_tree = et.parse(self.xml_path)
-        print('self.element_tree')
-        self.set_junit_formatter()
-        self.element_tree.write(self.xml_path, xml_declaration=True)
         p = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
         bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0], 'framework', 'projects')
         self.path_to_result_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "result.xml"))
@@ -58,7 +54,8 @@ class Tracer:
 
     def set_junit_formatter(self):
         print('set_junit_formatter')
-        junit = list(filter(lambda x: x.tag == 'junit', self.element_tree.iter()))
+        element_tree = et.parse(self.xml_path)
+        junit = list(filter(lambda x: x.tag == 'junit', element_tree.iter()))
         if junit:
             for j in junit:
                 j.attrib.update({'fork': 'yes'})
@@ -76,6 +73,7 @@ class Tracer:
                 arg_line = r'-javaagent:{JCOV_JAR_PATH}=grabber,port={PORT},include_list={CLASSES_FILE},template={OUT_TEMPLATE},type=method'.format(
                     JCOV_JAR_PATH=Tracer.JCOV_JAR_PATH, PORT=self.agent_port, CLASSES_FILE=Tracer.path_to_classes_file, OUT_TEMPLATE=Tracer.path_to_out_template)
                 jvmarg.attrib.update({'value': arg_line})
+        element_tree.write(self.xml_path, xml_declaration=True)
 
     def get_classes_path(self):
         all_classes = {os.path.dirname(self.xml_path)}
@@ -160,7 +158,8 @@ if __name__ == '__main__':
     if len(sys.argv) == 3:
         if sys.argv[-1] == 'start':
             t.execute_jcov_process()
+        elif sys.argv[-1] == 'formatter':
+            t.set_junit_formatter()
         else:
-            # t.stop_grabber()
-            pass
+            t.stop_grabber()
 
