@@ -395,6 +395,9 @@ sub _trace_tests {
               " && python Tracer.py ${root} start 2>&1";
 	my $log;
 	printf ("Execute ${cmd}\n");
+	`$cmd`;
+	system($cmd);
+	exec($cmd);
 	my $ret = Utils::exec_cmd($cmd, "Running Tracer start", \$log);
 	print($log);
 
