@@ -404,6 +404,7 @@ sub _trace_tests {
 	my $log;
 	printf ("Execute ${cmd}\n");
 	`$cmd`;
+	printf ("Execute ${cmd} new\n");
 	system($cmd);
 	# my $ret = Utils::exec_cmd($cmd, "Running Tracer start", \$log);
 	# print($log);
