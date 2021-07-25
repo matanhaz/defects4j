@@ -27,7 +27,10 @@ class JcovParser(object):
     def parse(self, delete_dir_when_finished=False):
         for jcov_file in self.jcov_files:
             test_name = os.path.splitext(os.path.basename(jcov_file))[0].lower()
-            yield self._parse_jcov_file(jcov_file, test_name)
+            try:
+                yield self._parse_jcov_file(jcov_file, test_name)
+            except:
+                pass
         if delete_dir_when_finished:
             shutil.rmtree(self.target_dir)
 
