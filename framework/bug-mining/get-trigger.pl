@@ -391,7 +391,7 @@ sub _trace_tests {
     $project->compile_tests() or die;
 
 	my $cmd1 = " cd tracing" .
-              " && python Tracer.py ${root} formatter 2>&1";
+				" && python Tracer.py ${root} formatter 2>&1";
 	my $log1;
 	printf ("Execute ${cmd1}\n");
 	# `$cmd1`;
