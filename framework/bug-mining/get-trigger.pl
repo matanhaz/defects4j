@@ -396,8 +396,6 @@ sub _trace_tests {
 	printf ("Execute ${cmd1}\n");
 	# `$cmd1`;
 	system($cmd1);
-	# my $ret1 = Utils::exec_cmd($cmd1, "Running Tracer formatter", \$log1);
-	# print($log1);
 
 	my $cmd3 = " cd tracing" .
               " && python Tracer.py ${root} template 2>&1";
@@ -405,8 +403,6 @@ sub _trace_tests {
 	printf ("Execute ${cmd3}\n");
 	# `$cmd3`;
 	system($cmd3);
-	# my $ret3 = Utils::exec_cmd($cmd3, "Running Tracer formatter", \$log3);
-	# print($log3);
 	
 	my $cmd4 = " cd tracing" .
               " && python Tracer.py ${root} grabber 2>&1 &";
@@ -414,18 +410,9 @@ sub _trace_tests {
 	printf ("Execute ${cmd4}\n");
 	# `$cmd4`;
 	system($cmd4);
-	# my $ret3 = Utils::exec_cmd($cmd3, "Running Tracer formatter", \$log3);
-	# print($log3);
 	
-	# my $cmd = " cd tracing" .
-    #           " && python Tracer.py ${root} start 2>&1";
-	# my $log;
-	# printf ("Execute ${cmd}\n");
-	# `$cmd`;
-	# printf ("Execute ${cmd} new\n");
-	# system($cmd);
-	# my $ret = Utils::exec_cmd($cmd, "Running Tracer start", \$log);
-	# print($log);
+    # Clean output file
+    system(">$TESTS_FILE");
 
     # Run tests and get number of failing tests
     $project->run_tests($TESTS_FILE) or die;
