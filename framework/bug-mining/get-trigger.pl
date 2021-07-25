@@ -385,47 +385,24 @@ sub _trace_tests {
     my ($project, $root, $vid) = @_;
     $project->{prog_root} = $root;
     $project->checkout_vid($vid, $root, 1) or die;
-
     # Compile src and test
     $project->compile() or die;
     $project->compile_tests() or die;
-
 	my $cmd1 = " cd tracing" .
-				" && python Tracer.py ${root} formatter 2>&1";
-	my $log1;
-	printf ("Execute ${cmd1}\n");
-	# `$cmd1`;
+				" && python Tracer.py ${root} formatter >/dev/null 2>&1";
 	system($cmd1);
-
 	my $cmd3 = " cd tracing" .
-              " && python Tracer.py ${root} template 2>&1";
-	my $log3;
-	printf ("Execute ${cmd3}\n");
-	# `$cmd3`;
+              " && python Tracer.py ${root} template >/dev/null 2>&1";
 	system($cmd3);
-	
 	my $cmd4 = " cd tracing" .
               " && python Tracer.py ${root} grabber 2>&1 &";
-	my $log4;
-	printf ("Execute ${cmd4}\n");
-	# `$cmd4`;
 	system($cmd4);
-	
-    # Clean output file
+
     system(">$TESTS_FILE");
-
-    # Run tests and get number of failing tests
     $project->run_tests($TESTS_FILE) or die;
-
-	# Set up environment before running ant
     my $cmd2 = " cd tracing" .
               " && python Tracer.py ${root} stop 2>&1";
-
-	my $log2;
-	printf ("Execute ${cmd2}\n");
 	system($cmd2);
-    # my $ret2 = Utils::exec_cmd($cmd2, "Running Tracer stop", \$log2);
-	# print($log2);
 }
 
 #
