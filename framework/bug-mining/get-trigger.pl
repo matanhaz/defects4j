@@ -251,7 +251,7 @@ foreach my $bid (@bids) {
 
 $dbh_trigger->disconnect();
 $dbh_revs->disconnect();
-# system("rm -rf $TMP_DIR");
+system("rm -rf $TMP_DIR");
 
 #
 # Get bug ids from TAB_REV_PAIRS
@@ -393,7 +393,7 @@ sub _trace_tests {
 	system("cd tracing && python Tracer.py ${root} grabber 2>&1 &");
 	sleep(20);
     # $project->run_tests($TESTS_FILE) or die;
-    $project->_ant_call_comp("test", "-keep-going")  or die;
+    $project->_ant_call_comp("test", "-keep-going");
 	system(" cd tracing && python Tracer.py ${root} stop 2>&1");
 }
 
