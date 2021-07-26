@@ -388,20 +388,16 @@ sub _trace_tests {
     # Compile src and test
     $project->compile() or die;
     $project->compile_tests() or die;
-	my $cmd1 = " cd tracing" .
-				" && python Tracer.py ${root} formatter >/dev/null 2>&1";
+	my $cmd1 = "cd tracing && python Tracer.py ${root} formatter >/dev/null 2>&1";
 	system($cmd1);
-	my $cmd3 = " cd tracing" .
-              " && python Tracer.py ${root} template >/dev/null 2>&1";
+	my $cmd3 = "cd tracing && python Tracer.py ${root} template >/dev/null 2>&1";
 	system($cmd3);
-	my $cmd4 = " cd tracing" .
-              " && python Tracer.py ${root} grabber 2>&1 &";
+	my $cmd4 = "cd tracing && python Tracer.py ${root} grabber 2>&1 &";
 	system($cmd4);
 
     system(">$TESTS_FILE");
     $project->run_tests($TESTS_FILE) or die;
-    my $cmd2 = " cd tracing" .
-              " && python Tracer.py ${root} stop 2>&1";
+    my $cmd2 = " cd tracing && python Tracer.py ${root} stop 2>&1";
 	system($cmd2);
 }
 
