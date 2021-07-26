@@ -392,7 +392,7 @@ sub _trace_tests {
 	system("cd tracing && python Tracer.py ${root} template >/dev/null 2>&1");
 	system("cd tracing && python Tracer.py ${root} grabber 2>&1 &");
 	sleep(20);
-    $project->run_tests() or die;
+    $project->run_tests($TESTS_FILE) or die;
 	system(" cd tracing && python Tracer.py ${root} stop 2>&1");
 }
 
