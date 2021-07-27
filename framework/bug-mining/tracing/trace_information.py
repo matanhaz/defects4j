@@ -1,6 +1,5 @@
 import re
 from functools import reduce
-from networkx import nx
 
 
 class PrimitiveTypes(object):
