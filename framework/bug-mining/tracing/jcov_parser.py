@@ -29,8 +29,8 @@ class JcovParser(object):
             test_name = os.path.splitext(os.path.basename(jcov_file))[0].lower()
             try:
                 yield self._parse_jcov_file(jcov_file, test_name)
-            except:
-                pass
+            except Exception as e:
+                print(e)
         if delete_dir_when_finished:
             shutil.rmtree(self.target_dir)
 
