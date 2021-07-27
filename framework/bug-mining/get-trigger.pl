@@ -128,11 +128,11 @@ unshift(@INC, "$WORK_DIR/framework/core");
 
 # Override global constants
 $REPO_DIR = "$WORK_DIR/project_repos";
-my $PROJECTS_DIR = "$WORK_DIR/framework/projects";
+$PROJECTS_DIR = "$WORK_DIR/framework/projects";
 
 # Set the projects and repository directories to the current working directory.
-my $PATCH_DIR   = "$PROJECT_DIR/patches";
-my $BUGS_FILE   = "$PROJECT_DIR/bugs.json";
+my $PATCHES_DIR = "$PROJECTS_DIR/$PID/patches";
+my $BUGS_FILE = "$PROJECTS_DIR/$PID/bugs.json";
 
 # Temporary directory
 my $TMP_DIR = Utils::get_tmp_dir();
