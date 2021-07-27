@@ -131,7 +131,6 @@ $REPO_DIR = "$WORK_DIR/project_repos";
 $PROJECTS_DIR = "$WORK_DIR/framework/projects";
 
 # Set the projects and repository directories to the current working directory.
-my $PROJECTS_DIR = "$WORK_DIR/framework/projects";
 my $PATCH_DIR   = "$PROJECT_DIR/patches";
 my $BUGS_FILE   = "$PROJECT_DIR/bugs.json";
 
