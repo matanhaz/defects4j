@@ -390,8 +390,8 @@ sub _trace_tests {
     # Compile src and test
     $project->compile() or die;
     $project->compile_tests() or die;
-	system("cd tracing && python Tracer.py ${root} formatter >/dev/null 2>&1");
-	system("cd tracing && python Tracer.py ${root} template >/dev/null 2>&1");
+	system("cd tracing && python Tracer.py ${root} formatter 2>&1");
+	system("cd tracing && python Tracer.py ${root} template  2>&1");
 	system("cd tracing && python Tracer.py ${root} grabber 2>&1 &");
 	sleep(20);
     # $project->run_tests($TESTS_FILE) or die;
@@ -406,7 +406,7 @@ sub get_buggy_functions{
     my ($project, $root, $vid, $patch_file) = @_;
     $project->{prog_root} = $root;
     $project->checkout_vid($vid, $root, 1) or die;
-	system("cd tracing && python Tracer.py ${root} ${patch_file} ${BUGS_FILE} patch >/dev/null 2>&1");
+	system("cd tracing && python Tracer.py ${root} ${patch_file} ${BUGS_FILE} patch  2>&1");
 }
 
 #

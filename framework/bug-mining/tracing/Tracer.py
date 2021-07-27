@@ -13,10 +13,10 @@ try:
     import javadiff.javadiff.diff as diff
 except:
     import javadiff.diff as diff
-
 import git
 from sfl.sfl.Diagnoser.diagnoserUtils import write_json_planning_file
 from functools import reduce
+
 
 class TestResult(object):
     def __init__(self, junit_test, suite_name=None, report_file=None):
