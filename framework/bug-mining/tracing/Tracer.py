@@ -180,7 +180,7 @@ class Tracer:
         if os.path.exists(patch_file):
             repo.git.apply(patch_file)
         with open(save_to, "w") as f:
-            json.dump(list(map(lambda x: x.split("@")[1].lower().replace(',', ';'), diff.get_modified_functions(os.path.dirname(self.xml_path)))), f)
+            json.dump(list(map(lambda x: x.method_name_parameters.lower().replace(',', ';'), diff.get_modified_functions(os.path.dirname(self.xml_path)))), f)
 
 
 if __name__ == '__main__':
