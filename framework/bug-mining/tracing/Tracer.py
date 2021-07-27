@@ -186,15 +186,14 @@ class Tracer:
 if __name__ == '__main__':
     t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'))
     print(t.__dict__)
-    if len(sys.argv) == 3:
-        if sys.argv[-1] == 'template':
-            t.execute_template_process()
-        elif sys.argv[-1] == 'grabber':
-            t.execute_grabber_process()
-        elif sys.argv[-1] == 'formatter':
-            t.set_junit_formatter()
-        elif sys.argv[-1] == 'patch':
-            t.get_buggy_functions(sys.argv[2], sys.argv[3])
-        else:
-            t.stop_grabber(sys.argv[2])
+    if sys.argv[-1] == 'template':
+        t.execute_template_process()
+    elif sys.argv[-1] == 'grabber':
+        t.execute_grabber_process()
+    elif sys.argv[-1] == 'formatter':
+        t.set_junit_formatter()
+    elif sys.argv[-1] == 'patch':
+        t.get_buggy_functions(sys.argv[2], sys.argv[3])
+    else:
+        t.stop_grabber(sys.argv[2])
 
