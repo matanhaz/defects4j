@@ -145,6 +145,7 @@ class Tracer:
         fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 0, tests_details))), set())
         fail_components = fail_components - tests_names
         optimized_tests = list(map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]), tests_details))
+        print(optimized_tests)
         bugs = []
         with open(bugs_file) as f:
             bugs = json.loads(f.read())
