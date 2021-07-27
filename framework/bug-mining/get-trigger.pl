@@ -132,6 +132,8 @@ $PROJECTS_DIR = "$WORK_DIR/framework/projects";
 
 # Set the projects and repository directories to the current working directory.
 my $PROJECTS_DIR = "$WORK_DIR/framework/projects";
+my $PATCH_DIR   = "$PROJECT_DIR/patches";
+my $BUGS_FILE   = "$PROJECT_DIR/bugs.json";
 
 # Temporary directory
 my $TMP_DIR = Utils::get_tmp_dir();
@@ -244,6 +246,7 @@ foreach my $bid (@bids) {
         }
     }
 
+	get_buggy_functions($project, "$TMP_DIR/v4", "${bid}f", "$PATCH_DIR/$bid.src.patch");
 	_trace_tests($project, "$TMP_DIR/v3", "${bid}b");
     # Add data
     _add_row(\%data);
@@ -394,7 +397,17 @@ sub _trace_tests {
 	sleep(20);
     # $project->run_tests($TESTS_FILE) or die;
     $project->_ant_call_comp("test", "-keep-going");
-	system(" cd tracing && python Tracer.py ${root} stop 2>&1");
+	system(" cd tracing && python Tracer.py ${root} ${BUGS_FILE} stop 2>&1");
+}
+
+#
+# trace
+#
+sub get_buggy_functions{
+    my ($project, $root, $vid, $patch_file) = @_;
+    $project->{prog_root} = $root;
+    $project->checkout_vid($vid, $root, 1) or die;
+	system("cd tracing && python Tracer.py ${root} ${patch_file} ${BUGS_FILE} patch >/dev/null 2>&1");
 }
 
 #

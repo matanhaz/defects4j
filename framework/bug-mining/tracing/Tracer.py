@@ -9,7 +9,10 @@ from subprocess import Popen, PIPE, run
 from jcov_parser import JcovParser
 et.register_namespace('', "http://maven.apache.org/POM/4.0.0")
 et.register_namespace('xsi', "http://www.w3.org/2001/XMLSchema-instance")
-
+import javadiff.diff
+import git
+from sfl.sfl.Diagnoser.diagnoserUtils import write_json_planning_file
+from functools import reduce
 
 class TestResult(object):
     def __init__(self, junit_test, suite_name=None, report_file=None):
@@ -50,6 +53,8 @@ class Tracer:
         bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0], 'framework', 'projects')
         self.path_to_result_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "result.xml"))
         self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "test_details.json"))
+        self.buggy_functions = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "buggy_functions.json"))
+        self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "matrix.json"))
         self.test_results = {}
 
     def set_junit_formatter(self):
@@ -119,7 +124,10 @@ class Tracer:
         assert p.poll() is None
         assert self.check_if_grabber_is_on()
 
-    def stop_grabber(self):
+    def stop_grabber(self, bugs_file):
+        def make_nice_trace(t):
+            return list(map(lambda x: x.lower().replace("java.lang.", "").replace("java.io.", "").replace("java.util.", ""), t))
+
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-save", '-command_port', str(self.command_port)]).communicate()
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-stop", '-command_port', str(self.command_port)]).communicate()
         traces = list(JcovParser(os.path.dirname(self.path_to_result_file), True, True).parse(False))[0].split_to_subtraces()
@@ -128,8 +136,17 @@ class Tracer:
         tests_details = []
         for t in relevant_traces:
             tests_details.append((t, traces[t].get_trace(), 0 if self.test_results[t.split('(')[0].lower()].outcome == 'pass' else 1))
+        tests_details = list(filter(lambda x: x[1], tests_details))
+        tests_names = set(list(map(lambda x: x[0], tests_details)) + list(map(lambda x: x[0].lower(), tests_details)))
+        fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 0, tests_details))), set())
+        fail_components = fail_components - tests_names
+        optimized_tests = list(map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]), tests_details))
+        bugs = []
+        with open(bugs_file) as f:
+            bugs = json.loads(f.read())
         with open(self.path_to_tests_details, "w") as f:
             json.dump(tests_details, f)
+        write_json_planning_file(self.matrix, optimized_tests, bugs)
 
     def get_xml_files(self):
         for root, _, files in os.walk(os.path.dirname(self.xml_path)):
@@ -153,6 +170,13 @@ class Tracer:
                 json.dump(list(map(lambda x: self.test_results[x].as_dict(), self.test_results)), f)
         return self.test_results
 
+    def get_buggy_functions(self, patch_file, save_to):
+        repo = git.Repo(os.path.dirname(self.xml_path))
+        if os.path.exists(patch_file):
+            repo.git.apply(patch_file)
+        with open(save_to, "w") as f:
+            json.dump(list(map(lambda x: x.split("@")[1].lower().replace(',', ';'), javadiff.diff.get_modified_functions(os.path.dirname(self.xml_path)))), f)
+
 
 if __name__ == '__main__':
     t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'))
@@ -164,6 +188,8 @@ if __name__ == '__main__':
             t.execute_grabber_process()
         elif sys.argv[-1] == 'formatter':
             t.set_junit_formatter()
+        elif sys.argv[-1] == 'patch':
+            t.get_buggy_functions(sys.argv[2], sys.argv[3])
         else:
-            t.stop_grabber()
+            t.stop_grabber(sys.argv[2])
 
