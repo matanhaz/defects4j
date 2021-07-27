@@ -245,7 +245,7 @@ foreach my $bid (@bids) {
         }
     }
 
-	get_buggy_functions($project, "$TMP_DIR/v4", "${bid}f", "$PATCH_DIR/$bid.src.patch");
+	get_buggy_functions($project, "$TMP_DIR/v4", "${bid}f", "$PATCHES_DIR/$bid.src.patch");
 	_trace_tests($project, "$TMP_DIR/v3", "${bid}b");
     # Add data
     _add_row(\%data);
