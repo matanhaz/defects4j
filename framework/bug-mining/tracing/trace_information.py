@@ -72,7 +72,7 @@ class HitInformation(object):
     def __init__(self, method_name, lst):
         assert len(lst) == 4
         self.method_name = method_name
-        self.count, self.previous_slot, self.parent , self.test_slot = lst
+        self.count, self.previous_slot, self.parent, self.test_slot, self.test_parent, self.test_previous = lst
 
     def set_previous_method(self, method_name_by_id):
         self.previous_method = method_name_by_id.get(self.previous_slot, 'None')
@@ -123,7 +123,7 @@ class TraceElement(object):
         tests = {}
         for h in self.hits_information:
             if h.test_slot != -1:
-                tests.setdefault(h.test_slot, []).append(h)
+                tests.setdefault((h.test_slot, h.test_parent, h.test_previous), []).append(h)
         for t in tests:
             trace = TraceElement(self.jcov_data, {self.id : self.method_name})
             trace.hits_information = tests[t]
@@ -148,7 +148,7 @@ class Trace(object):
 
     def split_to_subtraces(self):
         tests = list(filter(lambda x: x.method_name.split('.')[-2].endswith('Test') and x.method_name.split('.')[-1].startswith('test'), list(self.trace.values())))
-        tests_slots = dict(list(map(lambda x: (x.id, x), tests)) + list(map(lambda x: (x.extra_slot, x), tests)))
+        tests_slots = dict(list(map(lambda x: ((x.id, x.hits_information[0].parent, x.hits_information[0].previous_slot), x), tests)) + list(map(lambda x: ((x.extra_slot, x.hits_information[0].parent, x.hits_information[0].previous_slot), x), tests)))
         test_traces = {}
         traces = {}
         for t in tests:
