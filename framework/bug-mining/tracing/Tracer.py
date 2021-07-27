@@ -9,7 +9,11 @@ from subprocess import Popen, PIPE, run
 from jcov_parser import JcovParser
 et.register_namespace('', "http://maven.apache.org/POM/4.0.0")
 et.register_namespace('xsi', "http://www.w3.org/2001/XMLSchema-instance")
-import javadiff.diff
+try:
+    import javadiff.javadiff.diff as diff
+except:
+    import javadiff.diff as diff
+
 import git
 from sfl.sfl.Diagnoser.diagnoserUtils import write_json_planning_file
 from functools import reduce
@@ -175,7 +179,7 @@ class Tracer:
         if os.path.exists(patch_file):
             repo.git.apply(patch_file)
         with open(save_to, "w") as f:
-            json.dump(list(map(lambda x: x.split("@")[1].lower().replace(',', ';'), javadiff.diff.get_modified_functions(os.path.dirname(self.xml_path)))), f)
+            json.dump(list(map(lambda x: x.split("@")[1].lower().replace(',', ';'), diff.get_modified_functions(os.path.dirname(self.xml_path)))), f)
 
 
 if __name__ == '__main__':
