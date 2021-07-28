@@ -70,7 +70,7 @@ class Signature(object):
 
 class HitInformation(object):
     def __init__(self, method_name, lst):
-        assert len(lst) == 4
+        assert len(lst) == 6
         self.method_name = method_name
         self.count, self.previous_slot, self.parent, self.test_slot, self.test_parent, self.test_previous = lst
 

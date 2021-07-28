@@ -61,7 +61,7 @@ class JcovParser(object):
                 yield next(f).strip()
 
     def _get_methods_lines(self):
-        with open(self.jcov_files[0]) as f:
+        with open(list(filter(lambda x: 'result' in os.path.basename(x).lower(), self.jcov_files))[0]) as f:
             return list(map(lambda line: line[0], filter(lambda line: any(list(map(lambda prefix: prefix in line[1], self.prefixes))), filter(lambda line: JcovParser.CLOSER in line[1], enumerate(f.readlines())))))
 
     @staticmethod
@@ -78,7 +78,7 @@ class JcovParser(object):
         return elements
 
     def _get_method_ids(self, short_type):
-        root = et.parse(self.jcov_files[0]).getroot()
+        root = et.parse(list(filter(lambda x: 'result' in os.path.basename(x).lower(), self.jcov_files))[0]).getroot()
         method_ids = {}
         for method_path, method in JcovParser.get_elements_by_path(root, ['package', 'class', 'meth']):
             package_name, class_name, method_name = list(map(lambda elem: elem.attrib['name'], method_path))
@@ -117,4 +117,3 @@ def block_to_comps(block):
     function_name = ".".join(splitted[:-1])
     block_name = ".".join(splitted)
     return [package_name, class_name, function_name, block_name]
-
