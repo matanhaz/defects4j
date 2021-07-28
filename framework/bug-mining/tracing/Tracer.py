@@ -54,11 +54,12 @@ class Tracer:
         self.agent_port = 5551
         self.xml_path = xml_path
         p = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        ind = list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0].split('_')[1]
         bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0], 'framework', 'projects')
         self.path_to_result_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "result.xml"))
         self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "test_details.json"))
         self.buggy_functions = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "buggy_functions.json"))
-        self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "matrix.json"))
+        self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{ind}.json"))
         self.test_results = {}
 
     def set_junit_formatter(self):
