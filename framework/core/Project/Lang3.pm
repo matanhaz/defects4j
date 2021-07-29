@@ -24,7 +24,7 @@
 
 =head1 NAME
 
-Project::Lang.pm -- L<Project> submodule for Commons-lang.
+Project::Lang3.pm -- L<Project> submodule for Commons-lang.
 
 =head1 DESCRIPTION
 
@@ -41,7 +41,7 @@ use Constants;
 use Vcs::Git;
 
 our @ISA = qw(Project);
-my $PID  = "Lang";
+my $PID  = "Lang3";
 
 sub new {
     @_ == 1 or die $ARG_ERROR;
