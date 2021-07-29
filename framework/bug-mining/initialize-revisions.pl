@@ -129,6 +129,7 @@ sub _init_version {
 
     # Use the VCS checkout routine, which does not apply the cached, possibly
     # minimized patch to obtain the buggy version.
+	printf ("checkout_vid %4d for : $project->{prog_name}\n", $bid);
     $project->{_vcs}->checkout_vid("${vid}", $work_dir) or die "Cannot checkout $vid version";
 
     if (defined $SUBPROJ) {
@@ -214,6 +215,7 @@ foreach my $bid (@ids) {
 
     # Populate the layout map and patches directory
     _bootstrap($project, $bid);
+    printf ("%4d after _bootstrap: $project->{prog_name}\n", $bid);
 
     # Defects4J cannot handle empty patch files -> skip the sanity check since
     # these candidates are filtered in a later step anyway.
