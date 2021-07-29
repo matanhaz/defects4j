@@ -32,7 +32,7 @@ This module provides all project-specific configurations and subroutines for the
 Commons-lang project.
 
 =cut
-package Project::Lang;
+package Project::Lang3;
 
 use strict;
 use warnings;
