@@ -33,6 +33,11 @@ class TestResult(object):
     def __repr__(self):
         return "{full_name}: {outcome}".format(full_name=self.full_name, outcome=self.outcome)
 
+    def set_failure(self, fail):
+        if fail:
+            self.outcome = 'failure'
+        self.outcome = 'pass'
+
     def is_passed(self):
         return self.outcome == 'pass'
 
@@ -58,6 +63,8 @@ class Tracer:
         bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0], 'framework', 'projects')
         self.path_to_result_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "result.xml"))
         self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "test_details.json"))
+        trigger_tests = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "trigger_tests"))
+        self.path_to_trigger_tests = os.path.join(trigger_tests, os.listdir(trigger_tests)[0])
         self.buggy_functions = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "buggy_functions.json"))
         self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{ind}.json"))
         self.test_results = {}
@@ -160,20 +167,20 @@ class Tracer:
                 if name.endswith('.xml'):
                     yield os.path.join(root, name)
 
-    def observe_tests(self, save_to=None):
+    def observe_tests(self):
         self.test_results = {}
+        with open(self.path_to_trigger_tests) as f:
+            trigger_tests = list(map(lambda x: x[4:-1].replace('::', '.').lower() + '()', filter(lambda l: l.startswith('---'), f.readlines())))
         for report in self.get_xml_files():
             try:
                 suite = JUnitXml.fromfile(report)
                 for case in suite:
                     test = TestResult(case, suite.name, report)
+                    test.set_failure(test.full_name.lower() in trigger_tests)
                     self.test_results[test.full_name.lower()] = test
             except Exception as e:
                 print(e, report)
                 pass
-        if save_to:
-            with open(save_to, "w") as f:
-                json.dump(list(map(lambda x: self.test_results[x].as_dict(), self.test_results)), f)
         return self.test_results
 
     def get_buggy_functions(self, patch_file, save_to):
