@@ -171,6 +171,7 @@ class Tracer:
         self.test_results = {}
         with open(self.path_to_trigger_tests) as f:
             trigger_tests = list(map(lambda x: x[4:-1].replace('::', '.').lower() + '()', filter(lambda l: l.startswith('---'), f.readlines())))
+        print(trigger_tests)
         for report in self.get_xml_files():
             try:
                 suite = JUnitXml.fromfile(report)
