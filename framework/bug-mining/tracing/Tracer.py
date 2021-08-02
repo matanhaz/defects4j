@@ -63,6 +63,7 @@ class Tracer:
         self.path_to_out_template = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "template.xml"))
         self.path_to_classes_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "classes"))
         self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "test_details.json"))
+        self.path_to_tests_results = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "test_results.json"))
         trigger_tests = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "trigger_tests"))
         self.path_to_trigger_tests = os.path.join(trigger_tests, os.listdir(trigger_tests)[0])
         self.buggy_functions = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "buggy_functions.json"))
@@ -70,7 +71,6 @@ class Tracer:
         self.test_results = {}
 
     def set_junit_formatter(self):
-        print('set_junit_formatter')
         element_tree = et.parse(self.xml_path)
         junit = list(filter(lambda x: x.tag == 'junit', element_tree.iter()))
         if junit:
@@ -99,7 +99,6 @@ class Tracer:
                 if f.endswith('class'):
                     all_classes.add(root)
                     break
-        print(all_classes)
         return all_classes
 
     def template_creator_cmd_line(self):
@@ -123,7 +122,6 @@ class Tracer:
             return False
 
     def execute_template_process(self):
-        print(self.template_creator_cmd_line())
         run(self.template_creator_cmd_line())
         for path in [self.path_to_classes_file, self.path_to_out_template]:
             if path:
@@ -131,7 +129,6 @@ class Tracer:
                     assert f.read(), "{0} is empty".format(path)
 
     def execute_grabber_process(self):
-        print(self.grabber_cmd_line())
         p = Popen(self.grabber_cmd_line())
         assert p.poll() is None
         assert self.check_if_grabber_is_on()
@@ -153,7 +150,6 @@ class Tracer:
         fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 0, tests_details))), set())
         fail_components = fail_components - tests_names
         optimized_tests = list(map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]), tests_details))
-        print(optimized_tests)
         bugs = []
         with open(bugs_file) as f:
             bugs = json.loads(f.read())
@@ -171,7 +167,6 @@ class Tracer:
         self.test_results = {}
         with open(self.path_to_trigger_tests) as f:
             trigger_tests = list(map(lambda x: x[4:-1].replace('::', '.').lower() + '()', filter(lambda l: l.startswith('---'), f.readlines())))
-        print(trigger_tests)
         for report in self.get_xml_files():
             try:
                 suite = JUnitXml.fromfile(report)
@@ -182,6 +177,8 @@ class Tracer:
             except Exception as e:
                 print(e, report)
                 pass
+        with open(self.path_to_tests_results, "w") as f:
+            json.dump(self.test_results, f)
         return self.test_results
 
     def get_buggy_functions(self, patch_file, save_to):
@@ -194,7 +191,6 @@ class Tracer:
 
 if __name__ == '__main__':
     t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'))
-    print(t.__dict__)
     if sys.argv[-1] == 'template':
         t.execute_template_process()
     elif sys.argv[-1] == 'grabber':
