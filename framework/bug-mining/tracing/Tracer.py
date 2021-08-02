@@ -50,8 +50,6 @@ class TestResult(object):
 
 class Tracer:
     JCOV_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "jcov.jar")
-    path_to_classes_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "classes")
-    path_to_out_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "template.xml")
 
     def __init__(self, xml_path):
         self.classes_dir = None
@@ -62,6 +60,8 @@ class Tracer:
         ind = list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0].split('_')[1]
         bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0], 'framework', 'projects')
         self.path_to_result_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "result.xml"))
+        self.path_to_out_template = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "template.xml"))
+        self.path_to_classes_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "classes"))
         self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "test_details.json"))
         trigger_tests = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "trigger_tests"))
         self.path_to_trigger_tests = os.path.join(trigger_tests, os.listdir(trigger_tests)[0])
@@ -88,7 +88,7 @@ class Tracer:
                 else:
                     jvmarg = et.SubElement(j, 'jvmarg')
                 arg_line = r'-javaagent:{JCOV_JAR_PATH}=grabber,port={PORT},include_list={CLASSES_FILE},template={OUT_TEMPLATE},type=method'.format(
-                    JCOV_JAR_PATH=Tracer.JCOV_JAR_PATH, PORT=self.agent_port, CLASSES_FILE=Tracer.path_to_classes_file, OUT_TEMPLATE=Tracer.path_to_out_template)
+                    JCOV_JAR_PATH=Tracer.JCOV_JAR_PATH, PORT=self.agent_port, CLASSES_FILE=self.path_to_classes_file, OUT_TEMPLATE=self.path_to_out_template)
                 jvmarg.attrib.update({'value': arg_line})
         element_tree.write(self.xml_path, xml_declaration=True)
 
@@ -103,12 +103,12 @@ class Tracer:
         return all_classes
 
     def template_creator_cmd_line(self):
-        cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'tmplgen', '-verbose', '-t', Tracer.path_to_out_template, '-c', Tracer.path_to_classes_file, '-type', 'method']
+        cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'tmplgen', '-verbose', '-t', self.path_to_out_template, '-c', self.path_to_classes_file, '-type', 'method']
         cmd_line.extend(self.get_classes_path())
         return cmd_line
 
     def grabber_cmd_line(self):
-            cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'grabber', '-vv', '-port', self.agent_port, '-command_port', self.command_port, '-t', Tracer.path_to_out_template, '-o', self.path_to_result_file]
+            cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'grabber', '-vv', '-port', self.agent_port, '-command_port', self.command_port, '-t', self.path_to_out_template, '-o', self.path_to_result_file]
             return list(map(str, cmd_line))
 
     def check_if_grabber_is_on(self):
