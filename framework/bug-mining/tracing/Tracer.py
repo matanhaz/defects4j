@@ -178,7 +178,7 @@ class Tracer:
                 print(e, report)
                 pass
         with open(self.path_to_tests_results, "w") as f:
-            json.dump(self.test_results, f)
+            json.dump(list(map(lambda x: x.as_dict(), self.test_results.values())), f)
         return self.test_results
 
     def get_buggy_functions(self, patch_file, save_to):
