@@ -12,9 +12,15 @@ et.register_namespace('xsi', "http://www.w3.org/2001/XMLSchema-instance")
 try:
     import javadiff.javadiff.diff as diff
 except:
-    import javadiff.diff as diff
+    try:
+        import javadiff.diff as diff
+    except:
+        pass
 import git
-from sfl.sfl.Diagnoser.diagnoserUtils import write_json_planning_file
+try:
+    from sfl.sfl.Diagnoser.diagnoserUtils import write_json_planning_file
+except:
+    pass
 from functools import reduce
 
 
@@ -166,7 +172,7 @@ class Tracer:
     def observe_tests(self):
         self.test_results = {}
         with open(self.path_to_trigger_tests) as f:
-            trigger_tests = list(map(lambda x: x[4:-1].replace('::', '.').lower() + '()', filter(lambda l: l.startswith('---'), f.readlines())))
+            trigger_tests = list(map(lambda x: x[4:-1].replace('::', '.').lower(), filter(lambda l: l.startswith('---'), f.readlines())))
         for report in self.get_xml_files():
             try:
                 suite = JUnitXml.fromfile(report)
