@@ -41,7 +41,6 @@ class TestResult(object):
 
     def set_failure(self, fail):
         if fail:
-            print(f'set_failure {fail} to {self.full_name}')
             self.outcome = 'failure'
         else:
             self.outcome = 'pass'
@@ -150,6 +149,7 @@ class Tracer:
         traces = list(JcovParser(os.path.dirname(self.path_to_result_file), True, True).parse(False))[0].split_to_subtraces()
         self.observe_tests()
         relevant_traces = list(filter(lambda t: t.split('(')[0].lower() in self.test_results, traces))
+        print(relevant_traces)
         tests_details = []
         for t in relevant_traces:
             tests_details.append((t, traces[t].get_trace(), 0 if self.test_results[t.split('(')[0].lower()].outcome == 'pass' else 1))
@@ -175,7 +175,6 @@ class Tracer:
         self.test_results = {}
         with open(self.path_to_trigger_tests) as f:
             trigger_tests = list(map(lambda x: x[4:-1].replace('::', '.').lower(), filter(lambda l: l.startswith('---'), f.readlines())))
-        print(trigger_tests)
         for report in self.get_xml_files():
             try:
                 suite = JUnitXml.fromfile(report)
