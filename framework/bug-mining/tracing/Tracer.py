@@ -43,7 +43,8 @@ class TestResult(object):
         if fail:
             print(f'set_failure {fail} to {self.full_name}')
             self.outcome = 'failure'
-        self.outcome = 'pass'
+        else:
+            self.outcome = 'pass'
 
     def is_passed(self):
         return self.outcome == 'pass'
