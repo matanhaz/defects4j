@@ -125,7 +125,7 @@ class TraceElement(object):
             if h.test_slot != -1:
                 tests.setdefault((h.test_slot, h.test_parent, h.test_previous), []).append(h)
         for t in tests:
-            trace = TraceElement(self.jcov_data, {self.id : self.method_name})
+            trace = TraceElement(self.jcov_data, {self.id: self.method_name})
             trace.hits_information = tests[t]
             trace.count = sum(list(map(lambda h: h.count, tests[t])))
             traces[t] = (trace.id, trace)

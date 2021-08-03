@@ -236,4 +236,4 @@ print("\n--- Add the following to the <fileset> tag identified by the id 'all.ma
 system("cat $ANALYZER_OUTPUT/*/includes | sort -u | while read -r include; do echo \"<include name='\"\$include\"' />\"; done");
 system("cat $ANALYZER_OUTPUT/*/excludes | sort -u | while read -r exclude; do echo \"<exclude name='\"\$exclude\"' />\"; done");
 
-# system("rm -rf $TMP_DIR");
+system("rm -rf $TMP_DIR");
