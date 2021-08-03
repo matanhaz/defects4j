@@ -41,6 +41,7 @@ class TestResult(object):
 
     def set_failure(self, fail):
         if fail:
+            print(f'set_failure {fail} to {self.full_name}')
             self.outcome = 'failure'
         self.outcome = 'pass'
 
