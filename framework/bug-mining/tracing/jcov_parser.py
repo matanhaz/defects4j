@@ -11,12 +11,15 @@ class JcovParser(object):
     CLOSER = "/>"
     METH = "<meth"
     METHENTER = "<meth"
-    CSV_HEADER = ["component", "hit_count"]
 
-    def __init__(self, xml_folder_dir, instrument_only_methods=True, short_type=True):
-        self.target_dir = xml_folder_dir
-        self.jcov_files = list(filter(os.path.exists, map(lambda name: os.path.join(self.target_dir, name),
-                              filter(lambda name: name.endswith('.xml'), os.listdir(self.target_dir)))))
+    def __init__(self, xml_folder_dir=None, files=None, instrument_only_methods=True, short_type=True):
+        self.target_dir = None
+        if xml_folder_dir:
+            self.target_dir = xml_folder_dir
+            self.jcov_files = list(filter(os.path.exists, map(lambda name: os.path.join(self.target_dir, name),
+                                  filter(lambda name: name.endswith('.xml'), os.listdir(self.target_dir)))))
+        else:
+            self.jcov_files = files
         self.instrument_only_methods = instrument_only_methods
         self.prefixes = set()
         if self.instrument_only_methods:
