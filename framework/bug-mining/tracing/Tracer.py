@@ -205,8 +205,9 @@ class Tracer:
 
 
 if __name__ == '__main__':
-    t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'), r'C:\Users\amirelm\Downloads\bug-mining (12)\bug-mining_32\framework\projects')
-    t.stop_grabber(r"C:\Users\amirelm\Downloads\bug-mining (12)\bug-mining_32\framework\projects\Lang\bugs.json")
+    t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'))
+    # t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'), r'C:\Users\amirelm\Downloads\bug-mining (12)\bug-mining_32\framework\projects')
+    # t.stop_grabber(r"C:\Users\amirelm\Downloads\bug-mining (12)\bug-mining_32\framework\projects\Lang\bugs.json")
     if sys.argv[-1] == 'template':
         t.execute_template_process()
     elif sys.argv[-1] == 'grabber':
