@@ -58,14 +58,16 @@ class TestResult(object):
 class Tracer:
     JCOV_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "jcov.jar")
 
-    def __init__(self, xml_path):
+    def __init__(self, xml_path, bug_mining=None):
         self.classes_dir = None
         self.command_port = 5552
         self.agent_port = 5551
         self.xml_path = xml_path
         p = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        ind = list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0].split('_')[1]
-        bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0], 'framework', 'projects')
+        ind = 0
+        if bug_mining is None:
+            ind = list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0].split('_')[1]
+            bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0], 'framework', 'projects')
         self.path_to_result_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "result.xml"))
         self.path_to_out_template = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "template.xml"))
         self.path_to_classes_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "classes"))
@@ -160,7 +162,7 @@ class Tracer:
         fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 1, tests_details))), set())
         fail_components = fail_components - tests_names
         print(fail_components)
-        optimized_tests = list(map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]), tests_details))
+        optimized_tests = list(filter(lambda x: x[1], map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]), tests_details)))
         bugs = []
         with open(bugs_file) as f:
             bugs = json.loads(f.read())
@@ -203,7 +205,8 @@ class Tracer:
 
 
 if __name__ == '__main__':
-    t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'))
+    t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'), r'C:\Users\amirelm\Downloads\bug-mining (12)\bug-mining_32\framework\projects')
+    t.stop_grabber(r"C:\Users\amirelm\Downloads\bug-mining (12)\bug-mining_32\framework\projects\Lang\bugs.json")
     if sys.argv[-1] == 'template':
         t.execute_template_process()
     elif sys.argv[-1] == 'grabber':
