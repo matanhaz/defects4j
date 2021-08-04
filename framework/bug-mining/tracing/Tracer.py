@@ -152,7 +152,6 @@ class Tracer:
         print(traces.keys())
         self.observe_tests()
         relevant_traces = list(filter(lambda t: t.split('(')[0].lower() in self.test_results, traces))
-        print(list(map(lambda t: t.split('(')[0].lower(), traces)))
         print(relevant_traces)
         tests_details = []
         for t in relevant_traces:
@@ -161,7 +160,6 @@ class Tracer:
         tests_names = set(list(map(lambda x: x[0], tests_details)) + list(map(lambda x: x[0].lower(), tests_details)))
         fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 1, tests_details))), set())
         fail_components = fail_components - tests_names
-        print(fail_components)
         optimized_tests = list(filter(lambda x: x[1], map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]), tests_details)))
         bugs = []
         with open(bugs_file) as f:
