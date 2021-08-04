@@ -165,6 +165,8 @@ class Tracer:
             bugs = json.loads(f.read())
         with open(self.path_to_tests_details, "w") as f:
             json.dump(optimized_tests, f)
+        with open(self.path_to_tests_details + '2', "w") as f:
+            json.dump(tests_details, f)
         write_json_planning_file(self.matrix, optimized_tests, bugs)
 
     def get_xml_files(self):
