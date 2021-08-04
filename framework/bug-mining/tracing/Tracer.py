@@ -153,8 +153,8 @@ class Tracer:
         print(relevant_traces)
         tests_details = []
         for t in relevant_traces:
-            tests_details.append((t, traces[t].get_trace(), self.test_results[t.split('(')[0].lower()].get_observation()))
-        tests_details = list(filter(lambda x: x[1], tests_details))
+            if traces[t].get_trace():
+                tests_details.append((t, traces[t].get_trace(), self.test_results[t.split('(')[0].lower()].get_observation()))
         tests_names = set(list(map(lambda x: x[0], tests_details)) + list(map(lambda x: x[0].lower(), tests_details)))
         fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 1, tests_details))), set())
         fail_components = fail_components - tests_names
