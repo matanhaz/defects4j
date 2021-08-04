@@ -147,6 +147,7 @@ class Tracer:
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-save", '-command_port', str(self.command_port)]).communicate()
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-stop", '-command_port', str(self.command_port)]).communicate()
         traces = list(JcovParser(os.path.dirname(self.path_to_result_file), True, True).parse(False))[0].split_to_subtraces()
+        print(traces.keys())
         self.observe_tests()
         relevant_traces = list(filter(lambda t: t.split('(')[0].lower() in self.test_results, traces))
         print(list(map(lambda t: t.split('(')[0].lower(), traces)))
