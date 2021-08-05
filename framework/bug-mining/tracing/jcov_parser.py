@@ -120,3 +120,10 @@ def block_to_comps(block):
     function_name = ".".join(splitted[:-1])
     block_name = ".".join(splitted)
     return [package_name, class_name, function_name, block_name]
+
+
+if __name__ == '__main__':
+    traces = list(JcovParser(None, [r"C:\Users\amirelm\Downloads\bug-mining (15)\bug-mining_19\framework\projects\Lang\result.xml"], True, True).parse(False))[
+        0].split_to_subtraces()
+    print(list(map(lambda t: t.split('(')[0].lower(), traces)))
+    pass

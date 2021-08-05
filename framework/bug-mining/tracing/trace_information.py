@@ -148,7 +148,17 @@ class Trace(object):
 
     def split_to_subtraces(self):
         tests = list(filter(lambda x: x.method_name.split('.')[-2].endswith('Test') and x.method_name.split('.')[-1].startswith('test'), list(self.trace.values())))
-        tests_slots = dict(list(map(lambda x: ((x.id, x.hits_information[0].parent, x.hits_information[0].previous_slot), x), tests)) + list(map(lambda x: ((x.extra_slot, x.hits_information[0].parent, x.hits_information[0].previous_slot), x), tests)))
+        tests_slots = {}
+        renames = {}
+        for t in tests:
+            if len(t.hits_information) == 0:
+                continue
+            key = (t.id, t.hits_information[0].parent, t.hits_information[0].previous_slot)
+            tests_slots[key] = t
+            for h in t.hits_information:
+                renames[(t.id, h.parent, h.previous_slot)] = key
+                renames[(t.extra_slot, h.parent, h.previous_slot)] = key
+        # tests_slots = dict(list(map(lambda x: ((x.id, x.hits_information[0].parent, x.hits_information[0].previous_slot), x), tests)) + list(map(lambda x: ((x.extra_slot, x.hits_information[0].parent, x.hits_information[0].previous_slot), x), tests)))
         test_traces = {}
         traces = {}
         for t in tests:
@@ -156,8 +166,8 @@ class Trace(object):
         for trace in self.trace:
             sub_traces = self.trace[trace].split_by_tests_slots()
             for st in sub_traces:
-                if tests_slots.get(st):
-                    test_traces[tests_slots[st].method_name].append(sub_traces[st])
+                if tests_slots.get(renames.get(st)):
+                    test_traces[tests_slots[renames[st]].method_name].append(sub_traces[st])
         for t in test_traces:
             traces[t] = Trace(t, dict(test_traces[t]))
         return traces
