@@ -146,17 +146,23 @@ class Tracer:
         def make_nice_trace(t):
             return list(map(lambda x: x.lower().replace("java.lang.", "").replace("java.io.", "").replace("java.util.", ""), t))
 
+        def get_obs(t):
+            if self.test_results.get(t.split('(')[0].lower()):
+                return self.test_results[t.split('(')[0].lower()].get_observation()
+            return 0
+
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-save", '-command_port', str(self.command_port)]).communicate()
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-stop", '-command_port', str(self.command_port)]).communicate()
         traces = list(JcovParser(None, [self.path_to_result_file], True, True).parse(False))[0].split_to_subtraces()
         print(traces.keys())
         self.observe_tests()
-        relevant_traces = list(filter(lambda t: t.split('(')[0].lower() in self.test_results, traces))
-        print(relevant_traces)
+        # relevant_traces = list(filter(lambda t: t.split('(')[0].lower() in self.test_results, traces))
+        relevant_traces = traces
         tests_details = []
         for t in relevant_traces:
             if traces[t].get_trace():
-                tests_details.append((t, traces[t].get_trace(), self.test_results[t.split('(')[0].lower()].get_observation()))
+                tests_details.append((t, traces[t].get_trace(), get_obs(t)))
+                # tests_details.append((t, traces[t].get_trace(), self.test_results[t.split('(')[0].lower()].get_observation()))
         tests_names = set(list(map(lambda x: x[0], tests_details)) + list(map(lambda x: x[0].lower(), tests_details)))
         fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 1, tests_details))), set())
         fail_components = fail_components - tests_names

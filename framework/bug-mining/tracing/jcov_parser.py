@@ -124,7 +124,7 @@ def block_to_comps(block):
 
 
 if __name__ == '__main__':
-    traces = list(JcovParser(None, [r"C:\Users\amirelm\Downloads\bug-mining (15)\bug-mining_19\framework\projects\Lang\result.xml"], True, True).parse(False))[
+    traces = list(JcovParser(None, [r"C:\Users\amirelm\Downloads\bug-mining (18)\bug-mining_33\framework\projects\Lang\result.xml"], True, True).parse(False))[
         0].split_to_subtraces()
     print(list(map(lambda t: t.split('(')[0].lower(), traces)))
     pass
