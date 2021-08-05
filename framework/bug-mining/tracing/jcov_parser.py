@@ -24,7 +24,7 @@ class JcovParser(object):
         self.prefixes = set()
         if self.instrument_only_methods:
             self.prefixes.add(JcovParser.METH)
-        self.method_name_by_id = self._get_method_ids(short_type)
+        self.method_name_by_id, self.method_name_by_extra_slot = self._get_method_ids(short_type)
         self.lines_to_read = self._get_methods_lines()
 
     def parse(self, delete_dir_when_finished=False):
@@ -40,7 +40,7 @@ class JcovParser(object):
     def _parse_jcov_file(self, jcov_file, test_name):
         gc.collect()
         trace = self._get_trace_for_file(jcov_file)
-        list(map(lambda element: element.set_previous_method(self.method_name_by_id), trace.values()))
+        list(map(lambda element: element.set_previous_method(self.method_name_by_extra_slot), trace.values()))
         return Trace(test_name, trace)
 
     def _get_trace_for_file(self, jcov_file):
@@ -83,6 +83,7 @@ class JcovParser(object):
     def _get_method_ids(self, short_type):
         root = et.parse(list(filter(lambda x: 'result' in os.path.basename(x).lower(), self.jcov_files))[0]).getroot()
         method_ids = {}
+        method_slots = {}
         for method_path, method in JcovParser.get_elements_by_path(root, ['package', 'class', 'meth']):
             package_name, class_name, method_name = list(map(lambda elem: elem.attrib['name'], method_path))
             if method_name == '<init>':
@@ -93,12 +94,12 @@ class JcovParser(object):
                 Signature(method.attrib['vmsig'], short_type).args)
             if self.instrument_only_methods:
                 method_ids[int(method.attrib['id'])] = method_name
-                method_ids[int(method.attrib['extra_slots'])] = method_name
+                method_slots[int(method.attrib['extra_slots'])] = method_name
             else:
                 # id = JcovParser.get_elements_by_path(method, ['bl', 'methenter'])[0][1].attrib['id']
                 # extra_slot = JcovParser.get_elements_by_path(method, ['bl', 'methenter'])[0][1].attrib['extra_slots']
                 method_ids.update(self._get_method_blocks_ids(method, method_name))
-        return method_ids
+        return method_ids, method_slots
 
     def _get_method_blocks_ids(self, method_et, method_name):
         ids = {}
