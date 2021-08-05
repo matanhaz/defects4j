@@ -161,9 +161,10 @@ class Tracer:
         fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 1, tests_details))), set())
         fail_components = fail_components - tests_names
         optimized_tests = list(filter(lambda x: x[1], map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]), tests_details)))
+        components = reduce(set.__or__, list(map(lambda x: set(x[1]), optimized_tests)), set())
         bugs = []
         with open(bugs_file) as f:
-            bugs = json.loads(f.read())
+            bugs = list(set(json.loads(f.read())) - components)
         with open(self.path_to_tests_details, "w") as f:
             json.dump(optimized_tests, f)
         with open(self.path_to_tests_details + '2', "w") as f:
@@ -203,9 +204,9 @@ class Tracer:
 
 
 if __name__ == '__main__':
-    # t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'))
-    t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'), r'C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects')
-    t.stop_grabber(r"C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects\Lang\bugs.json")
+    t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'))
+    # t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'), r'C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects')
+    # t.stop_grabber(r"C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects\Lang\bugs.json")
     if sys.argv[-1] == 'template':
         t.execute_template_process()
     elif sys.argv[-1] == 'grabber':
