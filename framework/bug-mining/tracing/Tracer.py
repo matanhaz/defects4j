@@ -146,22 +146,18 @@ class Tracer:
         def make_nice_trace(t):
             return list(map(lambda x: x.lower().replace("java.lang.", "").replace("java.io.", "").replace("java.util.", ""), t))
 
-        def get_obs(t):
-            if self.test_results.get(t.split('(')[0].lower()):
-                return self.test_results[t.split('(')[0].lower()].get_observation()
-            return 0
-
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-save", '-command_port', str(self.command_port)]).communicate()
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-stop", '-command_port', str(self.command_port)]).communicate()
         traces = list(JcovParser(None, [self.path_to_result_file], True, True).parse(False))[0].split_to_subtraces()
         print(traces.keys())
-        self.observe_tests()
+        # self.observe_tests()
+        trigger_tests = self.get_trigger_tests()
         # relevant_traces = list(filter(lambda t: t.split('(')[0].lower() in self.test_results, traces))
         relevant_traces = traces
         tests_details = []
         for t in relevant_traces:
             if traces[t].get_trace():
-                tests_details.append((t, traces[t].get_trace(), get_obs(t)))
+                tests_details.append((t, traces[t].get_trace(), 1 if t.lower().split('(')[0] in trigger_tests else 0))
                 # tests_details.append((t, traces[t].get_trace(), self.test_results[t.split('(')[0].lower()].get_observation()))
         tests_names = set(list(map(lambda x: x[0], tests_details)) + list(map(lambda x: x[0].lower(), tests_details)))
         fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 1, tests_details))), set())
@@ -170,7 +166,7 @@ class Tracer:
         components = reduce(set.__or__, list(map(lambda x: set(x[1]), optimized_tests)), set())
         bugs = []
         with open(bugs_file) as f:
-            bugs = list(set(json.loads(f.read())) - components)
+            bugs = list(set(json.loads(f.read())) & components)
         with open(self.path_to_tests_details, "w") as f:
             json.dump(optimized_tests, f)
         with open(self.path_to_tests_details + '2', "w") as f:
@@ -185,8 +181,7 @@ class Tracer:
 
     def observe_tests(self):
         self.test_results = {}
-        with open(self.path_to_trigger_tests) as f:
-            trigger_tests = list(map(lambda x: x[4:-1].replace('::', '.').lower(), filter(lambda l: l.startswith('---'), f.readlines())))
+        trigger_tests = self.get_trigger_tests()
         for report in self.get_xml_files():
             try:
                 suite = JUnitXml.fromfile(report)
@@ -200,6 +195,12 @@ class Tracer:
         with open(self.path_to_tests_results, "w") as f:
             json.dump(list(map(lambda x: x.as_dict(), self.test_results.values())), f)
         return self.test_results
+
+    def get_trigger_tests(self):
+        with open(self.path_to_trigger_tests) as f:
+            trigger_tests = list(
+                map(lambda x: x[4:-1].replace('::', '.').lower(), filter(lambda l: l.startswith('---'), f.readlines())))
+        return trigger_tests
 
     def get_buggy_functions(self, patch_file, save_to):
         repo = git.Repo(os.path.dirname(self.xml_path))
