@@ -74,9 +74,9 @@ class HitInformation(object):
         self.method_name = method_name
         self.count, self.previous_slot, self.parent, self.test_slot, self.test_parent, self.test_previous = lst
 
-    def set_previous_method(self, method_name_by_id):
-        self.previous_method = method_name_by_id.get(self.previous_slot, 'None')
-        self.parent_method = method_name_by_id.get(self.parent, 'None')
+    def set_previous_method(self, method_name_by_slot, method_name_by_id):
+        self.previous_method = method_name_by_slot.get(self.previous_slot, method_name_by_id.get(self.previous_slot, 'None'))
+        self.parent_method = method_name_by_slot.get(self.parent, method_name_by_id.get(self.parent, 'None'))
         self.execution_edge = (self.previous_method, self.method_name)
         self.call_graph_edge = (self.parent_method, self.method_name)
 
@@ -99,8 +99,8 @@ class TraceElement(object):
             self.hits_information = HitInformation.read_hit_information_string(self.jcov_data['HitInformation'], self.method_name)
             # assert sum(map(lambda x: x.count, self.hits_information)) == self.count, "{0}-{1}, {2}".format(self.id, self.method_name, self.count)
 
-    def set_previous_method(self, method_name_by_id):
-        list(map(lambda hit: hit.set_previous_method(method_name_by_id), self.hits_information))
+    def set_previous_method(self, method_name_by_slot, method_name_by_id):
+        list(map(lambda hit: hit.set_previous_method(method_name_by_slot, method_name_by_id), self.hits_information))
 
     def have_count(self):
         return self.count != 0
@@ -117,6 +117,12 @@ class TraceElement(object):
 
     def get_call_graph_edges(self):
         return list(map(lambda hit: hit.call_graph_edge, self.hits_information))
+
+    def get_execution_edges_num(self):
+        return list(map(lambda hit: (hit.previous_slot, self.extra_slot), self.hits_information))
+
+    def get_call_graph_edges_num(self):
+        return list(map(lambda hit: (hit.parent, self.extra_slot), self.hits_information))
 
     def split_by_tests_slots(self):
         traces = {}
@@ -141,10 +147,16 @@ class Trace(object):
         return list(set(map(lambda t: self.trace[t].get_trace(trace_granularity).lower().replace("java.lang.", "").replace("java.io.", "").replace("java.util.", ""), self.trace)))
 
     def get_execution_edges(self):
-        return reduce(list.__add__, list(map(lambda element: element.get_execution_edges(), self.trace.values())), [])
+        return set(reduce(list.__add__, list(map(lambda element: element.get_execution_edges(), self.trace.values())), []))
 
     def get_call_graph_edges(self):
-        return reduce(list.__add__, list(map(lambda element: element.get_call_graph_edges(), self.trace.values())), [])
+        return set(reduce(list.__add__, list(map(lambda element: element.get_call_graph_edges(), self.trace.values())), []))
+
+    def get_execution_edges_num(self):
+        return set(reduce(list.__add__, list(map(lambda element: element.get_execution_edges_num(), self.trace.values())), []))
+
+    def get_call_graph_edges_num(self):
+        return set(reduce(list.__add__, list(map(lambda element: element.get_call_graph_edges_num(), self.trace.values())), []))
 
     def split_to_subtraces(self):
         tests = list(filter(lambda x: x.method_name.split('.')[-2].endswith('Test') and x.method_name.split('.')[-1].startswith('test'), list(self.trace.values())))
@@ -169,5 +181,16 @@ class Trace(object):
                 if tests_slots.get(renames.get(st)):
                     test_traces[tests_slots[renames[st]].method_name].append(sub_traces[st])
         for t in test_traces:
-            traces[t] = Trace(t, dict(test_traces[t]))
+            if test_traces[t]:
+                traces[t] = Trace(t, dict(test_traces[t]))
+        # fix prev method
+        for t in traces:
+            trace = traces[t]
+            ids = {}
+            slots = {}
+            for e in trace.trace.values():
+                ids[e.id] = e.method_name
+                slots[e.extra_slot] = e.method_name
+            for e in trace.trace.values():
+                e.set_previous_method(slots, ids)
         return traces

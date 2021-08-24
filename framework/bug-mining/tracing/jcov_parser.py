@@ -40,7 +40,7 @@ class JcovParser(object):
     def _parse_jcov_file(self, jcov_file, test_name):
         gc.collect()
         trace = self._get_trace_for_file(jcov_file)
-        list(map(lambda element: element.set_previous_method(self.method_name_by_extra_slot), trace.values()))
+        list(map(lambda element: element.set_previous_method(self.method_name_by_extra_slot, self.method_name_by_id), trace.values()))
         return Trace(test_name, trace)
 
     def _get_trace_for_file(self, jcov_file):
@@ -123,8 +123,42 @@ def block_to_comps(block):
     return [package_name, class_name, function_name, block_name]
 
 
+def findPathsNoLC(G,u,n):
+    if n==0:
+        return [[u]]
+    paths = []
+    for neighbor in G.neighbors(u):
+        for path in findPathsNoLC(G,neighbor,n-1):
+            if u not in path:
+                paths.append([u]+path)
+    return paths
+
+
 if __name__ == '__main__':
-    traces = list(JcovParser(None, [r"C:\Users\amirelm\Downloads\bug-mining (18)\bug-mining_33\framework\projects\Lang\result.xml"], True, True).parse(False))[
-        0].split_to_subtraces()
-    print(list(map(lambda t: t.split('(')[0].lower(), traces)))
+    t = list(JcovParser(None, [r"C:\Users\amirelm\Downloads\bug-mining (20)\bug-mining_19\framework\projects\Lang\result.xml"], True, True).parse(False))[
+        0]
+    traces = t.split_to_subtraces()
+    from collections import Counter
+    from networkx import DiGraph, single_source_shortest_path_length
+    import networkx as nx
+    import json
+    e = t.get_call_graph_edges()
+    c = Counter(e)
+    g = DiGraph()
+    g.add_edges_from(e, count=dict(c))
+    possible_pairs = []
+    paths = {}
+    # allpaths = []
+    # for node in g:
+    #     allpaths.extend(findPathsNoLC(g, node, 3))
+    for n in g.node:
+        if not n.split('.')[-1].startswith('test'):
+            continue
+        for k, v in single_source_shortest_path_length(g, n).items():
+            if k == n:
+                continue
+            possible_pairs.append((n, k, v))
+            paths[(n, k, v)] = list(nx.all_simple_paths(g, source=n, target=k))
+    with open(r'z:\temp\paths.json', 'w') as f:
+        f.write(json.dumps(list(paths.items())))
     pass
