@@ -303,4 +303,5 @@ if __name__ == '__main__':
     with open('./run.sh', 'w') as f:
         for c in get_cmds(project_name, working_dir, ind):
             f.write(" ".join(c) + '\n')
+    run(['chmod', '+x', 'run.sh'])
     run(['./run.sh'])
