@@ -304,4 +304,4 @@ if __name__ == '__main__':
         for c in get_cmds(project_name, working_dir, ind):
             f.write(" ".join(c) + '\n')
     run(['chmod', '+x', 'run.sh'])
-    run(['./run.sh'])
+    run(['run.sh'])
