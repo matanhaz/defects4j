@@ -290,7 +290,7 @@ projects = {'distributedlog': ('https://github.com/apache/distributedlog', 'DL')
 
 
 def get_cmds(p, working_dir, ind):
-    getters = {'p': projects[p][1].title(), 'r': projects[p][0], 'n': p, 'g': 'jira', 't': projects[p][1], 'e': r'"/({0}-\d+)/mi"'.format(projects[p][1]), 'w': working_dir, 'i': ind}
+    getters = {'p': projects[p][1].title(), 'r': projects[p][0], 'n': p, 'g': 'jira', 't': projects[p][1], 'e': '"/({0}-\d+)/mi"'.format(projects[p][1]), 'w': working_dir, 'i': ind}
     files_cmds = [('initialize-project-and-collect-issues', ['p', 'n', 'r', 'g', 't', 'e', 'w']), ('initialize-revisions', ['p', 'w', 'i']), ('analyze-project', ['p', 'w', 'g', 't', 'i']), ('get-trigger', ['p', 'w']), ('get-metadata', ['p', 'w'])]
     for f in files_cmds:
         yield [f'./{f[0]}.pl'] + reduce(list.__add__, list(map(lambda x: [f'-{x}', getters[x]], f[1])), [])
@@ -300,6 +300,7 @@ if __name__ == '__main__':
     project_name = sys.argv[1]
     working_dir = sys.argv[2]
     ind = sys.argv[3]
-    for c in get_cmds(project_name, working_dir, ind):
-        print(c)
-        run(c)
+    with open('run.sh', 'w') as f:
+        for c in get_cmds(project_name, working_dir, ind):
+            f.write(" ".join(c) + '\n')
+    run(['run.sh'])
