@@ -300,7 +300,7 @@ if __name__ == '__main__':
     project_name = sys.argv[1]
     working_dir = sys.argv[2]
     ind = sys.argv[3]
-    with open('run.sh', 'w') as f:
+    with open('./run.sh', 'w') as f:
         for c in get_cmds(project_name, working_dir, ind):
             f.write(" ".join(c) + '\n')
-    run(['run.sh'])
+    run(['./run.sh'])
