@@ -211,7 +211,7 @@ foreach my $bid (@ids) {
     printf ("%4d: $project->{prog_name}\n", $bid);
 
     # Clean up previously generated data
-    system("rm -rf $ANALYZER_OUTPUT/${bid} $PATCH_DIR/${bid}.src.patch $PATCH_DIR/${bid}.test.patch");
+    # system("rm -rf $ANALYZER_OUTPUT/${bid} $PATCH_DIR/${bid}.src.patch $PATCH_DIR/${bid}.test.patch");
 
     # Populate the layout map and patches directory
     _bootstrap($project, $bid);
