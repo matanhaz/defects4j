@@ -96,10 +96,10 @@ unshift(@INC, "$WORK_DIR/framework/core");
 
 # Override global constants
 $REPO_DIR = "$WORK_DIR/project_repos";
-$MVNPY_DIR = "$WORK_DIR/framework/bug-mining/tracing/mvnpy";
 $PROJECTS_DIR = "$WORK_DIR/framework/projects";
 
 # Create necessary directories
+my $MVNPY_DIR = "$WORK_DIR/framework/bug-mining/tracing/mvnpy";
 my $PROJECT_DIR = "$PROJECTS_DIR/$PID";
 my $PATCH_DIR   = "$PROJECT_DIR/patches";
 my $ANALYZER_OUTPUT = "$PROJECT_DIR/analyzer_output";
