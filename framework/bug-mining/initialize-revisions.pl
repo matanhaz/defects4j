@@ -148,7 +148,8 @@ sub _init_version {
         my $cmd = " cd $work_dir" .
                   " && python $MVNPY_DIR/d4jchanges.py $work_dir" .
                   " && mvn ant:ant -Doverwrite=true 2>&1 -Dhttps.protocols=TLSv1.2 -Dmaven.compile.source=1.8 -Dmaven.compile.target=1.8" .
-                  " && patch build.xml $PROJECT_DIR/build.xml.patch 2>&1" .
+                  " && python build.xml $work_dir" .
+                  " && patch $MVNPY_DIR/../../fix_compile_source.py $PROJECT_DIR/build.xml.patch 2>&1" .
                   " && rm -rf $GEN_BUILDFILE_DIR/$rev_id && mkdir -p $GEN_BUILDFILE_DIR/$rev_id 2>&1" .
                   " && cp maven-build.* $GEN_BUILDFILE_DIR/$rev_id 2>&1" .
                   " && cp build.xml $GEN_BUILDFILE_DIR/$rev_id 2>&1";
