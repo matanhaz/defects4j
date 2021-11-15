@@ -10,6 +10,7 @@ def fix(file_name):
             l = 'maven.compile.source=1.8\n'
         if l.startswith('maven.compile.target='):
             l = 'maven.compile.target=1.8\n'
+            l = ''
         lines2.append(l)
     with open(file_name,'w') as f:
         f.writelines(lines2)
