@@ -1132,7 +1132,7 @@ sub _ant_call_comp {
     @_ >= 2 or die $ARG_ERROR;
     my ($self, $target, $option_str, $log_file, $ant_cmd) =  @_;
     $option_str = " -Dbuild.compiler=javac1.7 " . ($option_str // "");
-    $ant_cmd = "$MAJOR_ROOT/bin/ant" unless defined $ant_cmd;
+    $ant_cmd = "ant" unless defined $ant_cmd;
     return $self->_ant_call($target, $option_str, $log_file, $ant_cmd);
 }
 sub _call_major {
@@ -1141,8 +1141,8 @@ sub _call_major {
     $option_str = "-Dbuild.compiler=major.ant.MajorCompiler " . ($option_str // "");
     # Prepend path with Major's executables
     my $path = $ENV{PATH};
-    $ENV{PATH}="$MAJOR_ROOT/bin:$ENV{PATH}";
-    $ant_cmd = "$MAJOR_ROOT/bin/ant" unless defined $ant_cmd;
+    # $ENV{PATH}="$MAJOR_ROOT/bin:$ENV{PATH}";
+    $ant_cmd = "ant" unless defined $ant_cmd;
     my $ret = $self->_ant_call($target, $option_str, $log_file, $ant_cmd);
     # Reset path for downstream calls to ant
     $ENV{PATH} = $path;
