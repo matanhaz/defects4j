@@ -7,7 +7,7 @@ def fix(file_name):
     lines2 = []
     for l in lines:
         if l.startswith('maven.compile.source='):
-            l = 'maven.compile.source=1.8\n'
+            l = ''
         if l.startswith('maven.compile.target='):
             l = 'maven.compile.target=1.8\n'
             l = ''
