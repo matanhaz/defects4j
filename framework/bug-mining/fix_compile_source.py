@@ -7,9 +7,9 @@ def fix(file_name):
     lines2 = []
     for l in lines:
         if l.startswith('maven.compile.source='):
-            l = 'maven.compile.source=1.8\n'
+            l = 'maven.compile.source=1.7\n'
         if l.startswith('maven.compile.target='):
-            l = 'maven.compile.target=1.8\n'
+            l = 'maven.compile.target=1.7\n'
         lines2.append(l)
     with open(file_name,'w') as f:
         f.writelines(lines2)
