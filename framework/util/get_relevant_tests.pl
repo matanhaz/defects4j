@@ -110,7 +110,9 @@ foreach my $id (@ids) {
     $project->checkout_vid($vid) or die "Could not checkout ${vid}";
     $project->fix_tests($vid);
     $project->compile() or die "Could not compile";
-    $project->compile_tests() or die "Could not compile tests";
+	$project->compile_tests("$WORK_DIR/compile_tests_r_log.log");
+	system("python fix_compile_errors.py $WORK_DIR/compile_tests_r_log.log $project->{prog_root} 2>&1");
+	$project->compile_tests() or die "Could not compile tests";
 
     # Hash all modified classes
     my %mod_classes = ();

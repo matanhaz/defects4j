@@ -178,7 +178,9 @@ foreach my $bid (@bids) {
 
     # Compile sources and tests
     $project->compile() or die;
-    $project->compile_tests() or die;
+	$project->compile_tests("$WORK_DIR/compile_tests_metadata_log.log");
+	system("python fix_compile_errors.py $WORK_DIR/compile_tests_metadata_log.log $project->{prog_root} 2>&1");
+	$project->compile_tests() or die;
 
     my %src;
     my %test;

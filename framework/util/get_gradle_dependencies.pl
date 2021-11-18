@@ -146,6 +146,9 @@ foreach my $bid (@ids) {
     # Compile the project using the D4J API (this step should force the download
     # of all dependencies to a local gradle directory)
     $project->compile() or die "Could not compile source code";
+	$project->compile_tests("$WORK_DIR/compile_tests_g_log.log");
+	system("python fix_compile_errors.py $WORK_DIR/compile_tests_g_log.log $project->{prog_root} 2>&1");
+
     $project->compile_tests() or die "Could not compile test suites";
 
     my $gradle_caches_dir = "$project->{prog_root}/$GRADLE_LOCAL_HOME_DIR/caches/modules-2/files-2.1";

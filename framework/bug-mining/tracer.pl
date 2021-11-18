@@ -277,6 +277,9 @@ sub _trace_tests {
 
     # Compile src and test
     $project->compile() or die;
+	$project->compile_tests("$WORK_DIR/compile_tests_t_log.log");
+	system("python fix_compile_errors.py $WORK_DIR/compile_tests_t_log.log $project->{prog_root} 2>&1");
+
     $project->compile_tests() or die;
 
     # Run tests and get number of failing tests

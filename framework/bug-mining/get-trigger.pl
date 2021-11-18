@@ -344,6 +344,8 @@ sub _get_failing_tests {
 
     # Compile src and test
     $project->compile() or die;
+	$project->compile_tests("$WORK_DIR/compile_tests_trigger_log.log");
+	system("python fix_compile_errors.py $WORK_DIR/compile_tests_trigger_log.log $project->{prog_root} 2>&1");
     $project->compile_tests() or die;
 
     # Run tests and get number of failing tests
@@ -389,6 +391,8 @@ sub _trace_tests {
     $project->checkout_vid($vid, $root, 1) or die;
     # Compile src and test
     $project->compile() or die;
+	$project->compile_tests("$WORK_DIR/compile_tests_trigger_log.log");
+	system("python fix_compile_errors.py $WORK_DIR/compile_tests_trigger_log.log $project->{prog_root} 2>&1");
     $project->compile_tests() or die;
 	system("cd tracing && python Tracer.py ${root} formatter 2>&1");
 	system("cd tracing && python Tracer.py ${root} template  2>&1");

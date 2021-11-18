@@ -121,7 +121,9 @@ foreach my $bid (@ids) {
         # - Only expected triggering test(s) fail on the buggy version
         # - All expected triggering test(s) fail on the buggy version
         $project->compile() or die "Could not compile sources: ${vid}";
-        $project->compile_tests() or die "Could not compile tests: ${vid}";
+		$project->compile_tests("$WORK_DIR/compile_tests_s_log.log");
+		system("python fix_compile_errors.py $WORK_DIR/compile_tests_s_log.log $project->{prog_root} 2>&1");
+		$project->compile_tests() or die "Could not compile tests: ${vid}";
 
         my $failing_tests = "$TMP_DIR/.failing_tests";
         system(">$failing_tests");
