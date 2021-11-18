@@ -18,7 +18,7 @@ class JiraExtractor():
 		self.inspected_branch = repo.branches[0].name
 		self.java_commits = self.get_java_commits()
 		self.issues_d = self.commits_and_issues()
-    
+	
 	def fix(self):
 		detailed_issues = dict(reduce(list.__add__, list(map(lambda commits: list(map(lambda c: ((self.get_parent(c).hexsha, c.hexsha), commits[0]), commits[1])), self.issues_d.items())), []))
 		detailed_issues.update(dict(self.check_active_bugs()))
@@ -43,18 +43,18 @@ class JiraExtractor():
 					break
 		return ans
 
-    def check_active_bugs(self):
-        df = pd.read_csv(self.active_bugs)[['revision.id.buggy', 'revision.id.fixed','report.id']]
-        for (ind, (b,f,i)) in df.iterrows():
-            if self.repo.commit(f).parents[0].hexsha == b:
-                files = self.java_commits.get(self.repo.commit(f), [])
-            else:
-                files = self.repo.git.diff(b, f, '--name-only').split('\n')
-            java_files = list(filter(lambda x: x.endswith('.java'), files))
-            src_files = list(filter(lambda x: 'test' not in x, java_files))
-            if src_files:
-                yield ((b,f),i.split('-')[1])
-    
+	def check_active_bugs(self):
+		df = pd.read_csv(self.active_bugs)[['revision.id.buggy', 'revision.id.fixed','report.id']]
+		for (ind, (b,f,i)) in df.iterrows():
+			if self.repo.commit(f).parents[0].hexsha == b:
+				files = self.java_commits.get(self.repo.commit(f), [])
+			else:
+				files = self.repo.git.diff(b, f, '--name-only').split('\n')
+			java_files = list(filter(lambda x: x.endswith('.java'), files))
+			src_files = list(filter(lambda x: 'test' not in x, java_files))
+			if src_files:
+				yield ((b,f),i.split('-')[1])
+	
 	def commits_and_issues(self):
 		def replace(chars_to_replace, replacement, s):
 			temp_s = s
@@ -94,8 +94,8 @@ class JiraExtractor():
 
 
 if __name__ == '__main__':
-    repo_dir = sys.argv[2]
-    working_dir = sys.argv[4]
-    active_bugs = sys.argv[6]
+	repo_dir = sys.argv[2]
+	working_dir = sys.argv[4]
+	active_bugs = sys.argv[6]
 	JiraExtractor(repo_dir=repo_dir, issues_path=os.path.join(working_dir, 'issues.txt'), active_bugs=active_bugs).fix()
 
