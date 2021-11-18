@@ -338,7 +338,9 @@ sub _check_t2v1 {
     # Compile v1 and t2v1
     my $ret = $project->compile();
     _add_bool_result($data, $COMP_V1, $ret) or return;
-    $ret = $project->compile_tests();
+	$project->compile_tests("$WORK_DIR/compile_tests_a2_log.log");
+	system("python fix_compile_errors.py $WORK_DIR/compile_tests_a2_log.log $project->{prog_root} 2>&1");
+	$ret = $project->compile_tests();
     _add_bool_result($data, $COMP_T2V1, $ret);
 }
 
