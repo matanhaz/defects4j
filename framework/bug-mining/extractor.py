@@ -20,7 +20,7 @@ class JiraExtractor():
 	def fix(self):
 		detailed_issues = dict(reduce(list.__add__, list(map(lambda commits: list(map(lambda c: ((self.get_parent(c).hexsha, c.hexsha), commits[0]), commits[1])), self.issues_d.items())), []))
 		detailed_issues.update(dict(self.check_active_bugs()))
-		active = list(map(lambda x: (x[0] + 1, x[1][0][0],x[1][0][1], x[1][1], ''), enumerate(detailed_issues.items())))
+		active = list(map(lambda x: (x[0] + 1, x[1][0][0],x[1][0][1], 'TEMP-'x[1][1], 'https://issues.apache.org/jira/browse'), enumerate(detailed_issues.items())))
 		df = pd.DataFrame(active, columns=['bug.id','revision.id.buggy','revision.id.fixed','report.id','report.url'])
 		df.to_csv(self.active_bugs, index=False)
 
@@ -85,7 +85,7 @@ class JiraExtractor():
 			if bug_id != '0':
 				issues_d.setdefault(bug_id, []).append(git_commit)
 			elif any(map(lambda x: 'test' in x, self.java_commits[git_commit])) and any(map(lambda x: 'test' not in x, self.java_commits[git_commit])):
-				issues_d.setdefault("-1", []).append(git_commit)
+				issues_d.setdefault("123456789", []).append(git_commit)
 		return issues_d
 
 
