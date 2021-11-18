@@ -19,7 +19,7 @@ class JiraExtractor():
 		self.java_commits = self.get_java_commits()
 		self.issues_d = self.commits_and_issues()
     
-    def fix(self)
+    def fix(self):
 		detailed_issues = dict(reduce(list.__add__, list(map(lambda commits: list(map(lambda c: ((self.get_parent(c).hexsha, c.hexsha), commits[0]), commits[1])), self.issues_d.items())), []))
         detailed_issues.update(dict(self.check_active_bugs()))
         active = list(map(lambda x: (x[0] + 1, x[1][0][0],x[1][0][1], x[1][1], ''), enumerate(detailed_issues.items())))
