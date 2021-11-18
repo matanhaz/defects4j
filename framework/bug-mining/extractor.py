@@ -46,7 +46,10 @@ class JiraExtractor():
     def check_active_bugs(self):
         df = pd.read_csv(self.active_bugs)[['revision.id.buggy', 'revision.id.fixed','report.id']]
         for (ind, (b,f,i)) in df.iterrows():
-            files = self.repo.git.diff(b,f, '--name-only').split('\n')
+            if self.repo.commit(f).parents[0].hexsha == b:
+                files = self.java_commits.get(self.repo.commit(f), [])
+            else:
+                files = self.repo.git.diff(b, f, '--name-only').split('\n')
             java_files = list(filter(lambda x: x.endswith('.java'), files))
             src_files = list(filter(lambda x: 'test' not in x, java_files))
             if src_files:
