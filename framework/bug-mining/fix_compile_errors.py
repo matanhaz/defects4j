@@ -15,9 +15,10 @@ def fix(candidates):
     for c in candidates:
         if 'test' in c.lower():
             try:
+                print(c)
                 os.remove(c)
             except Exception as e:
-                pass
+                print(e)
 
     
 if __name__ == '__main__':
