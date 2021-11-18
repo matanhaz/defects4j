@@ -1,4 +1,3 @@
-
 import pandas as pd
 import os
 import sys
@@ -6,7 +5,6 @@ from urllib.parse import urlparse
 from functools import reduce
 from jira import JIRA
 from git import Repo
-import settings
 
 
 class JiraExtractor():
