@@ -22,4 +22,4 @@ def fix(candidates):
     
 if __name__ == '__main__':
     print('fix_compile_errors', sys.argv)
-    fix(get_candidates(sys.argv[1], sys.argv[2]))
+    fix(get_candidates(sys.argv[1], sys.argv[2].split('pl')[0]))
