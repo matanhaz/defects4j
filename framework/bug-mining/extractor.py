@@ -13,7 +13,7 @@ class JiraExtractor():
 		self.repo = Repo(repo_dir)
 		self.active_bugs = active_bugs
 		self.issues_path = issues_path
-		self.inspected_branch = repo.branches[0].name
+		self.inspected_branch = self.repo.branches[0].name
 		self.java_commits = self.get_java_commits()
 		self.issues_d = self.commits_and_issues()
 	
