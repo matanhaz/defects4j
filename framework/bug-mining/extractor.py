@@ -85,8 +85,7 @@ class JiraExtractor():
 			if bug_id != '0':
 				issues_d.setdefault(bug_id, []).append(git_commit)
 			elif any(map(lambda x: 'test' in x, self.java_commits[git_commit])) and any(map(lambda x: 'test' not in x, self.java_commits[git_commit])):
-				# check if it change a test file and java
-                issues_d.setdefault("-1", []).append(git_commit)
+				issues_d.setdefault("-1", []).append(git_commit)
 		return issues_d
 
 
