@@ -151,7 +151,7 @@ my $db_dir = $WORK_DIR;
 # Number of successful test runs in a row required
 my $TEST_RUNS = 2;
 # Number of maximum test runs (give up point)
-my $MAX_TEST_RUNS = 3;
+my $MAX_TEST_RUNS = 10;
 
 # Temporary directory
 my $TMP_DIR = Utils::get_tmp_dir();
@@ -265,6 +265,8 @@ sub _check_t2v2 {
     # Compile v2 ant t2
     my $ret = $project->compile();
     _add_bool_result($data, $COMP_V2, $ret) or return 0;
+    $project->compile_tests("$WORK_DIR/compile_tests_log.log");
+	system("python fix_compile_errors.py $WORK_DIR/compile_tests_log.log $project->{prog_root} 2>&1");
     $ret = $project->compile_tests();
     _add_bool_result($data, $COMP_T2V2, $ret) or return 0;
 
