@@ -87,7 +87,7 @@ class Tracer:
         junit = list(filter(lambda x: x.tag == 'junit', element_tree.iter()))
         if junit:
             for j in junit:
-                j.attrib.update({'fork': 'yes'})
+                j.attrib.update({'fork': 'true', 'forkmode': 'once', 'haltonerror': 'false', 'haltonfailure': 'false'})
                 formatter = list(filter(lambda x: x.tag == 'formatter', j.iter()))
                 if formatter:
                     formatter = formatter[0]
