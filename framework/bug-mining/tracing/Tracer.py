@@ -58,11 +58,14 @@ class TestResult(object):
 class Tracer:
     JCOV_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "jcov.jar")
 
-    def __init__(self, xml_path, bug_mining=None):
+    def __init__(self, repo_path, bug_mining=None):
         self.classes_dir = None
         self.command_port = 5552
         self.agent_port = 5551
-        self.xml_path = xml_path
+        self.repo_path = repo_path
+        self.xml_path = os.path.join(self.repo_path, 'build.xml')
+        if os.path.isfile(os.path.join(self.repo_path, 'maven-build.xml')):
+            self.xml_path = os.path.join(self.repo_path, 'maven-build.xml')
         p = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
         ind = 0
         if bug_mining is None:
@@ -211,7 +214,7 @@ class Tracer:
 
 
 if __name__ == '__main__':
-    t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'))
+    t = Tracer(os.path.abspath(sys.argv[1]))
     # t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'), r'C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects')
     # t.stop_grabber(r"C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects\Lang\bugs.json")
     if sys.argv[-1] == 'template':
