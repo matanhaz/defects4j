@@ -159,7 +159,8 @@ class Trace(object):
         return set(reduce(list.__add__, list(map(lambda element: element.get_call_graph_edges_num(), self.trace.values())), []))
 
     def split_to_subtraces(self):
-        tests = list(filter(lambda x: x.method_name.split('.')[-2].endswith('Test') and x.method_name.split('.')[-1].startswith('test'), list(self.trace.values())))
+        # tests = list(filter(lambda x: x.method_name.split('.')[-2].endswith('Test') and x.method_name.split('.')[-1].startswith('test'), list(self.trace.values())))
+        tests = list(filter(lambda x: x.method_name.split('.')[-2].endswith('Test'), list(self.trace.values())))
         tests_slots = {}
         renames = {}
         for t in tests:
