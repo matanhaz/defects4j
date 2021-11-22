@@ -67,6 +67,7 @@ class Tracer:
         if os.path.isfile(os.path.join(self.repo_path, 'maven-build.xml')):
             self.xml_path = os.path.join(self.repo_path, 'maven-build.xml')
         p = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        self.defects4j_build = os.path.join(os.path.dirname(p), 'projects', 'defects4j.build.xml')
         ind = 0
         if bug_mining is None:
             ind = list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0].split('_')[1]
@@ -214,7 +215,7 @@ class Tracer:
 
 
 if __name__ == '__main__':
-    t = Tracer(os.path.abspath(sys.argv[1]), r'C:\Users\User\Downloads\bug-mining (79)\bug-mining_189\framework\projects')
+    t = Tracer(os.path.abspath(sys.argv[1]))
     # t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'), r'C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects')
     # t.stop_grabber(r"C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects\Lang\bugs.json")
     if sys.argv[-1] == 'template':
