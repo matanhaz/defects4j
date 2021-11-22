@@ -83,7 +83,11 @@ class Tracer:
         self.test_results = {}
 
     def set_junit_formatter(self):
-        element_tree = et.parse(self.xml_path)
+        self.set_junit_formatter_file(self.xml_path)
+        self.set_junit_formatter_file(self.defects4j_build)
+
+    def set_junit_formatter_file(self, xml_path):
+        element_tree = et.parse(xml_path)
         junit = list(filter(lambda x: x.tag == 'junit', element_tree.iter()))
         if junit:
             for j in junit:
