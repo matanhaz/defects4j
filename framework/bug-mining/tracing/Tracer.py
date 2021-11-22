@@ -85,7 +85,7 @@ class Tracer:
 
     def set_junit_formatter(self):
         self.set_junit_formatter_file(self.xml_path)
-        self.set_junit_formatter_file(self.defects4j_build)
+        # self.set_junit_formatter_file(self.defects4j_build)
 
     def set_junit_formatter_file(self, xml_path):
         element_tree = et.parse(xml_path)
