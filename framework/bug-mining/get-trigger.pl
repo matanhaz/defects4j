@@ -399,7 +399,7 @@ sub _trace_tests {
 	system("cd tracing && python Tracer.py ${root} grabber 2>&1 &");
 	sleep(20);
     # $project->run_tests($TESTS_FILE) or die;
-    $project->_ant_call_comp("test", "-keep-going");
+    $project->_ant_call_comp("run.dev.tests", "-keep-going");
 	system(" cd tracing && python Tracer.py ${root} ${BUGS_FILE} stop 2>&1");
 }
 
