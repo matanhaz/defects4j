@@ -107,7 +107,7 @@ class Tracer:
                 arg_line = r'-javaagent:{JCOV_JAR_PATH}=grabber,port={PORT},include_list={CLASSES_FILE},template={OUT_TEMPLATE},type=method'.format(
                     JCOV_JAR_PATH=Tracer.JCOV_JAR_PATH, PORT=self.agent_port, CLASSES_FILE=self.path_to_classes_file, OUT_TEMPLATE=self.path_to_out_template)
                 jvmarg.attrib.update({'value': arg_line})
-        element_tree.write(self.xml_path, xml_declaration=True)
+        element_tree.write(xml_path, xml_declaration=True)
 
     def get_classes_path(self):
         all_classes = {os.path.dirname(self.xml_path)}
