@@ -58,8 +58,10 @@ class TestResult(object):
 class Tracer:
     JCOV_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "jcov.jar")
 
-    def __init__(self, repo_path, bug_mining=None):
+    def __init__(self, repo_path, trace_type, bugs_file, bug_mining=None):
         self.classes_dir = None
+        self.trace_type = trace_type
+        self.bugs_file = bugs_file
         self.command_port = 5552
         self.agent_port = 5551
         self.repo_path = repo_path
@@ -72,15 +74,17 @@ class Tracer:
         if bug_mining is None:
             ind = list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0].split('_')[1]
             bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0], 'framework', 'projects')
-        self.path_to_result_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "result.xml"))
-        self.path_to_out_template = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "template.xml"))
-        self.path_to_classes_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "classes"))
-        self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "test_details.json"))
-        self.path_to_tests_results = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "test_results.json"))
+        self.path_to_result_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"result_{self.trace_type}.xml"))
+        self.path_to_out_template = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"template_{self.trace_type}.xml"))
+        self.path_to_classes_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"classes_{self.trace_type}"))
+        self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_details_{self.trace_type}.json"))
+        self.path_to_tests_results = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_results_{self.trace_type}.json"))
         trigger_tests = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "trigger_tests"))
         self.path_to_trigger_tests = os.path.join(trigger_tests, os.listdir(trigger_tests)[0])
-        self.buggy_functions = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "buggy_functions.json"))
-        self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{ind}.json"))
+        if self.trace_type == 'sanity':
+            self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{self.trace_type}.json"))
+        else:
+            self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{ind}_{self.trace_type}.json"))
         self.test_results = {}
 
     def set_junit_formatter(self):
@@ -120,6 +124,12 @@ class Tracer:
 
     def template_creator_cmd_line(self):
         cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'tmplgen', '-verbose', '-t', self.path_to_out_template, '-c', self.path_to_classes_file, '-type', 'method']
+        if self.trace_type == 'sanity':
+            bugs = []
+            with open(self.bugs_file) as f:
+                bugs = list(map(lambda x: '.'.join(x.split('.')[:-1]), json.loads(f.read())))
+            for c in bugs:
+                cmd_line.extend(['-i', c])
         cmd_line.extend(self.get_classes_path())
         return cmd_line
 
@@ -150,7 +160,7 @@ class Tracer:
         assert p.poll() is None
         assert self.check_if_grabber_is_on()
 
-    def stop_grabber(self, bugs_file):
+    def stop_grabber(self):
         def make_nice_trace(t):
             return list(map(lambda x: x.lower().replace("java.lang.", "").replace("java.io.", "").replace("java.util.", ""), t))
 
@@ -169,13 +179,14 @@ class Tracer:
         optimized_tests = list(filter(lambda x: x[1], map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]), tests_details)))
         components = reduce(set.__or__, list(map(lambda x: set(x[1]), optimized_tests)), set())
         bugs = []
-        with open(bugs_file) as f:
+        with open(self.bugs_file) as f:
             bugs = list(set(json.loads(f.read())) & components)
         with open(self.path_to_tests_details, "w") as f:
             json.dump(optimized_tests, f)
         with open(self.path_to_tests_details + '2', "w") as f:
             json.dump(tests_details, f)
-        write_json_planning_file(self.matrix, optimized_tests, bugs)
+        if optimized_tests:
+            write_json_planning_file(self.matrix, optimized_tests, bugs)
 
     def get_xml_files(self):
         for root, _, files in os.walk(os.path.dirname(self.xml_path)):
@@ -206,16 +217,17 @@ class Tracer:
                 map(lambda x: x[4:-1].replace('::', '.').lower(), filter(lambda l: l.startswith('---'), f.readlines())))
         return trigger_tests
 
-    def get_buggy_functions(self, patch_file, save_to):
+    def get_buggy_functions(self, patch_file):
         repo = git.Repo(os.path.dirname(self.xml_path))
         if os.path.exists(patch_file):
             repo.git.apply(patch_file)
-        with open(save_to, "w") as f:
+        with open(self.bugs_file, "w") as f:
             json.dump(list(set(map(lambda x: x.method_name_parameters.lower().replace(',', ';'), diff.get_modified_exists_functions(os.path.dirname(self.xml_path))))), f)
 
 
 if __name__ == '__main__':
-    t = Tracer(os.path.abspath(sys.argv[1]))
+    t = Tracer(os.path.abspath(sys.argv[1]), sys.argv[2], sys.argv[3])
+    # t = Tracer(os.path.abspath(sys.argv[1]), sys.argv[2], sys.argv[3], r'C:\Users\User\Downloads\bug-mining (83)\bug-mining_189\framework\projects')
     # t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'), r'C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects')
     # t.stop_grabber(r"C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects\Lang\bugs.json")
     if sys.argv[-1] == 'template':
@@ -225,7 +237,7 @@ if __name__ == '__main__':
     elif sys.argv[-1] == 'formatter':
         t.set_junit_formatter()
     elif sys.argv[-1] == 'patch':
-        t.get_buggy_functions(sys.argv[2], sys.argv[3])
+        t.get_buggy_functions(sys.argv[4])
     else:
-        t.stop_grabber(sys.argv[2])
+        t.stop_grabber()
 
