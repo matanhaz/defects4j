@@ -391,7 +391,7 @@ sub _run_tests_isolation {
 # trace
 #
 sub _trace_tests {
-    my ($project, $root, $vid, $args) = @_;
+    my ($project, $root, $vid, $arg) = @_;
     $project->{prog_root} = $root;
     $project->checkout_vid($vid, $root, 1) or die;
     # Compile src and test
@@ -399,13 +399,13 @@ sub _trace_tests {
 	$project->compile_tests("$WORK_DIR/compile_tests_tracer_log.log");
 	system("python fix_compile_errors.py $WORK_DIR/compile_tests_tracer_log.log $project->{prog_root} 2>&1");
     $project->compile_tests() or die;
-	system("cd tracing && python Tracer.py ${root} ${args} ${BUGS_FILE} formatter 2>&1");
-	system("cd tracing && python Tracer.py ${root} ${args} ${BUGS_FILE} template  2>&1");
-	system("cd tracing && python Tracer.py ${root} ${args} ${BUGS_FILE} grabber 2>&1 &");
+	system("cd tracing && python Tracer.py ${root} ${arg} ${BUGS_FILE} formatter 2>&1");
+	system("cd tracing && python Tracer.py ${root} ${arg} ${BUGS_FILE} template  2>&1");
+	system("cd tracing && python Tracer.py ${root} ${arg} ${BUGS_FILE} grabber 2>&1 &");
 	sleep(20);
     # $project->run_tests($TESTS_FILE) or die;
     $project->_ant_call_comp("test", "-keep-going");
-	system(" cd tracing && python Tracer.py ${root} ${args} ${BUGS_FILE} stop 2>&1");
+	system(" cd tracing && python Tracer.py ${root} ${arg} ${BUGS_FILE} stop 2>&1");
 }
 
 #
@@ -415,7 +415,7 @@ sub get_buggy_functions{
     my ($project, $root, $vid, $patch_file) = @_;
     $project->{prog_root} = $root;
     $project->checkout_vid($vid, $root, 1) or die;
-	system("cd tracing && python Tracer.py ${root} ${args} ${BUGS_FILE} ${patch_file} patch  2>&1");
+	system("cd tracing && python Tracer.py ${root} full ${BUGS_FILE} ${patch_file} patch  2>&1");
 }
 
 #
