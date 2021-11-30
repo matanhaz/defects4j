@@ -128,7 +128,8 @@ class Tracer:
             bugs = []
             with open(self.bugs_file) as f:
                 bugs = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), json.loads(f.read()))))
-            for c in bugs:
+            tests_classes = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), self.get_trigger_tests())))
+            for c in bugs + tests_classes:
                 cmd_line.extend(['-i', c])
         cmd_line.extend(self.get_classes_path())
         return cmd_line
@@ -168,7 +169,7 @@ class Tracer:
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-save", '-command_port', str(self.command_port)]).communicate()
         Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-stop", '-command_port', str(self.command_port)]).communicate()
         traces = list(JcovParser(None, [self.path_to_result_file], True, True).parse(False))[0].split_to_subtraces()
-        trigger_tests = self.get_trigger_tests()
+        trigger_tests = list(map(lambda x: x.lower(), self.get_trigger_tests()))
         relevant_traces = traces
         tests_details = []
         for t in relevant_traces:
@@ -215,7 +216,7 @@ class Tracer:
     def get_trigger_tests(self):
         with open(self.path_to_trigger_tests) as f:
             trigger_tests = list(
-                map(lambda x: x[4:-1].replace('::', '.').lower(), filter(lambda l: l.startswith('---'), f.readlines())))
+                map(lambda x: x[4:-1].replace('::', '.'), filter(lambda l: l.startswith('---'), f.readlines())))
         return trigger_tests
 
     def get_buggy_functions(self, patch_file):
