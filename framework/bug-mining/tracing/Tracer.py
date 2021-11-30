@@ -181,7 +181,7 @@ class Tracer:
         components = reduce(set.__or__, list(map(lambda x: set(x[1]), optimized_tests)), set())
         bugs = []
         with open(self.bugs_file) as f:
-            bugs = list(set(json.loads(f.read())) & components)
+            bugs = list(list(map(lambda x: x.lower(), set(json.loads(f.read())))) & components)
         with open(self.path_to_tests_details, "w") as f:
             json.dump(optimized_tests, f)
         with open(self.path_to_tests_details + '2', "w") as f:
@@ -223,7 +223,7 @@ class Tracer:
         if os.path.exists(patch_file):
             repo.git.apply(patch_file)
         with open(self.bugs_file, "w") as f:
-            json.dump(list(set(map(lambda x: x.method_name_parameters.lower().replace(',', ';'), diff.get_modified_exists_functions(os.path.dirname(self.xml_path))))), f)
+            json.dump(list(set(map(lambda x: x.method_name_parameters.replace(',', ';'), diff.get_modified_exists_functions(os.path.dirname(self.xml_path))))), f)
 
 
 if __name__ == '__main__':
