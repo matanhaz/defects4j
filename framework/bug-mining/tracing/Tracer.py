@@ -127,7 +127,7 @@ class Tracer:
         if self.trace_type == 'sanity':
             bugs = []
             with open(self.bugs_file) as f:
-                bugs = list(map(lambda x: '.'.join(x.split('.')[:-1]), json.loads(f.read())))
+                bugs = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), json.loads(f.read()))))
             for c in bugs:
                 cmd_line.extend(['-i', c])
         cmd_line.extend(self.get_classes_path())
