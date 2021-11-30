@@ -183,7 +183,7 @@ class Trace(object):
                 if tests_slots.get(renames.get(st)):
                     test_traces[tests_slots[renames[st]].method_name].append(sub_traces[st])
                 else:
-                    key = 'unknown_' + '_'.join(st)
+                    key = 'unknown_' + '_'.join(list(map(str,st)))
                     test_traces.setdefault(key,[]).append(sub_traces[st])
                     # test_traces[tests_slots[renames[st]].method_name].append(sub_traces[st])
         for t in test_traces:
