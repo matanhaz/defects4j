@@ -181,7 +181,7 @@ class Tracer:
         components = reduce(set.__or__, list(map(lambda x: set(x[1]), optimized_tests)), set())
         bugs = []
         with open(self.bugs_file) as f:
-            bugs = list(list(map(lambda x: x.lower(), set(json.loads(f.read())))) & components)
+            bugs = list(set(map(lambda x: x.lower(), set(json.loads(f.read())))) & components)
         with open(self.path_to_tests_details, "w") as f:
             json.dump(optimized_tests, f)
         with open(self.path_to_tests_details + '2', "w") as f:
