@@ -173,7 +173,6 @@ class Trace(object):
                 extra_key = (t.extra_slot, h.parent, h.previous_slot)
                 renames[id_key] = key
                 renames[extra_key] = key
-        # tests_slots = dict(list(map(lambda x: ((x.id, x.hits_information[0].parent, x.hits_information[0].previous_slot), x), tests)) + list(map(lambda x: ((x.extra_slot, x.hits_information[0].parent, x.hits_information[0].previous_slot), x), tests)))
         test_traces = {}
         traces = {}
         for t in tests:
@@ -184,7 +183,9 @@ class Trace(object):
                 if tests_slots.get(renames.get(st)):
                     test_traces[tests_slots[renames[st]].method_name].append(sub_traces[st])
                 else:
-                    pass
+                    key = 'unknown_' + '_'.join(st)
+                    test_traces.setdefault(key,[]).append(sub_traces[st])
+                    # test_traces[tests_slots[renames[st]].method_name].append(sub_traces[st])
         for t in test_traces:
             if test_traces[t]:
                 traces[t] = Trace(t, dict(test_traces[t]))
