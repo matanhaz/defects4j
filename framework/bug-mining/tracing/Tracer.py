@@ -149,6 +149,7 @@ class Tracer:
             return False
 
     def execute_template_process(self):
+        print(self.template_creator_cmd_line())
         run(self.template_creator_cmd_line())
         for path in [self.path_to_classes_file, self.path_to_out_template]:
             if path:
