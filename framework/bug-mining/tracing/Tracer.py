@@ -286,7 +286,7 @@ class Tracer:
         with open(self.bugs_file) as f:
             bugs_classes = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), json.loads(f.read()))))
         trigger_tests_classes = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), self.get_trigger_tests())))
-        tests_classes = list(filter(lambda x: x.split('.').startswith('Test') or x.split('.').endswith('Test') or x.split('.').endswith('TestCase'), g_forward.nodes))
+        tests_classes = list(filter(lambda x: x.split('.')[-1].startswith('Test') or x.split('.')[-1].endswith('Test') or x.split('.')[-1].endswith('TestCase'), g_forward.nodes))
         relevant_tests = set()
         for t in tests_classes:
             for b in bugs_classes:
