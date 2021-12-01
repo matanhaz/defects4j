@@ -90,10 +90,27 @@ class Tracer:
         else:
             self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{ind}_{self.trace_type}.json"))
         self.test_results = {}
+        self.tests_to_run = None
+        self.classes_to_trace = None
+        self.set_by_trace_type()
+
+    def set_by_trace_type(self):
+        bugs = []
+        if not os.path.exists(self.bugs_file):
+            return
+        with open(self.bugs_file) as f:
+            bugs = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), json.loads(f.read()))))
+        tests_classes = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), self.get_trigger_tests())))
+        with open(self.call_graph_tests_path) as f:
+            relevant_tests = json.loads(f.read())
+        with open(self.call_graph_nodes_path) as f:
+            relevant_nodes = json.loads(f.read())
+        if self.trace_type == 'sanity':
+            self.classes_to_trace = bugs + tests_classes
+            self.tests_to_run = list(map(lambda t: f"**/{t.split('.')[-1]}.java", tests_classes))
 
     def set_junit_formatter(self):
         self.set_junit_formatter_file(self.xml_path)
-        # self.set_junit_formatter_file(self.defects4j_build)
 
     def set_junit_formatter_file(self, xml_path):
         element_tree = et.parse(xml_path)
@@ -115,7 +132,20 @@ class Tracer:
                 arg_line = r'-javaagent:{JCOV_JAR_PATH}=grabber,port={PORT},include_list={CLASSES_FILE},template={OUT_TEMPLATE},type=method'.format(
                     JCOV_JAR_PATH=Tracer.JCOV_JAR_PATH, PORT=self.agent_port, CLASSES_FILE=self.path_to_classes_file, OUT_TEMPLATE=self.path_to_out_template)
                 jvmarg.attrib.update({'value': arg_line})
+                if self.tests_to_run:
+                    self.set_junit_tests(j)
         element_tree.write(xml_path, xml_declaration=True)
+
+    def set_junit_tests(self, junit_element):
+        batchtest = list(filter(lambda x: x.tag == 'batchtest', junit_element.iter()))
+        for b in batchtest:
+            fileset = list(filter(lambda x: x.tag == 'fileset', b.iter()))[0]
+            includes = list(filter(lambda x: x.tag == 'include', fileset.iter()))
+            for i in includes:
+                fileset.remove(i)
+            for t in self.tests_to_run:
+                include = et.SubElement(fileset, 'include')
+                include.attrib.update({'name': t})
 
     def get_classes_path(self):
         all_classes = {os.path.dirname(self.xml_path)}
@@ -128,12 +158,8 @@ class Tracer:
 
     def template_creator_cmd_line(self):
         cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'tmplgen', '-verbose', '-t', self.path_to_out_template, '-c', self.path_to_classes_file, '-type', 'method']
-        if self.trace_type == 'sanity':
-            bugs = []
-            with open(self.bugs_file) as f:
-                bugs = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), json.loads(f.read()))))
-            tests_classes = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), self.get_trigger_tests())))
-            for c in bugs + tests_classes:
+        if self.classes_to_trace:
+            for c in self.classes_to_trace:
                 cmd_line.extend(['-i', c])
         cmd_line.extend(self.get_classes_path())
         return cmd_line
