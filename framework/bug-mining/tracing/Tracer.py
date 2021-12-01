@@ -6,6 +6,7 @@ import json
 from junitparser.junitparser import Error, Failure, Skipped
 from junitparser import JUnitXml
 from subprocess import Popen, PIPE, run
+import networkx as nx
 from jcov_parser import JcovParser
 et.register_namespace('', "http://maven.apache.org/POM/4.0.0")
 et.register_namespace('xsi', "http://www.w3.org/2001/XMLSchema-instance")
@@ -57,11 +58,16 @@ class TestResult(object):
 
 class Tracer:
     JCOV_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "jcov.jar")
+    CALL_GRAPH_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "javacg-0.1-SNAPSHOT-static.jar")
 
-    def __init__(self, repo_path, trace_type, bugs_file, bug_mining=None):
+    def __init__(self, repo_path, trace_type, pid_dir, bug_mining=None):
         self.classes_dir = None
         self.trace_type = trace_type
-        self.bugs_file = bugs_file
+        self.pid_dir = pid_dir
+        self.bugs_file = os.path.join(self.pid_dir, 'bugs.json')
+        self.all_jar_path = os.path.join(self.pid_dir, 'jar_path.jar')
+        self.call_graph_tests_path = os.path.join(self.pid_dir, 'call_graph_tests.json')
+        self.call_graph_nodes_path = os.path.join(self.pid_dir, 'call_graph_nodes.json')
         self.command_port = 5552
         self.agent_port = 5551
         self.repo_path = repo_path
@@ -219,19 +225,69 @@ class Tracer:
                 map(lambda x: x[4:-1].replace('::', '.'), filter(lambda l: l.startswith('---'), f.readlines())))
         return trigger_tests
 
-    def get_buggy_functions(self, patch_file):
-        repo = git.Repo(os.path.dirname(self.xml_path))
-        if os.path.exists(patch_file):
-            repo.git.apply(patch_file)
-        with open(self.bugs_file, "w") as f:
-            json.dump(list(set(map(lambda x: x.method_name_parameters.replace(',', ';'), diff.get_modified_exists_functions(os.path.dirname(self.xml_path))))), f)
+    def get_buggy_functions(self):
+        bugs = list(set(map(lambda x: x.method_name_parameters.replace(',', ';'),
+                            diff.get_modified_exists_functions(os.path.dirname(self.xml_path)))))
+        if bugs:
+            with open(self.bugs_file, "w") as f:
+                json.dump(bugs, f)
+
+    def create_call_graph(self):
+        cmd = ["java", "-jar", Tracer.CALL_GRAPH_JAR_PATH, self.all_jar_path]
+        edges = set()
+        edges = edges.union(set(str(Popen(cmd, stdout=PIPE).communicate()[0]).replace('(M)', '').replace('(I)', '').replace('(D)', '').replace('(S)', '').replace('(O)', '').replace('\\r', '').split('\\n')))
+        classes_edges = set()
+        for v, u in list(filter(lambda x: x, map(lambda x: x[2:].split(), edges))):
+            if ':' in v:
+                v = v.split(':')[0]
+            if ':' in u:
+                u = u.split(':')[0]
+            if '$' in v:
+                v = v.split('$')[0]
+            if '$' in u:
+                u = u.split('$')[0]
+            if v.startswith('['):
+                v = v[2:]
+            if u.startswith('['):
+                u = u[2:]
+            for prefix in ['java.', 'org.junit']:
+                if u.startswith(prefix) or v.startswith(prefix):
+                    u = ''
+                    v = ''
+            if v != u and v and u:
+                classes_edges.add((v,u))
+        g_forward = nx.DiGraph()
+        g_forward.add_edges_from(classes_edges)
+        bugs_classes = []
+        with open(self.bugs_file) as f:
+            bugs_classes = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), json.loads(f.read()))))
+        trigger_tests_classes = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), self.get_trigger_tests())))
+        tests_classes = list(filter(lambda x: x.split('.').startswith('Test') or x.split('.').endswith('Test') or x.split('.').endswith('TestCase'), g_forward.node))
+        relevant_tests = set()
+        for t in tests_classes:
+            for b in bugs_classes:
+                if nx.has_path(g_forward, t, b):
+                    relevant_tests.add(t)
+                    break
+        if not set(trigger_tests_classes).intersection(relevant_tests):
+            return
+        g2 = nx.DiGraph(g_forward)
+        relevant_nodes = set(relevant_tests)
+        relevant_nodes.update(set(bugs_classes))
+        for t in relevant_tests:
+            paths = nx.single_source_shortest_path(g2, t)
+            reachable = set(paths.keys())
+            relevant_nodes.update(reachable)
+            g2.remove_edges_from(reachable)
+        with open(self.call_graph_tests_path, "w") as f:
+            json.dump(list(relevant_tests), f)
+        with open(self.call_graph_nodes_path, "w") as f:
+            json.dump(list(relevant_nodes), f)
 
 
 if __name__ == '__main__':
     t = Tracer(os.path.abspath(sys.argv[1]), sys.argv[2], sys.argv[3])
     # t = Tracer(os.path.abspath(sys.argv[1]), sys.argv[2], sys.argv[3], r'C:\Users\User\Downloads\bug-mining (83)\bug-mining_189\framework\projects')
-    # t = Tracer(os.path.join(os.path.abspath(sys.argv[1]), 'build.xml'), r'C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects')
-    # t.stop_grabber(r"C:\Users\amirelm\Downloads\bug-mining (13)\bug-mining_32\framework\projects\Lang\bugs.json")
     if sys.argv[-1] == 'template':
         t.execute_template_process()
     elif sys.argv[-1] == 'grabber':
@@ -239,7 +295,9 @@ if __name__ == '__main__':
     elif sys.argv[-1] == 'formatter':
         t.set_junit_formatter()
     elif sys.argv[-1] == 'patch':
-        t.get_buggy_functions(sys.argv[4])
+        t.get_buggy_functions()
+    elif sys.argv[-1] == 'call_graph':
+        t.create_call_graph()
     else:
         t.stop_grabber()
 

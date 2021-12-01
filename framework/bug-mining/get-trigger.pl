@@ -132,8 +132,12 @@ $PROJECTS_DIR = "$WORK_DIR/framework/projects";
 
 # Set the projects and repository directories to the current working directory.
 my $PATCHES_DIR = "$PROJECTS_DIR/$PID/patches";
+my $PID_DIR = "$PROJECTS_DIR/$PID";
 my $BUGS_FILE = "$PROJECTS_DIR/$PID/bugs.json";
 my $SANITY_MATRIX = "$PROJECTS_DIR/$PID/matrix_sanity.json";
+my $JAR_PATH = "$PROJECTS_DIR/$PID/jar_path.jar";
+my $CALL_GRAPH_TESTS = "$PROJECTS_DIR/$PID/call_graph_tests.json";
+my $CALL_GRAPH_NODES = "$PROJECTS_DIR/$PID/call_graph_nodes.json";
 
 # Temporary directory
 my $TMP_DIR = Utils::get_tmp_dir();
@@ -247,11 +251,11 @@ foreach my $bid (@bids) {
     }
 
 	get_buggy_functions($project, "$TMP_DIR/v3", "${bid}f", "$PATCHES_DIR/$bid.src.patch");
-	_trace_tests($project, "$TMP_DIR/v4", "${bid}b", "sanity");
+	_trace_tests($project, "$TMP_DIR/v4", "${bid}f", "sanity", "$PATCHES_DIR/$bid.src.patch");
 	open FILE, $SANITY_MATRIX or die "Cannot open sanity matrix ($SANITY_MATRIX): $!";
     close FILE;
-	# _trace_tests($project, "$TMP_DIR/v5", "${bid}b", "package");
-	_trace_tests($project, "$TMP_DIR/v6", "${bid}b", "full");
+	# _trace_tests($project, "$TMP_DIR/v5", "${bid}f", "package", "$PATCHES_DIR/$bid.src.patch");
+	_trace_tests($project, "$TMP_DIR/v6", "${bid}f", "full", "$PATCHES_DIR/$bid.src.patch");
     # Add data
     _add_row(\%data);
 }
@@ -391,21 +395,22 @@ sub _run_tests_isolation {
 # trace
 #
 sub _trace_tests {
-    my ($project, $root, $vid, $arg) = @_;
+    my ($project, $root, $vid, $arg, $patch) = @_;
     $project->{prog_root} = $root;
     $project->checkout_vid($vid, $root, 1) or die;
+	$project->apply_patch($root, $patch)
     # Compile src and test
     $project->compile() or die;
 	$project->compile_tests("$WORK_DIR/compile_tests_tracer_log.log");
 	system("python fix_compile_errors.py $WORK_DIR/compile_tests_tracer_log.log $project->{prog_root} 2>&1");
     $project->compile_tests() or die;
-	system("cd tracing && python Tracer.py ${root} ${arg} ${BUGS_FILE} formatter 2>&1");
-	system("cd tracing && python Tracer.py ${root} ${arg} ${BUGS_FILE} template  2>&1");
-	system("cd tracing && python Tracer.py ${root} ${arg} ${BUGS_FILE} grabber 2>&1 &");
+	system("cd tracing && python Tracer.py ${root} ${arg} ${PID_DIR} formatter 2>&1");
+	system("cd tracing && python Tracer.py ${root} ${arg} ${PID_DIR} template  2>&1");
+	system("cd tracing && python Tracer.py ${root} ${arg} ${PID_DIR} grabber 2>&1 &");
 	sleep(20);
     # $project->run_tests($TESTS_FILE) or die;
     $project->_ant_call_comp("test", "-keep-going");
-	system(" cd tracing && python Tracer.py ${root} ${arg} ${BUGS_FILE} stop 2>&1");
+	system(" cd tracing && python Tracer.py ${root} ${arg} ${PID_DIR} stop 2>&1");
 }
 
 #
@@ -415,7 +420,19 @@ sub get_buggy_functions{
     my ($project, $root, $vid, $patch_file) = @_;
     $project->{prog_root} = $root;
     $project->checkout_vid($vid, $root, 1) or die;
-	system("cd tracing && python Tracer.py ${root} full ${BUGS_FILE} ${patch_file} patch  2>&1");
+	$project->apply_patch($root, $patch_file)
+	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} patch  2>&1");
+	open FILE, $BUGS_FILE or die "Cannot open bugs file ($BUGS_FILE): $!";
+    close FILE;
+	$project->compile() or die;
+	$project->compile_tests("$WORK_DIR/compile_tests_tracer_log.log");
+	system("python fix_compile_errors.py $WORK_DIR/compile_tests_tracer_log.log $project->{prog_root} 2>&1");
+    $project->compile_tests() or die;
+	system("jar cvf ${JAR_PATH} ${root} 2>&1");
+	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} call_graph 2>&1");
+	open FILE, $CALL_GRAPH_TESTS or die "Cannot open call graph tests ($CALL_GRAPH_TESTS): $!";
+    close FILE;
+
 }
 
 #

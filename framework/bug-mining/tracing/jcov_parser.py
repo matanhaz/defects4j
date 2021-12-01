@@ -135,7 +135,7 @@ def findPathsNoLC(G,u,n):
 
 
 if __name__ == '__main__':
-    t = list(JcovParser(None, [r"C:\Users\amirelm\Downloads\bug-mining (20)\bug-mining_19\framework\projects\Lang\result.xml"], True, True).parse(False))[
+    t = list(JcovParser(None, [r"C:\Users\User\Downloads\bug-mining (89)\bug-mining_189\framework\projects\Compress\result_sanity.xml"], True, True).parse(False))[
         0]
     traces = t.split_to_subtraces()
     from collections import Counter
