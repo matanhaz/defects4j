@@ -398,7 +398,7 @@ sub _trace_tests {
     my ($project, $root, $vid, $arg, $patch) = @_;
     $project->{prog_root} = $root;
     $project->checkout_vid($vid, $root, 1) or die;
-	$project->apply_patch($root, $patch)
+	$project->apply_patch($root, $patch);
     # Compile src and test
     $project->compile() or die;
 	$project->compile_tests("$WORK_DIR/compile_tests_tracer_log.log");
@@ -420,7 +420,7 @@ sub get_buggy_functions{
     my ($project, $root, $vid, $patch_file) = @_;
     $project->{prog_root} = $root;
     $project->checkout_vid($vid, $root, 1) or die;
-	$project->apply_patch($root, $patch_file)
+	$project->apply_patch($root, $patch_file);
 	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} patch  2>&1");
 	open FILE, $BUGS_FILE or die "Cannot open bugs file ($BUGS_FILE): $!";
     close FILE;
