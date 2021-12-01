@@ -98,6 +98,8 @@ class Tracer:
         bugs = []
         if not os.path.exists(self.bugs_file):
             return
+        if not os.path.exists(self.call_graph_tests_path):
+            return
         with open(self.bugs_file) as f:
             bugs = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), json.loads(f.read()))))
         tests_classes = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), self.get_trigger_tests())))
