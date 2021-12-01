@@ -304,7 +304,7 @@ class Tracer:
             paths = nx.single_source_shortest_path(g2, t)
             reachable = set(paths.keys())
             relevant_nodes.update(reachable)
-            g2.remove_edges_from(reachable)
+            g2.remove_nodes_from(reachable)
         with open(self.call_graph_tests_path, "w") as f:
             json.dump(list(relevant_tests), f)
         with open(self.call_graph_nodes_path, "w") as f:
