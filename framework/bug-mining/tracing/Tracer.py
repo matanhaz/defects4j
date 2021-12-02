@@ -299,6 +299,8 @@ class Tracer:
         relevant_tests = set()
         for t in tests_classes:
             for b in bugs_classes:
+                if t not in g_forward or b not in g_forward:
+                    continue
                 if nx.has_path(g_forward, t, b):
                     relevant_tests.add(t)
                     break
@@ -309,6 +311,8 @@ class Tracer:
         relevant_nodes = set(relevant_tests)
         relevant_nodes.update(set(bugs_classes))
         for t in relevant_tests:
+            if t not in g2:
+                continue
             paths = nx.single_source_shortest_path(g2, t)
             reachable = set(paths.keys())
             relevant_nodes.update(reachable)

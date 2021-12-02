@@ -180,7 +180,7 @@ foreach my $bid (@bids) {
     $data{$ID} = $bid;
 
     # V2 must not have any failing tests
-    my $list = _get_failing_tests($project, "$TMP_DIR/v2", "${bid}f");
+    my $list = _get_failing_tests($project, "$TMP_DIR/v2", "${bid}f", "");
     if (($data{$FAIL_V2} = (scalar(@{$list->{"classes"}}) + scalar(@{$list->{"methods"}}))) != 0) {
         print("Non expected failing test classes/methods on ${PID}-${bid}\n");
         _add_row(\%data);
@@ -188,7 +188,7 @@ foreach my $bid (@bids) {
     }
 
     # V1 must not have failing test classes but at least one failing test method
-    $list = _get_failing_tests($project, "$TMP_DIR/v1", "${bid}b");
+    $list = _get_failing_tests($project, "$TMP_DIR/v1", "${bid}f", "$PATCHES_DIR/$bid.src.patch");
     my $fail_c = scalar(@{$list->{"classes"}}); $data{$FAIL_C_V1} = $fail_c;
     my $fail_m = scalar(@{$list->{"methods"}}); $data{$FAIL_M_V1} = $fail_m;
     if ($fail_c !=0 or $fail_m == 0) {
@@ -343,13 +343,17 @@ sub _get_bug_ids_by_indices{
 # Get a list of all failing tests
 #
 sub _get_failing_tests {
-    my ($project, $root, $vid) = @_;
+    my ($project, $root, $vid, $patch) = @_;
 
     # Clean output file
     system(">$FAILED_TESTS_FILE");
     $project->{prog_root} = $root;
 
     $project->checkout_vid($vid, $root, 1) or die;
+	if ($patch ne "")
+	{
+	  $project->apply_patch($root, $patch);
+	}
 
     # Compile src and test
     $project->compile() or die;
