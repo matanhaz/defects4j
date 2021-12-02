@@ -99,6 +99,10 @@ class Tracer:
         self.set_by_trace_type()
 
     def set_by_trace_type(self):
+        if os.path.exists(self.tests_to_exclude_path):
+            with open(self.tests_to_exclude_path) as f:
+                exclude = json.loads(f.read())
+            self.tests_to_exclude = list(map(lambda t: f"**/{t.split('.')[-1]}.java", exclude))
         bugs = []
         if not os.path.exists(self.bugs_file):
             return
@@ -117,11 +121,6 @@ class Tracer:
         elif self.trace_type == 'full':
             self.classes_to_trace = list(set(relevant_nodes))
             self.tests_to_run = list(map(lambda t: f"**/{t.split('.')[-1]}.java", relevant_tests))
-        if not os.path.exists(self.tests_to_exclude_path):
-            return
-        with open(self.tests_to_exclude_path) as f:
-            exclude = json.loads(f.read())
-        self.tests_to_exclude = list(map(lambda t: f"**/{t.split('.')[-1]}.java", exclude))
 
     def set_junit_formatter(self):
         self.set_junit_formatter_file(self.xml_path)
