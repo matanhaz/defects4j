@@ -316,7 +316,7 @@ class Tracer:
             json.dump(list(relevant_tests), f)
         with open(self.call_graph_nodes_path, "w") as f:
             json.dump(list(relevant_nodes), f)
-        os.remove(Tracer.CALL_GRAPH_JAR_PATH)
+        os.remove(self.all_jar_path)
 
 
 if __name__ == '__main__':
