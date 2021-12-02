@@ -436,7 +436,7 @@ sub get_buggy_functions{
 	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} call_graph 2>&1");
 	open FILE, $CALL_GRAPH_TESTS or die "Cannot open call graph tests ($CALL_GRAPH_TESTS): $!";
     close FILE;
-
+	system("rm -f ${JAR_PATH} 2>&1");
 }
 
 #
