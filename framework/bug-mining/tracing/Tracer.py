@@ -131,6 +131,23 @@ class Tracer:
         with open(self.tests_to_exclude_path, 'w') as f:
             json.dump(trigger_tests, f)
 
+    def exclude_tests(self):
+        if not self.tests_to_exclude:
+            return
+        element_tree = et.parse(self.xml_path)
+        junit = list(filter(lambda x: x.tag == 'junit', element_tree.iter()))
+        if junit:
+            for junit_element in junit:
+                if self.tests_to_exclude:
+                    batchtest = list(filter(lambda x: x.tag == 'batchtest', junit_element.iter()))
+                    for b in batchtest:
+                        fileset = list(filter(lambda x: x.tag == 'fileset', b.iter()))[0]
+                        if self.tests_to_exclude:
+                            for t in self.tests_to_exclude:
+                                exclude = et.SubElement(fileset, 'exclude')
+                                exclude.attrib.update({'name': t})
+        element_tree.write(self.xml_path, xml_declaration=True)
+
     def set_junit_formatter_file(self, xml_path):
         element_tree = et.parse(xml_path)
         junit = list(filter(lambda x: x.tag == 'junit', element_tree.iter()))
@@ -170,7 +187,6 @@ class Tracer:
                 for t in self.tests_to_exclude:
                     include = et.SubElement(fileset, 'exclude')
                     include.attrib.update({'name': t})
-
 
     def get_classes_path(self):
         all_classes = {os.path.dirname(self.xml_path)}
@@ -359,6 +375,8 @@ if __name__ == '__main__':
         t.create_call_graph()
     elif sys.argv[-1] == 'collect_failed_tests':
         t.collect_failed_tests(sys.argv[4])
+    elif sys.argv[-1] == 'exclude_tests':
+        t.exclude_tests()
     else:
         t.stop_grabber()
 
