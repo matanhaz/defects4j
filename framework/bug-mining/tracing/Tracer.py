@@ -140,13 +140,12 @@ class Tracer:
         junit = list(filter(lambda x: x.tag == 'junit', element_tree.iter()))
         if junit:
             for junit_element in junit:
-                if self.tests_to_exclude:
-                    batchtest = list(filter(lambda x: x.tag == 'batchtest', junit_element.iter()))
-                    for b in batchtest:
-                        fileset = list(filter(lambda x: x.tag == 'fileset', b.iter()))[0]
-                        for t in self.tests_to_exclude:
-                            exclude = et.SubElement(fileset, 'exclude')
-                            exclude.attrib.update({'name': t})
+                batchtest = list(filter(lambda x: x.tag == 'batchtest', junit_element.iter()))
+                for b in batchtest:
+                    fileset = list(filter(lambda x: x.tag == 'fileset', b.iter()))[0]
+                    for t in self.tests_to_exclude:
+                        exclude = et.SubElement(fileset, 'exclude')
+                        exclude.attrib.update({'name': t})
         element_tree.write(self.xml_path, xml_declaration=True)
 
     def set_junit_formatter_file(self, xml_path):
