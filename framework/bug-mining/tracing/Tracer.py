@@ -148,7 +148,7 @@ class Tracer:
                         exclude.attrib.update({'name': t})
         element_tree.write(self.xml_path, xml_declaration=True)
         tests = list(map(lambda x: x.replace('.java', '').replace('**/', ''), self.tests_to_exclude))
-        for root, dirs, files in os.walk(os.path.dirname(self.xml_path)):
+        for root, _, files in os.walk(os.path.dirname(self.xml_path)):
             for f in files:
                 for t in tests:
                     if t.lower() in f.lower():
