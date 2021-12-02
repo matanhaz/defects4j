@@ -110,6 +110,9 @@ class Tracer:
         if self.trace_type == 'sanity':
             self.classes_to_trace = bugs + tests_classes
             self.tests_to_run = list(map(lambda t: f"**/{t.split('.')[-1]}.java", tests_classes))
+        elif self.trace_type == 'full':
+            self.classes_to_trace = list(set(relevant_nodes))
+            self.tests_to_run = list(map(lambda t: f"**/{t.split('.')[-1]}.java", relevant_tests))
 
     def set_junit_formatter(self):
         self.set_junit_formatter_file(self.xml_path)
@@ -276,7 +279,11 @@ class Tracer:
                 v = v[2:]
             if u.startswith('['):
                 u = u[2:]
-            for prefix in ['java.', 'org.junit']:
+            if '[' in v:
+                v = v.split('[')[0]
+            if '[' in u:
+                u = u.split('[')[0]
+            for prefix in ['java.', 'org.junit', 'javax.']:
                 if u.startswith(prefix) or v.startswith(prefix):
                     u = ''
                     v = ''
