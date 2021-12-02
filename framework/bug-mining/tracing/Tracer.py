@@ -303,6 +303,7 @@ class Tracer:
                     relevant_tests.add(t)
                     break
         if not set(trigger_tests_classes).intersection(relevant_tests):
+            os.remove(self.all_jar_path)
             return
         g2 = nx.DiGraph(g_forward)
         relevant_nodes = set(relevant_tests)
