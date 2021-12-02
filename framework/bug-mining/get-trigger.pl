@@ -352,6 +352,7 @@ sub _get_failing_tests {
     $project->checkout_vid($vid, $root, 1) or die;
 	if ($patch ne "")
 	{
+	  printf ("apply patch to get failed tests\n");
 	  $project->apply_patch($root, $patch);
 	}
 
