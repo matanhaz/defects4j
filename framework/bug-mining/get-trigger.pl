@@ -160,7 +160,7 @@ system("mkdir -p $OUT_DIR");
 my $DEP_TEST_FILE            = "$PROJECTS_DIR/$PID/dependent_tests";
 
 # Temporary files used for saving failed test results in
-my $FAILED_TESTS_FILE        = "$TMP_DIR/test.run";
+my $FAILED_TESTS_FILE        = "$WORK_DIR/test.run";
 my $TESTS_FILE        = "$TMP_DIR/test2.run";
 my $FAILED_TESTS_FILE_SINGLE = "$FAILED_TESTS_FILE.single";
 

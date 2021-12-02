@@ -186,8 +186,8 @@ class Tracer:
                     include.attrib.update({'name': t})
             if self.tests_to_exclude:
                 for t in self.tests_to_exclude:
-                    include = et.SubElement(fileset, 'exclude')
-                    include.attrib.update({'name': t})
+                    exclude = et.SubElement(fileset, 'exclude')
+                    exclude.attrib.update({'name': t})
 
     def get_classes_path(self):
         all_classes = {os.path.dirname(self.xml_path)}
