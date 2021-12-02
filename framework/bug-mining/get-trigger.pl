@@ -180,6 +180,8 @@ foreach my $bid (@bids) {
     $data{$ID} = $bid;
 
     # V2 must not have any failing tests
+    my $list0 = _get_failing_tests($project, "$TMP_DIR/v0", "${bid}f", "");
+	system("cd tracing && python Tracer.py $TMP_DIR/v0 full ${PID_DIR} $FAILED_TESTS_FILE collect_failed_tests 2>&1");
     my $list = _get_failing_tests($project, "$TMP_DIR/v2", "${bid}f", "");
     if (($data{$FAIL_V2} = (scalar(@{$list->{"classes"}}) + scalar(@{$list->{"methods"}}))) != 0) {
         print("Non expected failing test classes/methods on ${PID}-${bid}\n");

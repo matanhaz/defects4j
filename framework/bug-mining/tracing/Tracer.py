@@ -66,6 +66,7 @@ class Tracer:
         self.all_jar_path = os.path.join(self.pid_dir, 'jar_path.jar')
         self.call_graph_tests_path = os.path.join(self.pid_dir, 'call_graph_tests.json')
         self.call_graph_nodes_path = os.path.join(self.pid_dir, 'call_graph_nodes.json')
+        self.tests_to_exclude_path = os.path.join(self.pid_dir, 'tests_to_exclude.json')
         self.command_port = 5552
         self.agent_port = 5551
         self.repo_path = repo_path
@@ -91,6 +92,7 @@ class Tracer:
             self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{ind}_{self.trace_type}.json"))
         self.test_results = {}
         self.tests_to_run = None
+        self.tests_to_exclude = None
         self.classes_to_trace = None
         self.set_by_trace_type()
 
@@ -113,9 +115,21 @@ class Tracer:
         elif self.trace_type == 'full':
             self.classes_to_trace = list(set(relevant_nodes))
             self.tests_to_run = list(map(lambda t: f"**/{t.split('.')[-1]}.java", relevant_tests))
+        if not os.path.exists(self.tests_to_exclude_path):
+            return
+        with open(self.tests_to_exclude_path) as f:
+            exclude = json.loads(f.read())
+        self.tests_to_exclude = list(map(lambda t: f"**/{t.split('.')[-1]}.java", exclude))
 
     def set_junit_formatter(self):
         self.set_junit_formatter_file(self.xml_path)
+
+    def collect_failed_tests(self, failed_tests_file):
+        with open(failed_tests_file) as f:
+            trigger_tests = list(
+                map(lambda x: x[4:-1].replace('::', '.'), filter(lambda l: l.startswith('---'), f.readlines())))
+        with open(self.tests_to_exclude_path, 'w') as f:
+            json.dump(trigger_tests, f)
 
     def set_junit_formatter_file(self, xml_path):
         element_tree = et.parse(xml_path)
@@ -137,7 +151,7 @@ class Tracer:
                 arg_line = r'-javaagent:{JCOV_JAR_PATH}=grabber,port={PORT},include_list={CLASSES_FILE},template={OUT_TEMPLATE},type=method'.format(
                     JCOV_JAR_PATH=Tracer.JCOV_JAR_PATH, PORT=self.agent_port, CLASSES_FILE=self.path_to_classes_file, OUT_TEMPLATE=self.path_to_out_template)
                 jvmarg.attrib.update({'value': arg_line})
-                if self.tests_to_run:
+                if self.tests_to_run or self.tests_to_exclude:
                     self.set_junit_tests(j)
         element_tree.write(xml_path, xml_declaration=True)
 
@@ -148,9 +162,15 @@ class Tracer:
             includes = list(filter(lambda x: x.tag == 'include', fileset.iter()))
             for i in includes:
                 fileset.remove(i)
-            for t in self.tests_to_run:
-                include = et.SubElement(fileset, 'include')
-                include.attrib.update({'name': t})
+            if self.tests_to_run:
+                for t in self.tests_to_run:
+                    include = et.SubElement(fileset, 'include')
+                    include.attrib.update({'name': t})
+            if self.tests_to_exclude:
+                for t in self.tests_to_exclude:
+                    include = et.SubElement(fileset, 'exclude')
+                    include.attrib.update({'name': t})
+
 
     def get_classes_path(self):
         all_classes = {os.path.dirname(self.xml_path)}
@@ -337,6 +357,8 @@ if __name__ == '__main__':
         t.get_buggy_functions()
     elif sys.argv[-1] == 'call_graph':
         t.create_call_graph()
+    elif sys.argv[-1] == 'collect_failed_tests':
+        t.collect_failed_tests(sys.argv[4])
     else:
         t.stop_grabber()
 
