@@ -85,7 +85,9 @@ class Tracer:
         self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_details_{self.trace_type}.json"))
         self.path_to_tests_results = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_results_{self.trace_type}.json"))
         trigger_tests = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "trigger_tests"))
-        self.path_to_trigger_tests = os.path.join(trigger_tests, os.listdir(trigger_tests)[0])
+        self.path_to_trigger_tests = None
+        if os.listdir(trigger_tests):
+            self.path_to_trigger_tests = os.path.join(trigger_tests, os.listdir(trigger_tests)[0])
         if self.trace_type == 'sanity':
             self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{self.trace_type}.json"))
         else:
@@ -285,6 +287,8 @@ class Tracer:
         return self.test_results
 
     def get_trigger_tests(self):
+        if not os.path.exists(self.path_to_trigger_tests):
+            return []
         with open(self.path_to_trigger_tests) as f:
             trigger_tests = list(
                 map(lambda x: x[4:-1].replace('::', '.'), filter(lambda l: l.startswith('---'), f.readlines())))
