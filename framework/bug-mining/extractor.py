@@ -26,7 +26,7 @@ class JiraExtractor():
 
 	def get_java_commits(self):
 		data = self.repo.git.log('--pretty=format:"sha: %H"', '--name-only').split("sha: ")
-		comms = dict(map(lambda d: (d[0], list(filter(lambda x: x.endswith(".java"), d[1:-1]))), list(map(lambda d: d.replace('"', '').replace('\n\n', '\n').split('\n'), data))))
+		comms = dict(map(lambda d: (d[0], list(filter(lambda x: x.endswith(".java") and 'test' not in os.path.normpath(x).split(os.path.sep)[-1].lower(), d[1:-1]))), list(map(lambda d: d.replace('"', '').replace('\n\n', '\n').split('\n'), data))))
 		return dict(map(lambda x: (self.repo.commit(x), comms[x]), list(filter(lambda x: comms[x], comms))))
 
 	def has_parent(self, commit):
