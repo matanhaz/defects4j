@@ -260,6 +260,7 @@ class Tracer:
                 tests_details.append((t, traces[t].get_trace(), 1 if t.lower().split('(')[0] in trigger_tests else 0))
         tests_names = set(list(map(lambda x: x[0], tests_details)) + list(map(lambda x: x[0].lower(), tests_details)))
         fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 1, tests_details))), set())
+        all_components = reduce(set.__or__, list(map(lambda x: set(x[1]), tests_details)), set())
         fail_components = fail_components - tests_names
         optimized_tests = list(filter(lambda x: x[1], map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]), tests_details)))
         components = reduce(set.__or__, list(map(lambda x: set(x[1]), optimized_tests)), set())
@@ -270,7 +271,7 @@ class Tracer:
             json.dump(optimized_tests, f)
         with open(self.path_to_tests_details + '2', "w") as f:
             json.dump(tests_details, f)
-        if optimized_tests:
+        if set(bugs).intersection(all_components):
             write_json_planning_file(self.matrix, optimized_tests, bugs)
 
     def get_xml_files(self):
