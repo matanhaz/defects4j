@@ -131,6 +131,7 @@ class Tracer:
                 map(lambda x: x[4:-1].replace('::', '.'), filter(lambda l: l.startswith('---'), f.readlines())))
         with open(self.tests_to_exclude_path, 'w') as f:
             json.dump(trigger_tests, f)
+        print(f'collected tests {trigger_tests}')
 
     def exclude_tests(self):
         if not self.tests_to_exclude:
