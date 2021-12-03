@@ -102,7 +102,7 @@ class Tracer:
         if os.path.exists(self.tests_to_exclude_path):
             with open(self.tests_to_exclude_path) as f:
                 exclude = json.loads(f.read())
-            self.tests_to_exclude = list(map(lambda t: f"**/{t.split('.')[-1]}.java", exclude))
+            self.tests_to_exclude = list(map(lambda t: f"**/{t.split('.')[-2]}.java", exclude))
         bugs = []
         if not os.path.exists(self.bugs_file):
             return
