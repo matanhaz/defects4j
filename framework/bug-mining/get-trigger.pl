@@ -187,9 +187,7 @@ foreach my $bid (@bids) {
         print("Non expected failing test classes/methods on ${PID}-${bid}\n");
 		my $failing_methods = $list->{methods};
 		my $failing_classes = $list->{classes};
-		foreach ($failing_classes) {
-		  print "$_\n";
-		}
+		print join("\n",failing_classes),"\n";
         _add_row(\%data);
         next;
     }
