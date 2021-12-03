@@ -185,8 +185,10 @@ foreach my $bid (@bids) {
     my $list = _get_failing_tests($project, "$TMP_DIR/v2", "${bid}f", "");
     if (($data{$FAIL_V2} = (scalar(@{$list->{"classes"}}) + scalar(@{$list->{"methods"}}))) != 0) {
         print("Non expected failing test classes/methods on ${PID}-${bid}\n");
-		print "@{$list->{"methods"}}\n";
-		print "@{$list->{"classes"}}\n";
+		my $failing_methods = $list->{methods};
+		my $failing_classes = $list->{classes};
+		print "@failing_methods\n";
+		print "@failing_classes\n";
         _add_row(\%data);
         next;
     }
