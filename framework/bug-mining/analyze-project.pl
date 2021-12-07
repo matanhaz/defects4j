@@ -151,7 +151,7 @@ my $db_dir = $WORK_DIR;
 # Number of successful test runs in a row required
 my $TEST_RUNS = 2;
 # Number of maximum test runs (give up point)
-my $MAX_TEST_RUNS = 10;
+my $MAX_TEST_RUNS = 3;
 
 # Temporary directory
 my $TMP_DIR = Utils::get_tmp_dir();
