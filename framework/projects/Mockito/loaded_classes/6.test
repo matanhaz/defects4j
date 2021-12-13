@@ -1,9 +1,0 @@
-org.mockito.configuration.MockitoConfiguration
-org.mockito.internal.configuration.ConfigurationAccess
-org.mockito.StateMaster
-org.mockitousage.IMethods
-org.mockitousage.matchers.AnyXMatchersAcceptNullsTest
-org.mockitousage.matchers.MatchersTest
-org.mockitousage.matchers.NewMatchersTest
-org.mockitoutil.Assertor
-org.mockitoutil.TestBase

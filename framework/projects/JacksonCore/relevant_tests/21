@@ -1,3 +1,0 @@
-com.fasterxml.jackson.core.filter.BasicParserFilteringTest
-com.fasterxml.jackson.core.filter.JsonPointerParserFilteringTest
-com.fasterxml.jackson.core.filter.TokenVerifyingParserFiltering330Test

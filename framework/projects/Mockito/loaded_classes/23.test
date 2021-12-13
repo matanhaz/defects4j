@@ -1,3 +1,0 @@
-org.mockito.configuration.MockitoConfiguration
-org.mockitousage.stubbing.DeepStubsSerializableTest
-org.mockitoutil.SimpleSerializationUtil

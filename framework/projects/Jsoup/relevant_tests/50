@@ -1,6 +1,0 @@
-org.jsoup.helper.DataUtilTest
-org.jsoup.helper.W3CDomTest
-org.jsoup.integration.ParseTest
-org.jsoup.nodes.DocumentTest
-org.jsoup.parser.HtmlParserTest
-org.jsoup.parser.XmlTreeBuilderTest

@@ -1,4 +1,0 @@
-com.fasterxml.jackson.databind.TestJDKSerialization
-com.fasterxml.jackson.databind.convert.TestUpdateValue
-com.fasterxml.jackson.databind.seq.ReadRecoveryTest
-com.fasterxml.jackson.databind.seq.ReadValuesTest

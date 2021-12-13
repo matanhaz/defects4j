@@ -1,4 +1,0 @@
-com.fasterxml.jackson.databind.BaseMapTest
-com.fasterxml.jackson.databind.node.NodeTestBase
-com.fasterxml.jackson.databind.node.TestJsonNode
-com.fasterxml.jackson.test.BaseTest

@@ -1,5 +1,0 @@
-org.jsoup.nodes.Attributes
-org.jsoup.parser.HtmlTreeBuilder
-org.jsoup.parser.ParseSettings
-org.jsoup.parser.Token
-org.jsoup.parser.XmlTreeBuilder

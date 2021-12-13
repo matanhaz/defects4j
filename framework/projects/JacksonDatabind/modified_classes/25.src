@@ -1,4 +1,0 @@
-com.fasterxml.jackson.databind.deser.BasicDeserializerFactory
-com.fasterxml.jackson.databind.deser.DeserializerCache
-com.fasterxml.jackson.databind.jsontype.impl.TypeDeserializerBase
-com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver

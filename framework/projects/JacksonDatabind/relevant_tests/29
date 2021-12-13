@@ -1,4 +1,0 @@
-com.fasterxml.jackson.databind.TestJDKSerialization
-com.fasterxml.jackson.databind.jsontype.TestCustomTypeIdResolver
-com.fasterxml.jackson.databind.jsontype.TestExternalId
-com.fasterxml.jackson.databind.jsontype.TestVisibleTypeId

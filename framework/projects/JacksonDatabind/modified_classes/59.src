@@ -1,4 +1,0 @@
-com.fasterxml.jackson.databind.JavaType
-com.fasterxml.jackson.databind.type.CollectionLikeType
-com.fasterxml.jackson.databind.type.MapLikeType
-com.fasterxml.jackson.databind.type.TypeFactory

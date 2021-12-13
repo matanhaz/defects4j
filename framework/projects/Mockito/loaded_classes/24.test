@@ -1,7 +1,0 @@
-org.mockito.configuration.MockitoConfiguration
-org.mockito.internal.configuration.ConfigurationAccess
-org.mockito.internal.stubbing.defaultanswers.ReturnsEmptyValuesTest
-org.mockito.StateMaster
-org.mockitousage.bugs.ShouldMocksCompareToBeConsistentWithEqualsTest
-org.mockitoutil.Assertor
-org.mockitoutil.TestBase
