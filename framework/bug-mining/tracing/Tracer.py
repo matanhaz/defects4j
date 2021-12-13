@@ -261,7 +261,7 @@ class Tracer:
         tests_names = set(list(map(lambda x: x[0], tests_details)) + list(map(lambda x: x[0].lower(), tests_details)))
         fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 1, tests_details))), set())
         all_components = reduce(set.__or__, list(map(lambda x: set(x[1]), tests_details)), set())
-        fail_components = fail_components - tests_names
+        fail_components = set(filter(lambda x: not x.lower().split('.')[-2].endswith('test'), fail_components - tests_names))
         optimized_tests = list(filter(lambda x: x[1], map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]), tests_details)))
         components = reduce(set.__or__, list(map(lambda x: set(x[1]), optimized_tests)), set())
         bugs = []
