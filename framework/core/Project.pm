@@ -560,7 +560,7 @@ Format of C<single_test>: <classname>::<methodname>.
 
 =cut
 
-sub run_tests {
+sub run_tests_and_log {
     @_ >= 2 or die $ARG_ERROR;
     my ($self, $out_file, $log_file, $single_test) = @_;
 
@@ -575,6 +575,19 @@ sub run_tests {
     }
 
     return $self->_ant_call_comp("run.dev.tests", "-DOUTFILE=$out_file $single_test_opt", $log_file);
+}
+
+sub run_tests {
+    @_ >= 2 or die $ARG_ERROR;
+    my ($self, $out_file, $single_test) = @_;
+
+    my $single_test_opt = "";
+    if (defined $single_test) {
+        $single_test =~ /([^:]+)::([^:]+)/ or die "Wrong format for single test!";
+        $single_test_opt = "-Dtest.entry.class=$1 -Dtest.entry.method=$2";
+    }
+
+    return $self->_ant_call_comp("run.dev.tests", "-DOUTFILE=$out_file $single_test_opt");
 }
 
 =pod
