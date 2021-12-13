@@ -268,6 +268,10 @@ sub _check_t2v2 {
     $project->compile_tests("$WORK_DIR/compile_tests_log.log");
 	system("python fix_compile_errors.py $WORK_DIR/compile_tests_log.log $project->{prog_root} 2>&1");
     $ret = $project->compile_tests();
+	$project->fix_tests("${bid}f");
+	my $file2 = "$WORK_DIR/failing_tests.log"; `>$file2`;
+	$project->run_tests_and_log($file2, "$WORK_DIR/failing_tests_logger.log");
+
     _add_bool_result($data, $COMP_T2V2, $ret) or return 0;
 
     my $successful_runs = 0;
