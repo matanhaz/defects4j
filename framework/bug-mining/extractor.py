@@ -42,7 +42,11 @@ class JiraExtractor():
 		return ans
 
 	def check_active_bugs(self):
-		df = pd.read_csv(self.active_bugs)[['revision.id.buggy', 'revision.id.fixed','report.id']]
+		df = pd.read_csv(self.active_bugs, header=None)
+		df.columns = ['bug.id','revision.id.buggy','revision.id.fixed','report.id','report.url'] 
+        df = df[['revision.id.buggy', 'revision.id.fixed','report.id']]
+        if df.loc[0]['revision.id.buggy'] == 'revision.id.buggy':
+            df = df.drop(0)
 		for (ind, (b,f,i)) in df.iterrows():
 			if self.repo.commit(f).parents[0].hexsha == b:
 				files = self.java_commits.get(self.repo.commit(f), [])
