@@ -142,7 +142,7 @@ sub _init_version {
     if (-e "$work_dir/build.xml") {
         my $cmd = " cd $work_dir" .
                   " && java -jar $LIB_DIR/analyzer.jar $work_dir $ANALYZER_OUTPUT/$bid build.xml 2>&1";
-        Utils::exec_cmd($cmd, "Run build-file analyzer on build.xml.");
+        # Utils::exec_cmd($cmd, "Run build-file analyzer on build.xml.");
     } elsif (-e "$work_dir/pom.xml") {
         # Run maven-ant plugin and overwrite the original build.xml whenever a maven build file exists
         my $cmd = " cd $work_dir" .
@@ -153,11 +153,11 @@ sub _init_version {
                   " && rm -rf $GEN_BUILDFILE_DIR/$rev_id && mkdir -p $GEN_BUILDFILE_DIR/$rev_id 2>&1" .
                   " && cp maven-build.* $GEN_BUILDFILE_DIR/$rev_id 2>&1" .
                   " && cp build.xml $GEN_BUILDFILE_DIR/$rev_id 2>&1";
-        Utils::exec_cmd($cmd, "Convert Maven to Ant build file: " . $rev_id) or die;
+        # Utils::exec_cmd($cmd, "Convert Maven to Ant build file: " . $rev_id) or die;
 
         $cmd = " cd $work_dir" .
                " && java -jar $LIB_DIR/analyzer.jar $work_dir $ANALYZER_OUTPUT/$bid maven-build.xml 2>&1";
-        Utils::exec_cmd($cmd, "Run build-file analyzer on maven-ant.xml.") or die;
+        # Utils::exec_cmd($cmd, "Run build-file analyzer on maven-ant.xml.") or die;
 	
         # Fix broken dependency links
         my $fix_dep = "cd $work_dir && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml >> temp && mv temp maven-build.xml";
@@ -235,8 +235,8 @@ foreach my $bid (@ids) {
     $project->sanity_check();
 }
 
-print("\n--- Add the following to the <fileset> tag identified by the id 'all.manual.tests' in the <PROJECT_ID.build.xml> file ---\n");
-system("cat $ANALYZER_OUTPUT/${BI}/includes | sort -u | while read -r include; do echo \"<include name='\"\$include\"' />\"; done");
-system("cat $ANALYZER_OUTPUT/${BI}/excludes | sort -u | while read -r exclude; do echo \"<exclude name='\"\$exclude\"' />\"; done");
+# print("\n--- Add the following to the <fileset> tag identified by the id 'all.manual.tests' in the <PROJECT_ID.build.xml> file ---\n");
+# system("cat $ANALYZER_OUTPUT/${BI}/includes | sort -u | while read -r include; do echo \"<include name='\"\$include\"' />\"; done");
+# system("cat $ANALYZER_OUTPUT/${BI}/excludes | sort -u | while read -r exclude; do echo \"<exclude name='\"\$exclude\"' />\"; done");
 
 system("rm -rf $TMP_DIR");
