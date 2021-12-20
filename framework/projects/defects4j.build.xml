@@ -104,6 +104,13 @@ project-specific build file ("project_id"/"project_id".build.xml) for the
     Run developer-written tests
 -->
     <target name="run.dev.tests" depends="compile-tests" description="Run unit tests">
+	    <!-- Format path -->
+    <pathconvert pathsep="${line.separator}|   |-- "             
+        property="echo.path.compile"             
+        refid="all.manual.tests">
+    </pathconvert>
+    <echo>${echo.path.compile}</echo>
+
         <junit printsummary="yes" haltonfailure="no" haltonerror="no" fork="no" showOutput="true">
             <classpath>
                 <!-- Make sure that instrumented classes appear at the beginning of the
@@ -121,10 +128,11 @@ project-specific build file ("project_id"/"project_id".build.xml) for the
                 <fileset refid="all.manual.tests" />
             </batchtest>
         </junit>
+		
         <!-- fail build in case we are running all classes, but there are none in the fileset -->
         <if> <not> <isset property="test.entry.class" /> </not> <then>
             <pathconvert refid="all.manual.tests" property="fileset.notempty" setonempty="false" />
-            <fail unless="fileset.notempty" message="Test is running with empty fileset ${test.dir}" />
+            <fail unless="fileset.notempty" message="Test is running with empty fileset " />
         </then> </if>
     </target>
 
