@@ -63,7 +63,7 @@ sub determine_layout {
     @_ == 2 or die $ARG_ERROR;
     my ($self, $rev_id) = @_;
     my $dir = $self->{prog_root};
- 	my $file_name = $PYTHON_LAYOUT_FILE;
+ 	my $file_name = "python_layout.txt";
     system("python layout.py $self->{prog_root} $file_name 2>&1");
 
     open FILE, $file_name or die "Cannot open layout file";
