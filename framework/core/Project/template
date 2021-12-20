@@ -73,7 +73,7 @@ sub new {
 
 
 #    # Add additional layouts if necessary
-#    my $result = {src=>$lines[0], test=>$lines[1]} # //_ant_layout($dir) // _maven_layout($dir);
+#    my $result = {src=>$lines[0], test=>$lines[1]}; # //_ant_layout($dir) // _maven_layout($dir);
 #    die "Unknown layout for revision: ${rev_id}" unless defined $result;
 #    return $result;
 #}
