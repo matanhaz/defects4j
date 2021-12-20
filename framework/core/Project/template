@@ -98,8 +98,8 @@ sub initialize_revision {
     my $result = _ant_layout($work_dir) // _maven_layout($work_dir) // _layout_by_python($work_dir);
     die "Unknown layout for revision: ${rev_id}" unless defined $result;
 
-    $self->_add_to_layout_map($rev_id, $result->{src}, $result->{test});
-    $self->_cache_layout_map(); # Force cache rebuild
+    # $self->_add_to_layout_map($rev_id, $result->{src}, $result->{test});
+    # $self->_cache_layout_map(); # Force cache rebuild
 }
 
 #
