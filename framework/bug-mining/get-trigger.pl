@@ -268,7 +268,7 @@ foreach my $bid (@bids) {
 
 $dbh_trigger->disconnect();
 $dbh_revs->disconnect();
-system("rm -rf $TMP_DIR");
+# system("rm -rf $TMP_DIR");
 
 #
 # Get bug ids from TAB_REV_PAIRS
