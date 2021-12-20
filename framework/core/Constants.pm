@@ -283,6 +283,7 @@ our $TAG_PRE_FIX          = "PRE_FIX_REVISION";
 
 # Filename for directory layout csv
 our $LAYOUT_FILE = "dir-layout.csv";
+our $PYTHON_LAYOUT_FILE = "python_layout.txt";
 
 # Filenames for bugs csv files
 our $BUGS_CSV_ACTIVE = "active-bugs.csv";
