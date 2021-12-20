@@ -43,7 +43,7 @@
         </javac>
     </target>
 
-    <target name="compile.tests" depends="compile" description="Compile the tests">
+    <target name="compile-tests" depends="compile" description="Compile the tests">
         <javac srcdir="${dir.src.tests}"
               destdir="${dir.target.tests}"
     includeantruntime="false"
@@ -58,7 +58,7 @@
         <jar destfile="${dir.jar}/formatter.jar" basedir="${dir.target.classes}"/>
     </target>
 
-    <target name="test" depends="compile.tests">
+    <target name="test" depends="compile-tests">
         <delete file="failing-tests.txt"/>
         <junit fork="yes" timeout="1000" showoutput="true">
             <classpath refid="test.classpath" />

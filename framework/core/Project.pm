@@ -546,7 +546,7 @@ If F<log_file> is provided, the compiler output is written to this file.
 
 sub compile_tests {
     my ($self, $log_file) = @_;
-    return $self->_ant_call_comp("compile.tests", undef, $log_file);
+    return $self->_ant_call_comp("compile-tests", undef, $log_file);
 }
 
 =pod

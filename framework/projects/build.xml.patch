@@ -7,6 +7,6 @@ index f8de60b..3583d72 100644
    </target>
  
 +  <target name="compile" depends="<PROJECT_NAME>-from-maven.compile"> </target>
-+  <target name="compile.tests" depends="<PROJECT_NAME>-from-maven.compile-tests"> </target>
++  <target name="compile-tests" depends="<PROJECT_NAME>-from-maven.compile-tests"> </target>
 +
  </project>

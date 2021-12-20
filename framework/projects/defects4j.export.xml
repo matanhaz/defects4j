@@ -163,7 +163,7 @@ case? -->
 <!-- List of all manual test classes -->
     <target name="export.tests.all"
             description="List of all developer-written tests"
-            depends="sanity.check,compile,compile.tests">
+            depends="sanity.check,compile,compile-tests">
         <fail message="Property file.export not set!" unless="file.export" />
         <fail message="File set all.manual.tests not set!" unless="ant.refid:all.manual.tests" />
 
