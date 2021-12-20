@@ -65,15 +65,13 @@ sub determine_layout {
     my $dir = $self->{prog_root};
  	my $file_name = $PYTHON_LAYOUT_FILE;
     system("python layout.py $self->{prog_root} $file_name 2>&1");
-    return unless -e $file_name;
 
     open FILE, $file_name or die "Cannot open layout file";
     my @lines = <FILE>;
     close FILE;
 
-
     # Add additional layouts if necessary
-    my $result = {src=>$lines[0], test=>$lines[1]}; # //_ant_layout($dir) // _maven_layout($dir);
+    my $result = {src=>$lines[0], test=>$lines[1]};
     die "Unknown layout for revision: ${rev_id}" unless defined $result;
     return $result;
 }
