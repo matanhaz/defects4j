@@ -194,7 +194,7 @@ sub new {
         _vcs       => $vcs,
     };
     bless $self, $class;
-    $self->_cache_layout_map();
+    # $self->_cache_layout_map();
     return $self;
 }
 
