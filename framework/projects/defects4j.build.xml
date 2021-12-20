@@ -369,7 +369,7 @@ project-specific build file ("project_id"/"project_id".build.xml) for the
                 <striplinebreaks/>
             </filterchain>
         </loadfile>
-        <fileset id="all.manual.tests" dir="${test.home}" includes="${rel.files}"/>
+        <fileset id="all.manual.tests" dir="src/test/java/org/apache/commons/io" includes="${rel.files}"/>
     </target>
 
 <!--
