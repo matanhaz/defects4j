@@ -148,7 +148,7 @@ sub _layout_by_python {
    @_ == 1 or die $ARG_ERROR;
     my ($dir) = @_;
  	my $file_name = "python_layout.txt";
-    system("python layout.py $self->{prog_root} $file_name 2>&1");
+    system("python layout.py $dir $file_name 2>&1");
 
     open FILE, $file_name or die "Cannot open layout file";
     my @lines = <FILE>;
