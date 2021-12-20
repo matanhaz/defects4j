@@ -153,7 +153,7 @@ sub _init_version {
                   " && rm -rf $GEN_BUILDFILE_DIR/$rev_id && mkdir -p $GEN_BUILDFILE_DIR/$rev_id 2>&1" .
                   " && cp maven-build.* $GEN_BUILDFILE_DIR/$rev_id 2>&1" .
                   " && cp build.xml $GEN_BUILDFILE_DIR/$rev_id 2>&1";
-        # Utils::exec_cmd($cmd, "Convert Maven to Ant build file: " . $rev_id) or die;
+        Utils::exec_cmd($cmd, "Convert Maven to Ant build file: " . $rev_id) or die;
 
         $cmd = " cd $work_dir" .
                " && java -jar $LIB_DIR/analyzer.jar $work_dir $ANALYZER_OUTPUT/$bid maven-build.xml 2>&1";
