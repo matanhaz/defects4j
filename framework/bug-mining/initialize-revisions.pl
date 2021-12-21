@@ -193,6 +193,7 @@ sub _bootstrap {
     # Minimization doesn't matter here, which has to be done manually.
 	printf ("source path to diff %s\n", $src_f);
 	printf ("test path to diff %s\n", $test_f);
+    $project->export_diff($v2, $v1, "$PATCH_DIR/$bid.both.patch");
     $project->export_diff($v2, $v1, "$PATCH_DIR/$bid.src.patch", "$src_f");
     $project->export_diff($v2, $v1, "$PATCH_DIR/$bid.test.patch", "$test_f");
 }
