@@ -95,7 +95,8 @@ sub initialize_revision {
     $self->SUPER::initialize_revision($rev_id);
 
     my $work_dir = $self->{prog_root};
-    my $result = _ant_layout($work_dir) // _maven_layout($work_dir) // _layout_by_python($work_dir);
+    # my $result = _ant_layout($work_dir) // _maven_layout($work_dir) // _layout_by_python($work_dir);
+    my $result = _layout_by_python($work_dir);
     die "Unknown layout for revision: ${rev_id}" unless defined $result;
 
     # $self->_add_to_layout_map($rev_id, $result->{src}, $result->{test});
