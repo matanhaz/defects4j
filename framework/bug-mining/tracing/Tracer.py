@@ -126,9 +126,15 @@ class Tracer:
         self.set_junit_formatter_file(self.xml_path)
 
     def collect_failed_tests(self, failed_tests_file):
+        trigger_tests = []
         with open(failed_tests_file) as f:
-            trigger_tests = list(
-                map(lambda x: x[4:-1].replace('::', '.'), filter(lambda l: l.startswith('---'), f.readlines())))
+            for line in filter(lambda l: l.startswith('---'), f.readlines()):
+                trigger = line[4:-1]
+                if '::' in trigger:
+                    trigger = trigger.replace('::', '.')
+                else:
+                    trigger = trigger + '.NOTEST'
+            trigger_tests.append(trigger)
         with open(self.tests_to_exclude_path, 'w') as f:
             json.dump(trigger_tests, f)
         print(f'collected tests {trigger_tests}')
@@ -151,7 +157,7 @@ class Tracer:
         tests = list(map(lambda x: x.replace('.java', '').replace('**/', ''), self.tests_to_exclude))
         print(f"tests to remove {tests}")
         for root, _, files in os.walk(os.path.dirname(self.xml_path)):
-            for f in files:
+            for f in filter(lambda x: x.endswith('.java'), files):
                 for t in tests:
                     if t.lower() in f.lower():
                         try:
