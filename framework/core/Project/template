@@ -63,7 +63,8 @@ sub determine_layout {
     @_ == 2 or die $ARG_ERROR;
     my ($self, $rev_id) = @_;
     my $dir = $self->{prog_root};
-    my $result = _ant_layout($dir) // _maven_layout($dir) // _layout_by_python($dir);
+#    my $result = _ant_layout($dir) // _maven_layout($dir) // _layout_by_python($dir);
+    my $result = _layout_by_python($dir) // _ant_layout($dir) // _maven_layout($dir);
     die "Unknown layout for revision: ${rev_id}" unless defined $result;
     return $result;
 }
@@ -155,6 +156,6 @@ sub _layout_by_python {
     my @lines = <FILE>;
     close FILE;
 
-    return {src=>$lines[0], test=>$lines[1]}; 
+    return {src=>chomp($lines[0]), test=>chomp($lines[1])}; 
 }
 1;
