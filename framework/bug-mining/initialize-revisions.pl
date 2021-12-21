@@ -197,6 +197,7 @@ sub _bootstrap {
 	printf ("check what is the path2 %d\n", "$src_f" cmp "src/main/java/org/apache/commons/io");
     $project->export_diff($v2, $v1, "$PATCH_DIR/$bid.both.patch");
     $project->export_diff($v2, $v1, "$PATCH_DIR/$bid.src1.patch", $src_f);
+    $project->export_diff($v2, $v1, "$PATCH_DIR/$bid.src2.patch", "${src_f}");
     $project->export_diff($v2, $v1, "$PATCH_DIR/$bid.src.patch", "$src_f");
     $project->export_diff($v2, $v1, "$PATCH_DIR/$bid.test.patch", "$test_f");
 }
