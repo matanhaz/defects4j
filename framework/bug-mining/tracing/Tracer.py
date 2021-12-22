@@ -381,6 +381,15 @@ class Tracer:
             json.dump(list(relevant_nodes), f)
         os.remove(self.all_jar_path)
 
+    def fix_build(self):
+        build_xml = os.path.join(os.path.dirname(self.xml_path), 'build.xml')
+        if not os.path.exists(build_xml):
+            return
+        with open(build_xml) as f:
+            lines = list(map(lambda x: x.replace('compile.tests', 'compile-tests'), f.readlines()))
+        with open(build_xml, 'w') as f:
+            f.writelines(lines)
+
 
 if __name__ == '__main__':
     t = Tracer(os.path.abspath(sys.argv[1]), sys.argv[2], sys.argv[3])
@@ -399,6 +408,8 @@ if __name__ == '__main__':
         t.collect_failed_tests(sys.argv[4])
     elif sys.argv[-1] == 'exclude_tests':
         t.exclude_tests()
+    elif sys.argv[-1] == 'fix_build':
+        t.fix_build()
     else:
         t.stop_grabber()
 
