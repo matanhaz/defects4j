@@ -120,7 +120,8 @@ foreach my $bid (@ids) {
         # - All tests pass on the fixed version
         # - Only expected triggering test(s) fail on the buggy version
         # - All expected triggering test(s) fail on the buggy version
-        $project->compile() or die "Could not compile sources: ${vid}";
+        system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
+		$project->compile() or die "Could not compile sources: ${vid}";
 		$project->compile_tests("$WORK_DIR/compile_tests_s_log.log");
 		system("python fix_compile_errors.py $WORK_DIR/compile_tests_s_log.log $project->{prog_root} 2>&1");
 		$project->compile_tests() or die "Could not compile tests: ${vid}";

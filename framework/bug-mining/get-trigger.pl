@@ -363,6 +363,7 @@ sub _get_failing_tests {
 	}
 
     # Compile src and test
+	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
     $project->compile() or die;
 	$project->compile_tests("$WORK_DIR/compile_tests_trigger_log.log");
 	system("python fix_compile_errors.py $WORK_DIR/compile_tests_trigger_log.log $project->{prog_root} 2>&1");
@@ -412,7 +413,8 @@ sub _trace_tests {
     $project->checkout_vid($vid, $root, 1) or die;
 	$project->apply_patch($root, $patch);
     # Compile src and test
-    $project->compile() or die;
+	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
+	$project->compile() or die;
 	$project->compile_tests("$WORK_DIR/compile_tests_tracer_log.log");
 	system("python fix_compile_errors.py $WORK_DIR/compile_tests_tracer_log.log $project->{prog_root} 2>&1");
     $project->compile_tests() or die;
@@ -436,6 +438,7 @@ sub get_buggy_functions{
 	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} patch  2>&1");
 	open FILE, $BUGS_FILE or die "Cannot open bugs file ($BUGS_FILE): $!";
     close FILE;
+	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
 	$project->compile() or die;
 	$project->compile_tests("$WORK_DIR/compile_tests_tracer_log.log");
 	system("python fix_compile_errors.py $WORK_DIR/compile_tests_tracer_log.log $project->{prog_root} 2>&1");

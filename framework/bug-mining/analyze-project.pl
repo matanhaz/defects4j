@@ -263,6 +263,7 @@ sub _check_t2v2 {
     $project->checkout_vid("${bid}f", $TMP_DIR, 1) == 1 or die;
 
     # Compile v2 ant t2
+	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
     my $ret = $project->compile();
     _add_bool_result($data, $COMP_V2, $ret) or return 0;
     $project->compile_tests("$WORK_DIR/compile_tests_log.log");
@@ -343,6 +344,7 @@ sub _check_t2v1 {
     $project->checkout_vid("${bid}b", $TMP_DIR, 1) == 1 or die;
 
     # Compile v1 and t2v1
+	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
     my $ret = $project->compile();
     _add_bool_result($data, $COMP_V1, $ret) or return;
 	$project->compile_tests("$WORK_DIR/compile_tests_a2_log.log");
