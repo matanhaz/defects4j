@@ -133,6 +133,7 @@ class Tracer:
             for ind, line in filter(lambda l: l[1].startswith('---'), enumerate(lines)):
                 trigger = line[4:-1]
                 if '::' in trigger:
+                    trigger = trigger.split('[')[0]
                     trigger = trigger.replace('::', '.')
                 # else:
                 #     trigger = trigger + '.NOTEST'
