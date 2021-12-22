@@ -67,6 +67,7 @@ class Tracer:
         self.call_graph_tests_path = os.path.join(self.pid_dir, 'call_graph_tests.json')
         self.call_graph_nodes_path = os.path.join(self.pid_dir, 'call_graph_nodes.json')
         self.tests_to_exclude_path = os.path.join(self.pid_dir, 'tests_to_exclude.json')
+        self.tests_run_log = os.path.join(self.pid_dir, 'tests_run_log')
         self.command_port = 5552
         self.agent_port = 5551
         self.repo_path = repo_path
@@ -128,7 +129,8 @@ class Tracer:
     def collect_failed_tests(self, failed_tests_file):
         trigger_tests = []
         with open(failed_tests_file) as f:
-            for line in filter(lambda l: l.startswith('---'), f.readlines()):
+            lines = list(f.readlines())
+            for line in filter(lambda l: l.startswith('---'), lines):
                 trigger = line[4:-1]
                 if '::' in trigger:
                     trigger = trigger.replace('::', '.')
@@ -137,12 +139,15 @@ class Tracer:
             trigger_tests.append(trigger)
         with open(self.tests_to_exclude_path, 'w') as f:
             json.dump(trigger_tests, f)
+        with open(self.tests_run_log, 'w') as f:
+            f.writelines(lines)
         print(f'collected tests {trigger_tests}')
 
     def collect_failed_tests2(self, failed_tests_file):
         trigger_tests = []
         with open(failed_tests_file) as f:
-            for line in filter(lambda l: l.startswith('---'), f.readlines()):
+            lines = list(f.readlines())
+            for line in filter(lambda l: l.startswith('---'), lines):
                 trigger = line[4:-1]
                 if '::' in trigger:
                     trigger = trigger.replace('::', '.')
@@ -151,6 +156,8 @@ class Tracer:
             trigger_tests.append(trigger)
         with open(self.tests_to_exclude_path+ '2', 'w') as f:
             json.dump(trigger_tests, f)
+        with open(self.tests_run_log + '2', 'w') as f:
+            f.writelines(lines)
         print(f'collected tests {trigger_tests}')
 
     def exclude_tests(self):
