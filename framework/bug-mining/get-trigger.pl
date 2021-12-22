@@ -197,7 +197,7 @@ foreach my $bid (@bids) {
     $list = _get_failing_tests($project, "$TMP_DIR/v1", "${bid}f", "$PATCHES_DIR/$bid.src.patch");
     my $fail_c = scalar(@{$list->{"classes"}}); $data{$FAIL_C_V1} = $fail_c;
     my $fail_m = scalar(@{$list->{"methods"}}); $data{$FAIL_M_V1} = $fail_m;
-    if ($fail_c !=0 or $fail_m == 0) {
+    if ($fail_m == 0) {
         print("Expected at least one failing test method on ${PID}-${bid}b\n");
         _add_row(\%data);
         next;
