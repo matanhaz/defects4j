@@ -130,12 +130,12 @@ class Tracer:
         trigger_tests = []
         with open(failed_tests_file) as f:
             lines = list(f.readlines())
-            for line in filter(lambda l: l.startswith('---'), lines):
+            for ind, line in filter(lambda l: l[1].startswith('---'), enumerate(lines)):
                 trigger = line[4:-1]
                 if '::' in trigger:
                     trigger = trigger.replace('::', '.')
-                else:
-                    trigger = trigger + '.NOTEST'
+                # else:
+                #     trigger = trigger + '.NOTEST'
                 if 'test' in trigger.lower():
                     trigger_tests.append(trigger)
         with open(self.tests_to_exclude_path, 'w') as f:
