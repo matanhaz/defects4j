@@ -230,7 +230,7 @@ foreach my $bid (@ids) {
     }
 
     # Clean the temporary directory
-    Utils::exec_cmd("rm -rf $TMP_DIR && mkdir -p $TMP_DIR", "Cleaning working directory")
+    # Utils::exec_cmd("rm -rf $TMP_DIR && mkdir -p $TMP_DIR", "Cleaning working directory")
             or die "Cannot clean working directory";
     $project->{prog_root} = $TMP_DIR;
     $project->checkout_vid("${bid}f", $TMP_DIR, 1) or die "Cannot checkout fixed version";
@@ -241,4 +241,4 @@ foreach my $bid (@ids) {
 # system("cat $ANALYZER_OUTPUT/${BI}/includes | sort -u | while read -r include; do echo \"<include name='\"\$include\"' />\"; done");
 # system("cat $ANALYZER_OUTPUT/${BI}/excludes | sort -u | while read -r exclude; do echo \"<exclude name='\"\$exclude\"' />\"; done");
 
-system("rm -rf $TMP_DIR");
+# system("rm -rf $TMP_DIR");
