@@ -156,6 +156,8 @@ sub _layout_by_python {
     my @lines = <FILE>;
     close FILE;
 
-    return {src=>chomp($lines[0]), test=>chomp($lines[1])}; 
+    chomp($lines[0]);
+    chomp($lines[1]); 
+    return {src=>$lines[0], test=>$lines[1]}; 
 }
 1;
