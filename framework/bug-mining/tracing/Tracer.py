@@ -136,27 +136,10 @@ class Tracer:
                     trigger = trigger.replace('::', '.')
                 else:
                     trigger = trigger + '.NOTEST'
-            trigger_tests.append(trigger)
+                trigger_tests.append(trigger)
         with open(self.tests_to_exclude_path, 'w') as f:
             json.dump(trigger_tests, f)
         with open(self.tests_run_log, 'w') as f:
-            f.writelines(lines)
-        print(f'collected tests {trigger_tests}')
-
-    def collect_failed_tests2(self, failed_tests_file):
-        trigger_tests = []
-        with open(failed_tests_file) as f:
-            lines = list(f.readlines())
-            for line in filter(lambda l: l.startswith('---'), lines):
-                trigger = line[4:-1]
-                if '::' in trigger:
-                    trigger = trigger.replace('::', '.')
-                else:
-                    trigger = trigger + '.NOTEST'
-            trigger_tests.append(trigger)
-        with open(self.tests_to_exclude_path+ '2', 'w') as f:
-            json.dump(trigger_tests, f)
-        with open(self.tests_run_log + '2', 'w') as f:
             f.writelines(lines)
         print(f'collected tests {trigger_tests}')
 
@@ -427,8 +410,6 @@ if __name__ == '__main__':
         t.create_call_graph()
     elif sys.argv[-1] == 'collect_failed_tests':
         t.collect_failed_tests(sys.argv[4])
-    elif sys.argv[-1] == 'collect_failed_tests2':
-        t.collect_failed_tests2(sys.argv[4])
     elif sys.argv[-1] == 'exclude_tests':
         t.exclude_tests()
     elif sys.argv[-1] == 'fix_build':
