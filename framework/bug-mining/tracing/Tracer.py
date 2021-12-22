@@ -136,7 +136,8 @@ class Tracer:
                     trigger = trigger.replace('::', '.')
                 else:
                     trigger = trigger + '.NOTEST'
-                trigger_tests.append(trigger)
+                if 'test' in trigger.lower():
+                    trigger_tests.append(trigger)
         with open(self.tests_to_exclude_path, 'w') as f:
             json.dump(trigger_tests, f)
         with open(self.tests_run_log, 'w') as f:
