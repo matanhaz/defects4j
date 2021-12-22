@@ -159,15 +159,16 @@ class Tracer:
                         exclude = et.SubElement(fileset, 'exclude')
                         exclude.attrib.update({'name': t})
         element_tree.write(self.xml_path, xml_declaration=True)
-        tests = list(set(map(lambda x: x.replace('.java', '').replace('**/', ''), self.tests_to_exclude)))
+        tests = list(set(map(lambda x: x.replace('.java', '').replace('**/', '').lower(), self.tests_to_exclude)))
         print(f"tests to remove {tests}")
         for root, _, files in os.walk(os.path.dirname(self.xml_path)):
-            for f in filter(lambda x: x.endswith('.java') and 'test' in x.lower(), files):
+            for f in filter(lambda x: (x.endswith('.java') or x.endswith('.class') ) and 'test' in x.lower(), files):
                 for t in tests:
-                    if t.lower() in f.lower():
+                    if t in f.lower():
                         try:
-                            print("remove test file " + os.path.join(root, f))
-                            os.remove(os.path.join(root, f))
+                            if os.path.exists(os.path.join(root, f)):
+                                print("remove test file " + os.path.join(root, f))
+                                os.remove(os.path.join(root, f))
                         except Exception as e:
                             print(e)
 
