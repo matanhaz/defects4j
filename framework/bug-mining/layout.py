@@ -29,9 +29,14 @@ def layout(repo_path, out_file):
 		if name != min_test_name and name[:s_t] == min_test_name:
 			continue
 		reduced_tests.add(name)
-	lines = [sorted(reduced_java, key=lambda x: len(x))[0], sorted(reduced_tests, key=lambda x: len(x))[0]]
+	commond_java = os.path.commonpath(reduced_java)
+	if not commond_java:
+		commond_java = sorted(reduced_java, key=lambda x: len(x))[0]
+	commond_tests = os.path.commonpath(reduced_tests)
+	if not commond_tests:
+		commond_tests = sorted(reduced_tests, key=lambda x: len(x))[0]
 	with open(out_file, 'w') as f:
-		f.writelines(map(lambda x: x + '\n',lines))
+		f.writelines(map(lambda x: x + '\n',[commond_java, commond_tests]))
 
 
 if __name__ == '__main__':
