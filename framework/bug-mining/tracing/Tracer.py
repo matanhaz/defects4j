@@ -161,11 +161,11 @@ class Tracer:
         tests = list(map(lambda x: x.replace('.java', '').replace('**/', ''), self.tests_to_exclude))
         print(f"tests to remove {tests}")
         for root, _, files in os.walk(os.path.dirname(self.xml_path)):
-            for f in filter(lambda x: x.endswith('.java'), files):
+            for f in filter(lambda x: x.endswith('.java') and 'test' in x.lower(), files):
                 for t in tests:
                     if t.lower() in f.lower():
                         try:
-                            print("remove test file" + os.path.join(root, f))
+                            print("remove test file " + os.path.join(root, f))
                             os.remove(os.path.join(root, f))
                         except Exception as e:
                             print(e)
