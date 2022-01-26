@@ -288,6 +288,56 @@ projects = {'distributedlog': ('https://github.com/apache/distributedlog', 'DL')
 'commons-exec': ('https://github.com/apache/commons-exec', 'EXEC'),
 'commons-bcel': ('https://github.com/apache/commons-bcel', 'BCEL')}
 
+class Reproducer:
+    def __init__(self, p, working_dir, ind):
+        # consts
+        self.dir = os.path.abspath(os.path.dirname(__file__))
+        self.script_dir = os.path.dirname(self.dir)
+        self.projects_dir = os.path.join(self.script_dir, 'projects')
+        self.const_core_dir = os.path.join(self.script_dir, 'core')
+        self.lib_dir = os.path.join(self.script_dir, 'lib')
+        self.util_dir = os.path.join(self.script_dir, 'util')
+        self.base_dir = os.path.dirname(self.script_dir)
+        self.conts_repo_dir = os.path.join(self.base_dir, 'project_repos')
+        self.d4j_tmp_dir = '/tmp/versions'
+        self.major_root = os.path.join(self.base_dir, 'major')
+        self.d4j_build_file = os.path.join(self.projects_dir, 'defects4j.build.xml')
+
+        # scripts cmds
+        self.p = p
+        self.pid = p
+        self.working_dir = working_dir
+        self.project_dir = os.path.join(self.working_dir, 'framework', 'projects', self.pid)
+        self.ind = ind
+        getters = {'p': projects[p][1].title(), 'r': projects[p][0], 'n': p, 'g': 'jira', 't': projects[p][1],
+                   'e': '"/({0}-\d+)/mi"'.format(projects[p][1]), 'w': working_dir, 'i': ind,
+                   'a': f"{working_dir}//project_repos//{p}.git",
+                   'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv",
+                   'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': '',
+                   'l': f"{working_dir}//gitlog"}
+        self.name = getters['n']
+        self.url = getters['r']
+        self.work_dir = working_dir
+        self.module_template = os.path.join(self.const_core_dir, "Project/template")
+        self.build_template = os.path.join(self.projects_dir, 'build.xml.patch')
+        self.module_file = os.path.join(self.project_dir, self.pid + '.pm')
+        self.build_file = os.path.join(self.project_dir, self.pid + '.build.xml')
+        self.build_patch_file = os.path.join(self.project_dir, self.pid + '.build.xml.patch')
+        self.repo_dir = os.path.join(self.working_dir, 'project_repos')
+        self.issues_dir = os.path.join(self.working_dir, 'issues')
+        self.patch_dir = os.path.join(self.project_dir, 'patches')
+        self.failing_dir = os.path.join(self.project_dir, 'failing_tests')
+        self.trigger_dir = os.path.join(self.project_dir, 'trigger_tests')
+        self.relevant_dir = os.path.join(self.project_dir, 'relevant_tests')
+        self.mod_classes = os.path.join(self.project_dir, 'modified_classes')
+        self.rel_classes = os.path.join(self.project_dir, 'loaded_classes')
+        self.core_dir = os.path.join(self.working_dir, 'framework', 'core', 'Project')
+
+    def create_project(self):
+        pass
+
+    def do_all(self):
+        pass
 
 def get_cmds(p, working_dir, ind):
     getters = {'p': projects[p][1].title(), 'r': projects[p][0], 'n': p, 'g': 'jira', 't': projects[p][1],
