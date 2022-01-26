@@ -127,9 +127,9 @@ my $TRACKER_ID = $cmd_opts{t};
 my $TRACKER_NAME = $cmd_opts{g};
 
 # Check format of target version id
-if (defined $BID) {
-    $BID =~ /^(\d+)(:(\d+))?$/ or die "Wrong version id format ((\\d+)(:(\\d+))?): $BID!";
-}
+# if (defined $BID) {
+#     $BID =~ /^(\d+)(:(\d+))?$/ or die "Wrong version id format ((\\d+)(:(\\d+))?): $BID!";
+# }
 
 # Add script and core directory to @INC
 unshift(@INC, "$WORK_DIR/framework/core");
@@ -162,38 +162,38 @@ my $project = Project::create_project($PID);
 $project->{prog_root} = $TMP_DIR;
 
 # Get database handle for results
-my $dbh = DB::get_db_handle($TAB_REV_PAIRS, $db_dir);
-my @COLS = DB::get_tab_columns($TAB_REV_PAIRS) or die;
+# my $dbh = DB::get_db_handle($TAB_REV_PAIRS, $db_dir);
+# my @COLS = DB::get_tab_columns($TAB_REV_PAIRS) or die;
 
 # Figure out which IDs to run script for
 my @ids = $project->get_bug_ids();
-if (defined $BID) {
-    if ($BID =~ /(\d+):(\d+)/) {
-        @ids = grep { ($1 <= $_) && ($_ <= $2) } @ids;
-    } else {
-        # single vid
-        @ids = grep { ($BID == $_) } @ids;
-    }
-}
+# if (defined $BID) {
+#     if ($BID =~ /(\d+):(\d+)/) {
+#         @ids = grep { ($1 <= $_) && ($_ <= $2) } @ids;
+#     } else {
+#         # single vid
+#         @ids = grep { ($BID == $_) } @ids;
+#     }
+# }
 
-if (defined $BI) {
+# if (defined $BI) {
 	printf("defined BI: %s \n", $BI);
 	if ($BI =~ /^\d+$/) {
 		@ids = grep { ($BI == $_) } @ids;
 	}
-}
+# }
 print "@ids\n";
 
-my $sth = $dbh->prepare("SELECT * FROM $TAB_REV_PAIRS WHERE $PROJECT=? AND $ID=?") or die $dbh->errstr;
+# my $sth = $dbh->prepare("SELECT * FROM $TAB_REV_PAIRS WHERE $PROJECT=? AND $ID=?") or die $dbh->errstr;
 foreach my $bid (@ids) {
     printf ("%4d: $project->{prog_name}\n", $bid);
 
     # Skip existing entries
-    $sth->execute($PID, $bid);
-    if ($sth->rows !=0) {
-        printf("      -> Skipping (existing entry in $TAB_REV_PAIRS)\n");
-        next;
-    }
+#    $sth->execute($PID, $bid);
+#    if ($sth->rows !=0) {
+#        printf("      -> Skipping (existing entry in $TAB_REV_PAIRS)\n");
+#        next;
+#    }
 
     my %data;
     $data{$PROJECT} = $PID;
@@ -206,9 +206,9 @@ foreach my $bid (@ids) {
     _check_t2v1($project, $bid, \%data) or next;
 
     # Add data set to result file
-    _add_row(\%data);
+    # _add_row(\%data);
 }
-$dbh->disconnect();
+# $dbh->disconnect();
 system("rm -rf $TMP_DIR");
 
 #
@@ -377,17 +377,17 @@ sub _add_bool_result {
 #
 # Add a row to the database table
 #
-sub _add_row {
-    my $data = shift;
-
-    my @tmp;
-    foreach (@COLS) {
-        push (@tmp, $dbh->quote((defined $data->{$_} ? $data->{$_} : "-")));
-    }
-
-    my $row = join(",", @tmp);
-    $dbh->do("INSERT INTO $TAB_REV_PAIRS VALUES ($row)");
-}
+# sub _add_row {
+#     my $data = shift;
+# 
+#     my @tmp;
+#     foreach (@COLS) {
+#         push (@tmp, $dbh->quote((defined $data->{$_} ? $data->{$_} : "-")));
+#     }
+# 
+#     my $row = join(",", @tmp);
+#     $dbh->do("INSERT INTO $TAB_REV_PAIRS VALUES ($row)");
+# }
 
 =pod
 
