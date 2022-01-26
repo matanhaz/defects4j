@@ -168,23 +168,23 @@ my $VCS_TYPE = $cmd_opts{v} // "git";
 Utils::exec_cmd("git --git-dir=$REPOSITORY_DIR log --reverse > $GIT_LOG_FILE",
                 "Collecting repository log") or die "Cannot collect git history!";
 # Cross-reference the commit log with the issue numbers known to be bugs
-Utils::exec_cmd("./vcs-log-xref.pl -e '$REGEXP'"
-                               . " -l $GIT_LOG_FILE"
-                               . " -r $REPOSITORY_DIR"
-                               . " -i $ISSUES_FILE"
-                               . " -f $COMMIT_DB_FILE",
-                "Cross-referencing the commit log with the issue numbers known to be bugs") or die "Cannot collect all issues from the project issue tracker!";
-
+#Utils::exec_cmd("./vcs-log-xref.pl -e '$REGEXP'"
+#                               . " -l $GIT_LOG_FILE"
+#                               . " -a $REPOSITORY_DIR"
+#                               . " -f $ISSUES_FILE"
+#                               . " -b $COMMIT_DB_FILE",
+#                "Cross-referencing the commit log with the issue numbers known to be bugs") or die "Cannot collect all issues from the project issue tracker!";
+#
 # Does project exist in the Defects4J database? If yes, discard faults that
 # have already been mined.
-if (-e "$CORE_DIR/Project/$PID.pm") {
-    # Remove exiting ids
-    system("tail -n +2 $PROJECTS_DIR/$PID/$BUGS_CSV_ACTIVE | cut -f 2- -d',' > $COMMIT_DB_FILE.orig");
-    # Find all versions that have not been mined
-    system("grep -vFf $COMMIT_DB_FILE.orig $COMMIT_DB_FILE > $COMMIT_DB_FILE.filter && mv $COMMIT_DB_FILE.filter $COMMIT_DB_FILE");
-    # Print header to the active bugs csv
-    my $active_header = $BUGS_CSV_BUGID.",".$BUGS_CSV_COMMIT_BUGGY.",".$BUGS_CSV_COMMIT_FIXED.",".$BUGS_CSV_ISSUE_ID.",".$BUGS_CSV_ISSUE_URL;
-    system("echo $active_header > $COMMIT_DB_FILE.new && cat $COMMIT_DB_FILE >> $COMMIT_DB_FILE.new && mv $COMMIT_DB_FILE.new $COMMIT_DB_FILE");
-}
-
-print("Project $PID has been successfully initialized!\n");
+# if (-e "$CORE_DIR/Project/$PID.pm") {
+#     # Remove exiting ids
+#     system("tail -n +2 $PROJECTS_DIR/$PID/$BUGS_CSV_ACTIVE | cut -f 2- -d',' > $COMMIT_DB_FILE.orig");
+#     # Find all versions that have not been mined
+#     system("grep -vFf $COMMIT_DB_FILE.orig $COMMIT_DB_FILE > $COMMIT_DB_FILE.filter && mv $COMMIT_DB_FILE.filter $COMMIT_DB_FILE");
+#     # Print header to the active bugs csv
+#     my $active_header = $BUGS_CSV_BUGID.",".$BUGS_CSV_COMMIT_BUGGY.",".$BUGS_CSV_COMMIT_FIXED.",".$BUGS_CSV_ISSUE_ID.",".$BUGS_CSV_ISSUE_URL;
+#     system("echo $active_header > $COMMIT_DB_FILE.new && cat $COMMIT_DB_FILE >> $COMMIT_DB_FILE.new && mv $COMMIT_DB_FILE.new $COMMIT_DB_FILE");
+# }
+# 
+# print("Project $PID has been successfully initialized!\n");

@@ -154,11 +154,11 @@ my %SUPPORTED_VCSs = (
 );
 
 my %cmd_opts;
-getopts('e:l:r:i:f:v:n:', \%cmd_opts) or pod2usage(1);
+getopts('e:l:a:f:d:v:n:', \%cmd_opts) or pod2usage(1);
 
 pod2usage(1) unless defined $cmd_opts{e} and defined $cmd_opts{l}
-                    and defined $cmd_opts{r} and defined $cmd_opts{i}
-                    and defined $cmd_opts{f};
+                    and defined $cmd_opts{a} and defined $cmd_opts{f}
+                    and defined $cmd_opts{b};
 
 my $VCS_NAME = $cmd_opts{v} // "git";
 if (! defined $SUPPORTED_VCSs{$VCS_NAME}) {
@@ -168,9 +168,9 @@ my %VCS = %{$SUPPORTED_VCSs{$VCS_NAME}};
 
 my $REGEXP = $cmd_opts{e};
 my $LOG_FILE = $cmd_opts{l};
-my $REPOSITORY_DIR = $cmd_opts{r};
-my $ISSUES_FILE = abs_path($cmd_opts{i});
-my $OUTPUT_FILE = $cmd_opts{f};
+my $REPOSITORY_DIR = $cmd_opts{a};
+my $ISSUES_FILE = abs_path($cmd_opts{f});
+my $OUTPUT_FILE = $cmd_opts{b};
 my $PROJECT_NAME = $cmd_opts{n};
 
 # Issues file must exist and it can be empty
