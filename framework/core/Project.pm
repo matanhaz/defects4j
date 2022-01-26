@@ -143,7 +143,7 @@ use warnings;
 use strict;
 use Constants;
 use Utils;
-use Mutation;
+# use Mutation;
 use Carp qw(confess);
 
 =pod
@@ -820,128 +820,128 @@ sub coverage_report {
     return $self->_ant_call_comp("coverage.report", "-Dcoverage.src.dir=$source_dir");
 }
 
-=pod
-
-=item C<$project-E<gt>mutate(instrument_classes, mut_ops)>
-
-Mutates all classes listed in F<instrument_classes>, using all mutation operators
-defined by the array reference C<mut_ops>, in the checked-out program version.
-Returns the number of generated mutants on success, -1 otherwise.
-
-=cut
-
-sub mutate {
-    @_ == 3 or die $ARG_ERROR;
-    my ($self, $instrument_classes, $mut_ops)  = @_;
-    my $work_dir = $self->{prog_root};
-
-    # Read all classes that should be mutated
-    -e $instrument_classes or die "Classes file ($instrument_classes) does not exist!";
-    open(IN, "<$instrument_classes") or die "Cannot read $instrument_classes";
-    my @classes = ();
-    while(<IN>) {
-        s/\r?\n//;
-        push(@classes, $_);
-    }
-    close(IN);
-    # Update properties
-    my $list_classes = join(",", @classes);
-    my $list_mut_ops = join(",", @{$mut_ops});
-    my $config = {$PROP_MUTATE => $list_classes, $PROP_MUT_OPS => $list_mut_ops};
-    Utils::write_config_file("$work_dir/$PROP_FILE", $config);
-
-    # Create mutation definitions (mml file)
-    my $mml_src = "$self->{prog_root}/.mml/default.mml";
-    my $mml_bin = "${mml_src}.bin";
-
-    Mutation::create_mml($instrument_classes, $mml_src, $mut_ops);
-    -e "$mml_bin" or die "Mml file does not exist: $mml_bin!";
-
-    # Set environment variable MML, which is read by Major
-    $ENV{MML} = $mml_bin;
-
-    # Mutate and compile sources
-    my $ret = $self->_call_major("mutate");
-
-    delete($ENV{MML});
-
-    if (! $ret) {
-        return -1;
-    }
-
-    # Determine number of generated mutants
-    open(MUT_LOG, "<$self->{prog_root}/mutants.log") or die "Cannot open mutants log: $!";
-    my @lines = <MUT_LOG>;
-    close(MUT_LOG);
-    return scalar @lines;
-}
-
-=pod
-
-=item C<$project-E<gt>mutation_analysis(log_file, relevant_tests [, exclude_file, single_test])>
-
-Performs mutation analysis for the developer-written tests of the checked-out program
-version.
-The output of the mutation analysis process is redirected to F<log_file>, and the boolean
-parameter C<relevant_tests> indicates whether only relevant test cases are executed. If
-C<single_test> is specified, only that test is run.
-
-B<Note that C<mutate> is not called implicitly>.
-
-=cut
-
-sub mutation_analysis {
-    @_ >= 3 or die $ARG_ERROR;
-    my ($self, $log_file, $relevant_tests, $exclude_file, $single_test) = @_;
-    my $log = "-logfile $log_file";
-    my $exclude = defined $exclude_file ? "-Dmajor.exclude=$exclude_file" : "";
-    my $relevant = $relevant_tests ? "-Dd4j.relevant.tests.only=true" : "";
-
-    my $single_test_opt = "";
-    if (defined $single_test) {
-        $single_test =~ /([^:]+)::([^:]+)/ or die "Wrong format for single test!";
-        $single_test_opt = "-Dtest.entry.class=$1 -Dtest.entry.method=$2";
-    }
-
-    my $basedir = $self->{prog_root};
-
-    return $self->_call_major("mutation.test",
-                            "-Dmajor.kill.log=$basedir/$Mutation::KILL_FILE " .
-                            "$relevant $log $exclude $single_test_opt");
-}
-
-=pod
-
-=item C<$project-E<gt>mutation_analysis_ext(test_dir, test_include, log_file [, exclude_file, single_test])>
-
-Performs mutation analysis for all tests in F<test_dir> that match the pattern
-C<test_include>.
-The output of the mutation analysis process is redirected to F<log_file>. If
-C<single_test> is specified, only that test is run.
-
-B<Note that C<mutate> is not called implicitly>.
-
-=cut
-
-sub mutation_analysis_ext {
-    @_ >= 4 or die $ARG_ERROR;
-    my ($self, $dir, $include, $log_file, $exclude_file, $single_test) = @_;
-    my $log = "-logfile $log_file";
-    my $exclude = defined $exclude_file ? "-Dmajor.exclude=$exclude_file" : "";
-
-    my $basedir = $self->{prog_root};
-
-    my $single_test_opt = "";
-    if (defined $single_test) {
-        $single_test =~ /([^:]+)::([^:]+)/ or die "Wrong format for single test!";
-        $single_test_opt = "-Dtest.entry.class=$1 -Dtest.entry.method=$2";
-    }
-
-    return $self->_call_major("mutation.test",
-                            "-Dd4j.test.dir=$dir -Dd4j.test.include=$include " .
-                            "-Dmajor.kill.log=$basedir/$Mutation::KILL_FILE " .
-                            "$log $exclude $single_test_opt");
-}
+# =pod
+# 
+# =item C<$project-E<gt>mutate(instrument_classes, mut_ops)>
+# 
+# Mutates all classes listed in F<instrument_classes>, using all mutation operators
+# defined by the array reference C<mut_ops>, in the checked-out program version.
+# Returns the number of generated mutants on success, -1 otherwise.
+# 
+# =cut
+# 
+# sub mutate {
+#     @_ == 3 or die $ARG_ERROR;
+#     my ($self, $instrument_classes, $mut_ops)  = @_;
+#     my $work_dir = $self->{prog_root};
+# 
+#     # Read all classes that should be mutated
+#     -e $instrument_classes or die "Classes file ($instrument_classes) does not exist!";
+#     open(IN, "<$instrument_classes") or die "Cannot read $instrument_classes";
+#     my @classes = ();
+#     while(<IN>) {
+#         s/\r?\n//;
+#         push(@classes, $_);
+#     }
+#     close(IN);
+#     # Update properties
+#     my $list_classes = join(",", @classes);
+#     my $list_mut_ops = join(",", @{$mut_ops});
+#     my $config = {$PROP_MUTATE => $list_classes, $PROP_MUT_OPS => $list_mut_ops};
+#     Utils::write_config_file("$work_dir/$PROP_FILE", $config);
+# 
+#     # Create mutation definitions (mml file)
+#     my $mml_src = "$self->{prog_root}/.mml/default.mml";
+#     my $mml_bin = "${mml_src}.bin";
+# 
+#     Mutation::create_mml($instrument_classes, $mml_src, $mut_ops);
+#     -e "$mml_bin" or die "Mml file does not exist: $mml_bin!";
+# 
+#     # Set environment variable MML, which is read by Major
+#     $ENV{MML} = $mml_bin;
+# 
+#     # Mutate and compile sources
+#     my $ret = $self->_call_major("mutate");
+# 
+#     delete($ENV{MML});
+# 
+#     if (! $ret) {
+#         return -1;
+#     }
+# 
+#     # Determine number of generated mutants
+#     open(MUT_LOG, "<$self->{prog_root}/mutants.log") or die "Cannot open mutants log: $!";
+#     my @lines = <MUT_LOG>;
+#     close(MUT_LOG);
+#     return scalar @lines;
+# }
+# 
+# =pod
+# 
+# =item C<$project-E<gt>mutation_analysis(log_file, relevant_tests [, exclude_file, single_test])>
+# 
+# Performs mutation analysis for the developer-written tests of the checked-out program
+# version.
+# The output of the mutation analysis process is redirected to F<log_file>, and the boolean
+# parameter C<relevant_tests> indicates whether only relevant test cases are executed. If
+# C<single_test> is specified, only that test is run.
+# 
+# B<Note that C<mutate> is not called implicitly>.
+# 
+# =cut
+# 
+# sub mutation_analysis {
+#     @_ >= 3 or die $ARG_ERROR;
+#     my ($self, $log_file, $relevant_tests, $exclude_file, $single_test) = @_;
+#     my $log = "-logfile $log_file";
+#     my $exclude = defined $exclude_file ? "-Dmajor.exclude=$exclude_file" : "";
+#     my $relevant = $relevant_tests ? "-Dd4j.relevant.tests.only=true" : "";
+# 
+#     my $single_test_opt = "";
+#     if (defined $single_test) {
+#         $single_test =~ /([^:]+)::([^:]+)/ or die "Wrong format for single test!";
+#         $single_test_opt = "-Dtest.entry.class=$1 -Dtest.entry.method=$2";
+#     }
+# 
+#     my $basedir = $self->{prog_root};
+# 
+#     return $self->_call_major("mutation.test",
+#                             "-Dmajor.kill.log=$basedir/$Mutation::KILL_FILE " .
+#                             "$relevant $log $exclude $single_test_opt");
+# }
+# 
+# =pod
+# 
+# =item C<$project-E<gt>mutation_analysis_ext(test_dir, test_include, log_file [, exclude_file, single_test])>
+# 
+# Performs mutation analysis for all tests in F<test_dir> that match the pattern
+# C<test_include>.
+# The output of the mutation analysis process is redirected to F<log_file>. If
+# C<single_test> is specified, only that test is run.
+# 
+# B<Note that C<mutate> is not called implicitly>.
+# 
+# =cut
+# 
+# sub mutation_analysis_ext {
+#     @_ >= 4 or die $ARG_ERROR;
+#     my ($self, $dir, $include, $log_file, $exclude_file, $single_test) = @_;
+#     my $log = "-logfile $log_file";
+#     my $exclude = defined $exclude_file ? "-Dmajor.exclude=$exclude_file" : "";
+# 
+#     my $basedir = $self->{prog_root};
+# 
+#     my $single_test_opt = "";
+#     if (defined $single_test) {
+#         $single_test =~ /([^:]+)::([^:]+)/ or die "Wrong format for single test!";
+#         $single_test_opt = "-Dtest.entry.class=$1 -Dtest.entry.method=$2";
+#     }
+# 
+#     return $self->_call_major("mutation.test",
+#                             "-Dd4j.test.dir=$dir -Dd4j.test.include=$include " .
+#                             "-Dmajor.kill.log=$basedir/$Mutation::KILL_FILE " .
+#                             "$log $exclude $single_test_opt");
+# }
 
 =pod
 
