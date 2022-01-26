@@ -299,9 +299,10 @@ def get_cmds(p, working_dir, ind):
                   (['./download-issues.pl'], ['g', 't', 'o', 'f']),
                   (['./initialize-project-and-collect-issues.pl'], ['p', 'n', 'r', 'g', 't', 'e', 'w']),
                   (['./vcs-log-xref.pl'], ['e', 'l', 'a', 'f', 'b']),
-                  (['python', './extractor.py'], ['a', 'w', 'b']), (['./initialize-revisions.pl'], ['p', 'w', 'i']),
+                  (['python', './extractor.py'], ['a', 'w', 'b']),
+                  (['./initialize-revisions.pl'], ['p', 'w', 'i']),
                   (['./analyze-project.pl'], ['p', 'w', 'g', 't', 'i']),
-                  (['./get-trigger.pl'], ['p', 'w'])]  # , (['./get-metadata.pl'], ['p', 'w'])]
+                  (['./get-trigger.pl'], ['p', 'w'])]
     for f in files_cmds:
         yield f[0] + reduce(list.__add__, list(map(lambda x: [f'-{x}', getters[x]], f[1])), [])
 

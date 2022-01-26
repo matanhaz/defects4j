@@ -86,10 +86,10 @@ my $BI = $cmd_opts{i};
 my $WORK_DIR = abs_path($cmd_opts{w});
 my $SUBPROJ = $cmd_opts{s};
 
-# Check format of target bug id
-if (defined $BID) {
-    $BID =~ /^(\d+)(:(\d+))?$/ or die "Wrong version id format ((\\d+)(:(\\d+))?): $BID!";
-}
+# # Check format of target bug id
+# if (defined $BID) {
+#     $BID =~ /^(\d+)(:(\d+))?$/ or die "Wrong version id format ((\\d+)(:(\\d+))?): $BID!";
+# }
 
 # Add script and core directory to @INC
 unshift(@INC, "$WORK_DIR/framework/core");
@@ -198,19 +198,19 @@ sub _bootstrap {
 }
 
 my @ids = $project->get_bug_ids();
-if (defined $BID) {
-    if ($BID =~ /(\d+):(\d+)/) {
-        @ids = grep { ($1 <= $_) && ($_ <= $2) } @ids;
-    } else {
-        # single bid
-        @ids = grep { ($BID == $_) } @ids;
-    }
-}
-if (defined $BI) {
+# if (defined $BID) {
+#     if ($BID =~ /(\d+):(\d+)/) {
+#         @ids = grep { ($1 <= $_) && ($_ <= $2) } @ids;
+#     } else {
+#         # single bid
+#         @ids = grep { ($BID == $_) } @ids;
+#     }
+# }
+# if (defined $BI) {
 	if ($BI =~ /^\d+$/) {
 		@ids = grep { ($BI == $_) } @ids;
 	}
-}
+# }
 
 foreach my $bid (@ids) {
     printf ("%4d: $project->{prog_name}\n", $bid);
