@@ -1,7 +1,7 @@
 import os
 import sys
-from subprocess import run
 from functools import reduce
+from subprocess import run
 
 projects = {'distributedlog': ('https://github.com/apache/distributedlog', 'DL'),
 'maven-indexer': ('https://github.com/apache/maven-indexer', 'MINDEXER'),
@@ -290,8 +290,18 @@ projects = {'distributedlog': ('https://github.com/apache/distributedlog', 'DL')
 
 
 def get_cmds(p, working_dir, ind):
-    getters = {'p': projects[p][1].title(), 'r': projects[p][0], 'n': p, 'g': 'jira', 't': projects[p][1], 'e': '"/({0}-\d+)/mi"'.format(projects[p][1]), 'w': working_dir, 'i': ind, 'a': f"{working_dir}//project_repos//{p}.git", 'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv"}
-    files_cmds = [(['./initialize-project-and-collect-issues.pl'], ['p', 'n', 'r', 'g', 't', 'e', 'w']), (['python', './extractor.py'], ['a', 'w', 'b']), (['./initialize-revisions.pl'], ['p', 'w', 'i']), (['./analyze-project.pl'], ['p', 'w', 'g', 't', 'i']), (['./get-trigger.pl'], ['p', 'w'])] #, (['./get-metadata.pl'], ['p', 'w'])]
+    getters = {'p': projects[p][1].title(), 'r': projects[p][0], 'n': p, 'g': 'jira', 't': projects[p][1],
+               'e': '"/({0}-\d+)/mi"'.format(projects[p][1]), 'w': working_dir, 'i': ind,
+               'a': f"{working_dir}//project_repos//{p}.git",
+               'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv",
+               'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': ''}
+    files_cmds = [(['./create-project.pl'], ['p', 'n', 'w', 'r']),
+                  (['./download-issues.pl'], ['g', 't', 'o', 'f']),
+                  (['./initialize-project-and-collect-issues.pl'], ['p', 'n', 'r', 'g', 't', 'e', 'w']),
+                  # (['./vcs-log-xref.pl'], ['e', 'l', 'i', 'f']),
+                  (['python', './extractor.py'], ['a', 'w', 'b']), (['./initialize-revisions.pl'], ['p', 'w', 'i']),
+                  (['./analyze-project.pl'], ['p', 'w', 'g', 't', 'i']),
+                  (['./get-trigger.pl'], ['p', 'w'])]  # , (['./get-metadata.pl'], ['p', 'w'])]
     for f in files_cmds:
         yield f[0] + reduce(list.__add__, list(map(lambda x: [f'-{x}', getters[x]], f[1])), [])
 

@@ -136,34 +136,34 @@ my $COMMIT_DB_FILE = "$WORK_DIR/framework/projects/$PID/$BUGS_CSV_ACTIVE";
 my $VCS_TYPE = $cmd_opts{v} // "git";
 
 # Configure project for Defects4J
-Utils::exec_cmd("./create-project.pl -p $PID"
-                                 . " -n $NAME"
-                                 . " -w $WORK_DIR"
-                                 . " -r $REPOSITORY_URL",
-                "Configuring project for Defects4J") or die "Failed to configure project for Defects4J!";
+# Utils::exec_cmd("./create-project.pl -p $PID"
+#                                  . " -n $NAME"
+#                                  . " -w $WORK_DIR"
+#                                  . " -r $REPOSITORY_URL",
+#                 "Configuring project for Defects4J") or die "Failed to configure project for Defects4J!";
 
 # Does project exist in the Defects4J database? If yes, copy over the required
 # (and existing) files to build the project.
-if (-e "$CORE_DIR/Project/$PID.pm") {
-    # Override project module
-    system("cp $CORE_DIR/Project/$PID.pm $WORK_DIR/framework/core/Project/$PID.pm");
-    # Override project build file
-    system("cp $PROJECTS_DIR/$PID/$PID.build.xml $WORK_DIR/framework/projects/$PID/$PID.build.xml");
-}
+# if (-e "$CORE_DIR/Project/$PID.pm") {
+#     # Override project module
+#     system("cp $CORE_DIR/Project/$PID.pm $WORK_DIR/framework/core/Project/$PID.pm");
+#     # Override project build file
+#     system("cp $PROJECTS_DIR/$PID/$PID.build.xml $WORK_DIR/framework/projects/$PID/$PID.build.xml");
+# }
 
-if (defined($QUERY)) {
-    $QUERY = "-q $QUERY";
-} else {
-    $QUERY = "";
-}
+# if (defined($QUERY)) {
+#     $QUERY = "-q $QUERY";
+# } else {
+#     $QUERY = "";
+# }
 # Collect all issues from the project issue tracker
-Utils::exec_cmd("./download-issues.pl -g $ISSUE_TRACKER_NAME"
-                                  . " -t $ISSUE_TRACKER_PROJECT_ID"
-                                  . " -o $ISSUES_DIR"
-                                  . " -f $ISSUES_FILE"
-                                  . "$QUERY",
-                "Collecting all issues from the project issue tracker") or die "Cannot collect all issues from the project issue tracker!";
-
+#Utils::exec_cmd("./download-issues.pl -g $ISSUE_TRACKER_NAME"
+#                                  . " -t $ISSUE_TRACKER_PROJECT_ID"
+#                                  . " -o $ISSUES_DIR"
+#                                  . " -f $ISSUES_FILE"
+#                                  . "$QUERY",
+#                "Collecting all issues from the project issue tracker") or die "Cannot collect all issues from the project issue tracker!";
+#
 # Collect git log
 Utils::exec_cmd("git --git-dir=$REPOSITORY_DIR log --reverse > $GIT_LOG_FILE",
                 "Collecting repository log") or die "Cannot collect git history!";
