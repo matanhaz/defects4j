@@ -32,7 +32,7 @@ reported in the project issue tracker.
 
 =head1 SYNOPSIS
 
-vcs-log-xref.pl -e bug_matching_perl_regexp -l commit_log -r repository_dir -i issues_file -f output_file [-v vcs_type] [-n project_name]
+vcs-log-xref.pl -e bug_matching_perl_regexp -l commit_log -r repository_dir -i issues_file -b output_file [-v vcs_type] [-n project_name]
 
 =head1 OPTIONS
 
@@ -52,12 +52,12 @@ issue tracker. This file may be obtained for example by running C<git log>.
 The path to the git repository for this project (this argument is ignored for SVN
 repositories).
 
-=item B<-i C<issues_file>>
+=item B<-f C<issues_file>>
 
 The file with all issues that have been reported in the project issue tracker.
 Each row of the file has two values separated by ',': <issue id>,<issue url>.
 
-=item B<-f C<output_file>>
+=item B<-b C<output_file>>
 
 The file to which all revision ids of the pre-fix and post-fix revision are written.
 Each row of the file is composed by 5 values:
@@ -154,7 +154,7 @@ my %SUPPORTED_VCSs = (
 );
 
 my %cmd_opts;
-getopts('e:l:a:f:d:v:n:', \%cmd_opts) or pod2usage(1);
+getopts('e:l:a:f:b:v:n:', \%cmd_opts) or pod2usage(1);
 
 pod2usage(1) unless defined $cmd_opts{e} and defined $cmd_opts{l}
                     and defined $cmd_opts{a} and defined $cmd_opts{f}
