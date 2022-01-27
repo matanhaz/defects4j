@@ -202,8 +202,9 @@ foreach my $bid (@ids) {
     $data{$ISSUE_TRACKER_ID} = $TRACKER_ID;
 
     # _check_diff($project, $bid, \%data) and
-    _check_t2v2($project, $bid, \%data) and
-    _check_t2v1($project, $bid, \%data) or next;
+	_add_bool_result($data, $COMP_V1, 1);
+    _add_bool_result($data, $COMP_T2V1, 1);
+    _check_t2v2($project, $bid, \%data) or next;
 
     # Add data set to result file
     _add_row(\%data);
@@ -346,10 +347,10 @@ sub _check_t2v1 {
     # Compile v1 and t2v1
 	# system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
     # my $ret = $project->compile();
-    _add_bool_result($data, $COMP_V1, 1) or return;
 	# $project->compile_tests("$WORK_DIR/compile_tests_a2_log.log");
 	# system("python fix_compile_errors.py $WORK_DIR/compile_tests_a2_log.log $project->{prog_root} 2>&1");
 	# $ret = $project->compile_tests();
+    _add_bool_result($data, $COMP_V1, 1);
     _add_bool_result($data, $COMP_T2V1, 1);
 }
 
