@@ -418,7 +418,8 @@ class Reproducer:
             with open(dst, 'w') as dst_f:
                 dst_f.writelines(lines)
         os.makedirs(self.repo_dir, exist_ok=True)
-        os.system(f"git clone {self.url} {self.repo_dir}/{self.name}.git")
+        os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
+        # run(f"git clone {self.url} {os.path.abspath(self.repo_dir)}/{self.name}.git".split())
 
     def extract_issues(self):
         repo_path = os.path.join(self.repo_dir, self.name + ".git")
