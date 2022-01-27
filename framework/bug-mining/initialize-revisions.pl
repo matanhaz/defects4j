@@ -133,12 +133,12 @@ sub _init_version {
 	printf ("checkout_vid %4d for : $project->{prog_name}\n", $bid);
     $project->{_vcs}->checkout_vid("${vid}", $work_dir) or die "Cannot checkout $vid version";
 
-    if (defined $SUBPROJ) {
-        $work_dir .= "/$SUBPROJ/";
-        $project->{prog_root} = $work_dir;
-    }
+    # if (defined $SUBPROJ) {
+    #     $work_dir .= "/$SUBPROJ/";
+    #     $project->{prog_root} = $work_dir;
+    # }
 
-    system("mkdir -p $ANALYZER_OUTPUT/$bid");
+    # system("mkdir -p $ANALYZER_OUTPUT/$bid");
     # if (-e "$work_dir/build.xml") {
     #     my $cmd = " cd $work_dir" .
     #               " && java -jar $LIB_DIR/analyzer.jar $work_dir $ANALYZER_OUTPUT/$bid build.xml 2>&1";
@@ -167,9 +167,6 @@ sub _init_version {
         # Get dependencies if it is maven-ant project
         my $download_dep = "cd $work_dir && ant -Dmaven.repo.local=\"$PROJECT_DIR/lib\" get-deps";
         Utils::exec_cmd($download_dep, "Download dependencies for maven-ant.xml.");
-    } else {
-        # TODO add support for other build systems
-        die "Unsupported build system";
     }
 
     $project->initialize_revision($rev_id, "${vid}");
