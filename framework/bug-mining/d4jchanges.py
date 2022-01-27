@@ -16,18 +16,20 @@ class Repo(object):
         self.traces = None
 
     # Changes all the pom files in a module recursively
-    def get_all_pom_paths(self):
+    def get_all_pom_paths(self, module=None):
         ans = []
         inspected_module = self.repo_dir
-        pom_path = os.path.join(self.repo_dir, 'pom.xml')
+        if module is not None:
+            inspected_module = module
+        pom_path = os.path.join(inspected_module, 'pom.xml')
         if os.path.isfile(pom_path):
             try:
                 parse(pom_path)
                 ans.append(pom_path)
             except:
                 pass
-        for file in os.listdir(self.repo_dir):
-            full_path = os.path.join(self.repo_dir, file)
+        for file in os.listdir(inspected_module):
+            full_path = os.path.join(inspected_module, file)
             if os.path.isdir(full_path):
                 ans.extend(self.get_all_pom_paths(full_path))
         return ans
