@@ -222,9 +222,9 @@ foreach my $bid (@ids) {
 
     # Clean the temporary directory
     Utils::exec_cmd("rm -rf $TMP_DIR && mkdir -p $TMP_DIR", "Cleaning working directory") or die "Cannot clean working directory";
-    $project->{prog_root} = $TMP_DIR;
-    $project->checkout_vid("${bid}f", $TMP_DIR, 1) or die "Cannot checkout fixed version";
-    $project->sanity_check();
+    # $project->{prog_root} = $TMP_DIR;
+    # $project->checkout_vid("${bid}f", $TMP_DIR, 1) or die "Cannot checkout fixed version";
+    # $project->sanity_check();
 }
 
 # print("\n--- Add the following to the <fileset> tag identified by the id 'all.manual.tests' in the <PROJECT_ID.build.xml> file ---\n");
