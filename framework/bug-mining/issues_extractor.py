@@ -247,10 +247,9 @@ def _commits_and_issues(repo, jira_issues):
     return commits
 
 
-def extract(repo_path, jira_key, out_csv):
+def extract_issues(repo_path, jira_key, out_csv):
     issues = get_jira_issues(jira_key)
     commits = _commits_and_issues(git.Repo(repo_path), issues)
-
     issued_ = list(filter(lambda c: c.issue is not None, commits))
     buggy = list(filter(lambda c: c.issue.type.lower() == 'bug', issued_))
     lists = list(map(lambda b: [b[0] + 1] + b[1].get_list(), enumerate(buggy)))
