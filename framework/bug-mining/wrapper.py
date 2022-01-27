@@ -336,7 +336,7 @@ def layout(repo_path, commit_id):
     commond_tests = os.path.commonpath(reduced_tests)
     if not commond_tests:
         commond_tests = sorted(reduced_tests, key=lambda x: len(x))[0]
-    return commond_java, commond_tests
+    return os.path.normpath(commond_java), os.path.normpath(commond_tests)
     # with open(out_file, 'w') as f:
     #     f.writelines(map(lambda x: x + '\n', [commond_java, commond_tests]))
 
@@ -346,8 +346,8 @@ def diff_on_layouts(repo_path, commit_a, commit_b, src_patch, test_patch):
     java_b, test_b = layout(repo_path, commit_b)
     assert java_a == java_b
     assert test_a == test_b
-    diff_src = f"git diff --no-ext-diff --binary {commit_a} {commit_b} {java_a}"
-    diff_test = f"git diff --no-ext-diff --binary {commit_a} {commit_b} {test_a}"
+    diff_src = f"git diff --no-ext-diff --binary {commit_a} {commit_b} {java_a}".split()
+    diff_test = f"git diff --no-ext-diff --binary {commit_a} {commit_b} {test_a}".split()
     print(diff_src)
     with open(src_patch, 'w') as out:
         run(diff_src, cwd=repo_path, stdout=out)
@@ -428,10 +428,11 @@ class Reproducer:
         pass
 
     def get_diffs(self):
-        repo_path = os.path.join(self.repo_dir, self.name + ".git")
+        repo_path = os.path.abspath(os.path.join(self.repo_dir, self.name + ".git"))
         df = pd.read_csv(self.active_bugs)
         commit_a, commit_b = df[df['bug.id'] == int(self.ind)][['revision.id.fixed', 'revision.id.buggy']].values[0].tolist()
-        diff_on_layouts(os.path.abspath(repo_path), commit_a, commit_b,
+        print(repo_path)
+        diff_on_layouts(repo_path, commit_a, commit_b,
                         os.path.join(self.patch_dir, self.ind + '.src.patch2'),
                         os.path.join(self.patch_dir, self.ind + '.test.patch2'))
 
