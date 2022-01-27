@@ -148,21 +148,10 @@ sub _init_version {
         my $cmd = " cd $work_dir" .
                   " && python $MVNPY_DIR/d4jchanges.py $work_dir 1.8" .
                   " && mvn ant:ant -Doverwrite=true 2>&1 -Dhttps.protocols=TLSv1.2 -Dmaven.compile.source=1.8 -Dmaven.compile.target=1.8" .
-                  " && python $MVNPY_DIR/../../fix_compile_source.py $work_dir";
-        my $fix_dep = "cd $work_dir && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml >> temp && mv temp maven-build.xml";
-        my $download_dep = "cd $work_dir && ant -Dmaven.repo.local=\"$PROJECT_DIR/lib\" get-deps";
-
+                  " && python $MVNPY_DIR/../../fix_compile_source.py $work_dir" .
+				  " && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml >> temp && mv temp maven-build.xml" . 
+				  "&& ant -Dmaven.repo.local=\"$PROJECT_DIR/lib\" get-deps";
         Utils::exec_cmd($cmd, "Convert Maven to Ant build file: " . $rev_id) or die;
-        Utils::exec_cmd($fix_dep, "Fixing broken dependency links.");
-        Utils::exec_cmd($download_dep, "Download dependencies for maven-ant.xml.");
-
-        # my $cmd = " cd $work_dir" .
-        #           " && python $MVNPY_DIR/d4jchanges.py $work_dir 1.8" .
-        #           " && mvn ant:ant -Doverwrite=true 2>&1 -Dhttps.protocols=TLSv1.2 -Dmaven.compile.source=1.8 -Dmaven.compile.target=1.8" .
-        #           " && python $MVNPY_DIR/../../fix_compile_source.py $work_dir" .
-		# 		  " && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml >> temp && mv temp maven-build.xml" . 
-		# 		  "&& ant -Dmaven.repo.local=\"$PROJECT_DIR/lib\" get-deps";
-        # Utils::exec_cmd($cmd, "Convert Maven to Ant build file: " . $rev_id) or die;
 
     }
 
