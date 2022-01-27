@@ -317,7 +317,7 @@ class Reproducer:
                    'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': '',
                    'l': f"{working_dir}//gitlog"}
         self.name = p
-        self.url = getters['r']
+        self.url = projects[self.p][0]
         self.work_dir = working_dir
         self.module_template = os.path.join(self.const_core_dir, "Project/template")
         self.build_template = os.path.join(self.projects_dir, 'build.xml.patch')
@@ -343,6 +343,8 @@ class Reproducer:
                 lines = list(map(lambda l: l.replace('<PID>', self.pid).replace('<PROJECT_NAME>', self.name), src_f.readlines()))
             with open(dst, 'w') as dst_f:
                 dst_f.writelines(lines)
+        os.mkdir(self.repo_dir)
+        os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
 
     def do_all(self):
         self.create_project()
@@ -356,8 +358,7 @@ def get_cmds(p, working_dir, ind):
                'a': f"{working_dir}//project_repos//{p}.git",
                'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv",
                'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': '', 'l': f"{working_dir}//gitlog"}
-    files_cmds = [(['./create-project.pl'], ['p', 'n', 'w', 'r']),
-                  (['./download-issues.pl'], ['g', 't', 'o', 'f']),
+    files_cmds = [(['./download-issues.pl'], ['g', 't', 'o', 'f']),
                   (['./initialize-project-and-collect-issues.pl'], ['p', 'n', 'r', 'g', 't', 'e', 'w']),
                   (['./vcs-log-xref.pl'], ['e', 'l', 'a', 'f', 'b']),
                   (['python', './extractor.py'], ['a', 'w', 'b']),
