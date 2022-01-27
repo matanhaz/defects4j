@@ -182,8 +182,10 @@ sub _bootstrap {
     # Minimization doesn't matter here, which has to be done manually.
 	printf ("source path to diff %s\n", $src_f);
 	printf ("test path to diff %s\n", $test_f);
-    $project->export_diff($v2, $v1, "$PATCH_DIR/$bid.src.patch", "$src_f");
-    $project->export_diff($v2, $v1, "$PATCH_DIR/$bid.test.patch", "$test_f");
+    $project->{_vcs}->export_diff($v2, $v1, "$PATCH_DIR/$bid.src.patch", "$src_f");
+    $project->{_vcs}->export_diff($v2, $v1, "$PATCH_DIR/$bid.test.patch", "$test_f");
+	my $diff1 = "git --git-dir=$project->{_vcs}->{repo} diff --no-ext-diff --binary ${v2} ${v1} $src_f > $PATCH_DIR/$bid.src.patch". 
+	" && git --git-dir=$project->{_vcs}->{repo} diff --no-ext-diff --binary ${v2} ${v1} $test_f > $PATCH_DIR/$bid.test.patch";
 }
 
 my @ids = $project->get_bug_ids();
