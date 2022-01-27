@@ -374,12 +374,7 @@ def get_cmds(p, working_dir, ind):
                'a': f"{working_dir}//project_repos//{p}.git",
                'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv",
                'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': '', 'l': f"{working_dir}//gitlog"}
-    files_cmds = [(['./download-issues.pl'], ['g', 't', 'o', 'f']),
-                  (['git', f'--git-dir={getters["a"]}', 'log', '--reverse' '>' f"{working_dir}//gitlog"], []),
-                  # (['./initialize-project-and-collect-issues.pl'], ['p', 'n', 'r', 'g', 't', 'e', 'w']),
-                  (['./vcs-log-xref.pl'], ['e', 'l', 'a', 'f', 'b']),
-                  (['python', './extractor.py'], ['a', 'w', 'b']),
-                  (['./initialize-revisions.pl'], ['p', 'w', 'i']),
+    files_cmds = [(['./initialize-revisions.pl'], ['p', 'w', 'i']),
                   (['./analyze-project.pl'], ['p', 'w', 'g', 't', 'i']),
                   (['./get-trigger.pl'], ['p', 'w'])]
     for f in files_cmds:
