@@ -306,7 +306,7 @@ class Reproducer:
 
         # scripts cmds
         self.p = p
-        self.pid = p
+        self.pid = projects[p][1].title()
         self.working_dir = working_dir
         self.project_dir = os.path.join(self.working_dir, 'framework', 'projects', self.pid)
         self.ind = ind
@@ -316,7 +316,7 @@ class Reproducer:
                    'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv",
                    'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': '',
                    'l': f"{working_dir}//gitlog"}
-        self.name = getters['n']
+        self.name = p
         self.url = getters['r']
         self.work_dir = working_dir
         self.module_template = os.path.join(self.const_core_dir, "Project/template")
@@ -333,18 +333,24 @@ class Reproducer:
         self.mod_classes = os.path.join(self.project_dir, 'modified_classes')
         self.rel_classes = os.path.join(self.project_dir, 'loaded_classes')
         self.core_dir = os.path.join(self.working_dir, 'framework', 'core', 'Project')
+
+    def create_project(self):
         for d in [self.project_dir, self.core_dir, self.issues_dir, self.patch_dir, self.failing_dir, self.trigger_dir,
                   self.relevant_dir, self.mod_classes, self.rel_classes]:
             os.mkdir(d)
-
-    def create_project(self):
-        pass
+        for src, dst in [(self.module_template, self.module_file), (self.build_template, self.build_file), (self.build_patch, self.build_patch_file)]:
+            with open(src) as src_f:
+                lines = list(map(lambda l: l.replace('<PID>', self.pid).replace('<PROJECT_NAME>', self.name), src_f.readlines()))
+            with open(dst, 'w') as dst_f:
+                dst_f.writelines(lines)
 
     def do_all(self):
-        pass
+        self.create_project()
 
 
 def get_cmds(p, working_dir, ind):
+    reproducer = Reproducer(p, working_dir, ind)
+    reproducer.create_project()
     getters = {'p': projects[p][1].title(), 'r': projects[p][0], 'n': p, 'g': 'jira', 't': projects[p][1],
                'e': '"/({0}-\d+)/mi"'.format(projects[p][1]), 'w': working_dir, 'i': ind,
                'a': f"{working_dir}//project_repos//{p}.git",
