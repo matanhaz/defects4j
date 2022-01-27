@@ -155,7 +155,7 @@ sub _init_version {
 
     }
 
-    $project->initialize_revision($rev_id, "${vid}");
+    # $project->initialize_revision($rev_id, "${vid}");
 
     return ($rev_id, $project->src_dir("${vid}"), $project->test_dir("${vid}"));
 }

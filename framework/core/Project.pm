@@ -1280,6 +1280,7 @@ sub _determine_layout {
     @_ == 2 or die $ARG_ERROR;
     my ($self, $rev_id) = @_;
     unless (defined $self->{_layout_cache}->{$rev_id}) {
+        # $self->{_layout_cache}->{$rev_id} = $self->get_layout_by_python();
         $self->{_layout_cache}->{$rev_id} = $self->determine_layout($rev_id);
         $self->_add_to_layout_map($rev_id,
             $self->{_layout_cache}->{$rev_id}->{src},
@@ -1289,4 +1290,20 @@ sub _determine_layout {
     return $self->{_layout_cache}->{$rev_id};
 }
 
+
+sub get_layout_by_python {
+    @_ == 1 or die $ARG_ERROR;
+    my ($self) = @_;
+	my $dir = $self->{prog_root};
+ 	my $file_name = "python_layout.txt";
+    system("python layout.py $dir $file_name 2>&1");
+
+    open FILE, $file_name or die "Cannot open layout file";
+    my @lines = <FILE>;
+    close FILE;
+
+    chomp($lines[0]);
+    chomp($lines[1]); 
+    return {src=>$lines[0], test=>$lines[1]}; 
+}
 1;
