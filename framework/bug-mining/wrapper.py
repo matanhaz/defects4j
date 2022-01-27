@@ -419,6 +419,7 @@ class Reproducer:
                 dst_f.writelines(lines)
         os.makedirs(self.repo_dir, exist_ok=True)
         os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
+        os.system(f"git clone {self.url} {self.repo_dir}/{self.name}_real.git")
         # run(f"git clone {self.url} {os.path.abspath(self.repo_dir)}/{self.name}.git".split())
 
     def extract_issues(self):
@@ -429,7 +430,7 @@ class Reproducer:
         pass
 
     def get_diffs(self):
-        repo_path = os.path.abspath(os.path.join(self.repo_dir, self.name + ".git"))
+        repo_path = os.path.abspath(os.path.join(self.repo_dir, self.name + "_real.git"))
         df = pd.read_csv(self.active_bugs)
         commit_a, commit_b = df[df['bug.id'] == int(self.ind)][['revision.id.fixed', 'revision.id.buggy']].values[0].tolist()
         print(repo_path)
@@ -440,7 +441,7 @@ class Reproducer:
     def do_all(self):
         self.create_project()
         self.extract_issues()
-        # self.get_diffs()
+        self.get_diffs()
 
 
 def get_cmds(p, working_dir, ind):
