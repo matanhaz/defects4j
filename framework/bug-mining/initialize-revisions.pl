@@ -149,13 +149,16 @@ sub _init_version {
                   " && python $MVNPY_DIR/d4jchanges.py $work_dir 1.8" .
                   " && mvn ant:ant -Doverwrite=true 2>&1 -Dhttps.protocols=TLSv1.2 -Dmaven.compile.source=1.8 -Dmaven.compile.target=1.8" .
                   " && python $MVNPY_DIR/../../fix_compile_source.py $work_dir" .
+				  " && rm -rf $GEN_BUILDFILE_DIR/$rev_id && mkdir -p $GEN_BUILDFILE_DIR/$rev_id 2>&1" .
+                  " && cp maven-build.* $GEN_BUILDFILE_DIR/$rev_id 2>&1" .
+                  " && cp build.xml $GEN_BUILDFILE_DIR/$rev_id 2>&1" . 
 				  " && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml >> temp && mv temp maven-build.xml" . 
 				  "&& ant -Dmaven.repo.local=\"$PROJECT_DIR/lib\" get-deps";
         Utils::exec_cmd($cmd, "Convert Maven to Ant build file: " . $rev_id) or die;
 
     }
 
-    # $project->initialize_revision($rev_id, "${vid}");
+    $project->initialize_revision($rev_id, "${vid}");
 
     return ($rev_id, $project->src_dir("${vid}"), $project->test_dir("${vid}"));
 }

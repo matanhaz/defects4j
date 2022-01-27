@@ -19,7 +19,7 @@ class JiraExtractor():
 	
 	def fix(self):
 		detailed_issues = dict(reduce(list.__add__, list(map(lambda commits: list(map(lambda c: ((self.get_parent(c).hexsha, c.hexsha), commits[0]), commits[1])), self.issues_d.items())), []))
-		# detailed_issues.update(dict(self.check_active_bugs()))
+		detailed_issues.update(dict(self.check_active_bugs()))
 		active = list(map(lambda x: (x[0] + 1, x[1][0][0],x[1][0][1], 'TEMP-' + x[1][1], 'https://issues.apache.org/jira/browse'), enumerate(detailed_issues.items())))
 		df = pd.DataFrame(active, columns=['bug.id','revision.id.buggy','revision.id.fixed','report.id','report.url'])
 		df.to_csv(self.active_bugs, index=False)
