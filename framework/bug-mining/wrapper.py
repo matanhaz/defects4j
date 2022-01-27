@@ -323,7 +323,7 @@ class Reproducer:
         self.build_template = os.path.join(self.projects_dir, 'build.xml.patch')
         self.module_file = os.path.join(self.project_dir, self.pid + '.pm')
         self.build_file = os.path.join(self.project_dir, self.pid + '.build.xml')
-        self.build_patch = os.path.join(self.projects_dir, '.build.xml.patch')
+        self.build_patch = os.path.join(self.projects_dir, 'build.xml.patch')
         self.build_patch_file = os.path.join(self.project_dir, 'build.xml.patch')
         self.repo_dir = os.path.join(self.working_dir, 'project_repos')
         self.issues_dir = os.path.join(self.working_dir, 'issues')
