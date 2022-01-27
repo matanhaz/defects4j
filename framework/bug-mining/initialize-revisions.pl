@@ -132,6 +132,8 @@ sub _init_version {
     # minimized patch to obtain the buggy version.
 	printf ("checkout_vid %4d for : $project->{prog_name}\n", $bid);
     $project->{_vcs}->checkout_vid("${vid}", $work_dir) or die "Cannot checkout $vid version";
+	my $git_checkout = "git clone $project->{_vcs}->{repo} ${work_dir} 2>&1 && cd $work_dir && git checkout $rev_id 2>&1";
+	printf("try checkout by: %s", $git_checkout);
 
     # if (defined $SUBPROJ) {
     #     $work_dir .= "/$SUBPROJ/";
