@@ -156,7 +156,7 @@ sub _init_version {
                   " && cp build.xml $GEN_BUILDFILE_DIR/$rev_id 2>&1" . 
 				  " && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml >> temp && mv temp maven-build.xml" . 
 				  "&& ant -Dmaven.repo.local=\"$PROJECT_DIR/lib\" get-deps";
-        # Utils::exec_cmd($cmd, "Convert Maven to Ant build file: " . $rev_id) or die;
+        Utils::exec_cmd($cmd, "Convert Maven to Ant build file: " . $rev_id) or die;
 
     }
 
