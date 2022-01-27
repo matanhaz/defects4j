@@ -321,7 +321,6 @@ class Reproducer:
         self.work_dir = working_dir
         self.module_template = os.path.join(self.const_core_dir, "Project/template")
         self.build_template = os.path.join(self.projects_dir, 'build.xml.patch')
-        self.module_file = os.path.join(self.project_dir, self.pid + '.pm')
         self.build_file = os.path.join(self.project_dir, self.pid + '.build.xml')
         self.build_patch = os.path.join(self.projects_dir, 'build.xml.patch')
         self.build_patch_file = os.path.join(self.project_dir, 'build.xml.patch')
@@ -334,6 +333,7 @@ class Reproducer:
         self.mod_classes = os.path.join(self.project_dir, 'modified_classes')
         self.rel_classes = os.path.join(self.project_dir, 'loaded_classes')
         self.core_dir = os.path.join(self.working_dir, 'framework', 'core', 'Project')
+        self.module_file = os.path.join(self.core_dir, self.pid + '.pm')
         self.analyzer_output = os.path.join(self.project_dir, 'analyzer_output')
         self.gen_buildfile_dir = os.path.join(self.project_dir, 'build_files')
 
@@ -352,6 +352,9 @@ class Reproducer:
         os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
 
     def download_issues(self):
+        pass
+
+    def init_version(self, project, bid, vid):
         pass
 
     def do_all(self):
