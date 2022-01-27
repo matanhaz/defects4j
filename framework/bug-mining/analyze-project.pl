@@ -202,8 +202,7 @@ foreach my $bid (@ids) {
     $data{$ISSUE_TRACKER_ID} = $TRACKER_ID;
 
     # _check_diff($project, $bid, \%data) and
-    _check_t2v2($project, $bid, \%data) and
-    _check_t2v1($project, $bid, \%data) or next;
+    _check_t2v2($project, $bid, \%data) or next;
 
     # Add data set to result file
     _add_row(\%data);
