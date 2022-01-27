@@ -429,6 +429,7 @@ class Reproducer:
 
     def get_diffs(self):
         repo_path = os.path.join(self.repo_dir, self.name + ".git")
+        df = pd.read_csv(self.active_bugs)
         commit_a, commit_b = df[df['bug.id'] == self.ind][['revision.id.fixed', 'revision.id.buggy']].values[0].tolist()
         diff_on_layouts(repo_path, commit_a, commit_b, os.path.join(self.patch_dir, self.ind + '.src.patch2'), os.path.join(self.patch_dir, self.ind + '.test.patch2'))
 
