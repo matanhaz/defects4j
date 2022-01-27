@@ -257,60 +257,6 @@ def extract_issues(repo_path, jira_key, out_csv):
     df.to_csv(out_csv, index=False)
 
 
-def layout(repo_path, commit_id):
-    java = set()
-    tests = set()
-    repo = git.Repo(repo_path)
-    files = repo.git.ls_tree("-r", "--name-only", commit_id).split()
-    for f in filter(lambda x: x.endswith('.java'), files):
-            if 'test' in f:
-                tests.add(os.path.dirname(f))
-            else:
-                java.add(os.path.dirname(f))
-    reduced_java = set()
-    s_j = min(list(map(lambda x: len(x), java)))
-    min_java_name = list(filter(lambda x: len(x) == s_j, java))[0]
-    reduced_tests = set()
-    s_t = min(list(map(lambda x: len(x), tests)))
-    min_test_name = list(filter(lambda x: len(x) == s_t, tests))[0]
-    for name in java:
-        if os.path.dirname(name) in java:
-            continue
-        if name != min_java_name and name[:s_j] == min_java_name:
-            continue
-        reduced_java.add(name)
-    for name in tests:
-        if os.path.dirname(name) in tests:
-            continue
-        if name != min_test_name and name[:s_t] == min_test_name:
-            continue
-        reduced_tests.add(name)
-    commond_java = os.path.commonpath(reduced_java)
-    if not commond_java:
-        commond_java = sorted(reduced_java, key=lambda x: len(x))[0]
-    commond_tests = os.path.commonpath(reduced_tests)
-    if not commond_tests:
-        commond_tests = sorted(reduced_tests, key=lambda x: len(x))[0]
-    return commond_java, commond_tests
-    # with open(out_file, 'w') as f:
-    #     f.writelines(map(lambda x: x + '\n', [commond_java, commond_tests]))
-
-
-def diff_on_layouts(repo_path, commit_a, commit_b, src_patch, test_patch):
-    java_a, test_a = layout(repo_path, commit_a)
-    java_b, test_b = layout(repo_path, commit_b)
-    assert java_a == java_b
-    assert test_a == test_b
-    diff_src = f"git diff --no-ext-diff --binary {commit_a} {commit_b} {java_a}"
-    diff_test = f"git diff --no-ext-diff --binary {commit_a} {commit_b} {test_a}"
-    print(diff_src)
-    with open(src_patch, 'w') as out:
-        run(diff_src, cwd=repo_path, stdout=out)
-    with open(test_patch, 'w') as out:
-        run(diff_test, cwd=repo_path, stdout=out)
-
-    # TODO: check patches are not empty
-
 if __name__ == "__main__":
     # extract(r"c:\temp\camel2", "CAMEL", r'c:\temp\active.csv')
     # layout(r"c:\temp\commons-codec", "d2f27093d7d95a07da901902f894d88b4ecc3e95")
