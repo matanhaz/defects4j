@@ -307,7 +307,7 @@ class Reproducer:
         # scripts cmds
         self.p = p
         self.pid = projects[p][1].title()
-        self.working_dir = working_dir
+        self.working_dir = os.path.abspath(working_dir)
         self.project_dir = os.path.join(self.working_dir, 'framework', 'projects', self.pid)
         self.ind = ind
         getters = {'p': projects[p][1].title(), 'r': projects[p][0], 'n': p, 'g': 'jira', 't': projects[p][1],
@@ -337,14 +337,17 @@ class Reproducer:
     def create_project(self):
         for d in [self.project_dir, self.core_dir, self.issues_dir, self.patch_dir, self.failing_dir, self.trigger_dir,
                   self.relevant_dir, self.mod_classes, self.rel_classes]:
-            os.mkdir(d)
+            os.makedirs(d, exist_ok=True)
         for src, dst in [(self.module_template, self.module_file), (self.build_template, self.build_file), (self.build_patch, self.build_patch_file)]:
             with open(src) as src_f:
                 lines = list(map(lambda l: l.replace('<PID>', self.pid).replace('<PROJECT_NAME>', self.name), src_f.readlines()))
             with open(dst, 'w') as dst_f:
                 dst_f.writelines(lines)
-        os.mkdir(self.repo_dir)
+        os.makedirs(self.repo_dir, exist_ok=True)
         os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
+
+    def download_issues(self):
+        pass
 
     def do_all(self):
         self.create_project()
@@ -359,6 +362,7 @@ def get_cmds(p, working_dir, ind):
                'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv",
                'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': '', 'l': f"{working_dir}//gitlog"}
     files_cmds = [(['./download-issues.pl'], ['g', 't', 'o', 'f']),
+                  (['cat' ,getters['f']], []),
                   (['./initialize-project-and-collect-issues.pl'], ['p', 'n', 'r', 'g', 't', 'e', 'w']),
                   (['./vcs-log-xref.pl'], ['e', 'l', 'a', 'f', 'b']),
                   (['python', './extractor.py'], ['a', 'w', 'b']),
