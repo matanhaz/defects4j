@@ -320,7 +320,7 @@ class Reproducer:
         self.url = projects[self.p][0]
         self.work_dir = working_dir
         self.module_template = os.path.join(self.const_core_dir, "Project", "template")
-        self.build_template = os.path.join(self.projects_dir, 'template.xml.patch')
+        self.build_template = os.path.join(self.projects_dir, 'template.build.xml')
         self.build_file = os.path.join(self.project_dir, self.pid + '.build.xml')
         self.build_patch = os.path.join(self.projects_dir, 'build.xml.patch')
         self.build_patch_file = os.path.join(self.project_dir, 'build.xml.patch')
