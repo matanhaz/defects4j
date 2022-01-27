@@ -346,10 +346,10 @@ class Reproducer:
             with open(src) as src_f:
                 lines = list(
                     map(lambda l: l.replace('<PID>', self.pid).replace('<PROJECT_NAME>', self.name), src_f.readlines()))
-            with open(dst + '2', 'w') as dst_f:
+            with open(dst, 'w') as dst_f:
                 dst_f.writelines(lines)
         os.makedirs(self.repo_dir, exist_ok=True)
-        # os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
+        os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
 
     def download_issues(self):
         pass
@@ -369,8 +369,7 @@ def get_cmds(p, working_dir, ind):
                'a': f"{working_dir}//project_repos//{p}.git",
                'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv",
                'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': '', 'l': f"{working_dir}//gitlog"}
-    files_cmds = [(['./create-project.pl'], ['p', 'n', 'w', 'r']),
-                  (['./download-issues.pl'], ['g', 't', 'o', 'f']),
+    files_cmds = [(['./download-issues.pl'], ['g', 't', 'o', 'f']),
                   (['cat', getters['f']], []),
                   (['git', f'--git-dir={getters["a"]}', 'log', '--reverse' '>' f"{working_dir}//gitlog"], []),
                   # (['./initialize-project-and-collect-issues.pl'], ['p', 'n', 'r', 'g', 't', 'e', 'w']),
