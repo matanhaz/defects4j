@@ -202,8 +202,8 @@ foreach my $bid (@ids) {
     $data{$ISSUE_TRACKER_ID} = $TRACKER_ID;
 
     # _check_diff($project, $bid, \%data) and
-	_add_bool_result($data, $COMP_V1, 1);
-    _add_bool_result($data, $COMP_T2V1, 1);
+	_add_bool_result(\%data, $COMP_V1, 1);
+    _add_bool_result(\%data, $COMP_T2V1, 1);
     _check_t2v2($project, $bid, \%data) or next;
 
     # Add data set to result file
