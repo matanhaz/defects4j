@@ -180,12 +180,12 @@ sub _bootstrap {
 
     # Create local patch so that we can use the D4J core framework.
     # Minimization doesn't matter here, which has to be done manually.
-	printf ("source path to diff %s\n", $src_f);
-	printf ("test path to diff %s\n", $test_f);
-    $project->{_vcs}->export_diff($v2, $v1, "$PATCH_DIR/$bid.src.patch", "$src_f");
-    $project->{_vcs}->export_diff($v2, $v1, "$PATCH_DIR/$bid.test.patch", "$test_f");
-	my $diff1 = "git --git-dir=$project->{_vcs}->{repo} diff --no-ext-diff --binary ${v2} ${v1} $src_f > $PATCH_DIR/$bid.src.patch". 
-	" && git --git-dir=$project->{_vcs}->{repo} diff --no-ext-diff --binary ${v2} ${v1} $test_f > $PATCH_DIR/$bid.test.patch";
+	# printf ("source path to diff %s\n", $src_f);
+	# printf ("test path to diff %s\n", $test_f);
+    # $project->{_vcs}->export_diff($v2, $v1, "$PATCH_DIR/$bid.src.patch", "$src_f");
+    # $project->{_vcs}->export_diff($v2, $v1, "$PATCH_DIR/$bid.test.patch", "$test_f");
+	# my $diff1 = "git --git-dir=$project->{_vcs}->{repo} diff --no-ext-diff --binary ${v2} ${v1} $src_f > $PATCH_DIR/$bid.src.patch". 
+	# " && git --git-dir=$project->{_vcs}->{repo} diff --no-ext-diff --binary ${v2} ${v1} $test_f > $PATCH_DIR/$bid.test.patch";
 }
 
 my @ids = $project->get_bug_ids();
@@ -210,7 +210,8 @@ foreach my $bid (@ids) {
     # system("rm -rf $ANALYZER_OUTPUT/${bid} $PATCH_DIR/${bid}.src.patch $PATCH_DIR/${bid}.test.patch");
 
     # Populate the layout map and patches directory
-    _bootstrap($project, $bid);
+    #_bootstrap($project, $bid);
+	my ($v2, $src_f, $test_f) = _init_version($project, $bid, "${bid}f");
     printf ("%4d after _bootstrap: $project->{prog_name}\n", $bid);
 
     # Defects4J cannot handle empty patch files -> skip the sanity check since

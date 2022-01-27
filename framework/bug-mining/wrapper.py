@@ -435,8 +435,8 @@ class Reproducer:
         commit_a, commit_b = df[df['bug.id'] == int(self.ind)][['revision.id.fixed', 'revision.id.buggy']].values[0].tolist()
         print(repo_path)
         diff_on_layouts(repo_path, commit_a, commit_b,
-                        os.path.join(self.patch_dir, self.ind + '.src.patch2'),
-                        os.path.join(self.patch_dir, self.ind + '.test.patch2'))
+                        os.path.join(self.patch_dir, self.ind + '.src.patch'),
+                        os.path.join(self.patch_dir, self.ind + '.test.patch'))
 
     def do_all(self):
         self.create_project()
