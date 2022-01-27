@@ -323,7 +323,8 @@ class Reproducer:
         self.build_template = os.path.join(self.projects_dir, 'build.xml.patch')
         self.module_file = os.path.join(self.project_dir, self.pid + '.pm')
         self.build_file = os.path.join(self.project_dir, self.pid + '.build.xml')
-        self.build_patch_file = os.path.join(self.project_dir, self.pid + '.build.xml.patch')
+        self.build_patch = os.path.join(self.projects_dir, '.build.xml.patch')
+        self.build_patch_file = os.path.join(self.project_dir, 'build.xml.patch')
         self.repo_dir = os.path.join(self.working_dir, 'project_repos')
         self.issues_dir = os.path.join(self.working_dir, 'issues')
         self.patch_dir = os.path.join(self.project_dir, 'patches')
@@ -338,9 +339,11 @@ class Reproducer:
         for d in [self.project_dir, self.core_dir, self.issues_dir, self.patch_dir, self.failing_dir, self.trigger_dir,
                   self.relevant_dir, self.mod_classes, self.rel_classes]:
             os.makedirs(d, exist_ok=True)
-        for src, dst in [(self.module_template, self.module_file), (self.build_template, self.build_file), (self.build_patch, self.build_patch_file)]:
+        for src, dst in [(self.module_template, self.module_file), (self.build_template, self.build_file),
+                         (self.build_patch, self.build_patch_file)]:
             with open(src) as src_f:
-                lines = list(map(lambda l: l.replace('<PID>', self.pid).replace('<PROJECT_NAME>', self.name), src_f.readlines()))
+                lines = list(
+                    map(lambda l: l.replace('<PID>', self.pid).replace('<PROJECT_NAME>', self.name), src_f.readlines()))
             with open(dst, 'w') as dst_f:
                 dst_f.writelines(lines)
         os.makedirs(self.repo_dir, exist_ok=True)
