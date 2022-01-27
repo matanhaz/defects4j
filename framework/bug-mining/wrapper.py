@@ -356,7 +356,7 @@ class Reproducer:
 
     def extract_issues(self):
         repo_path = os.path.join(self.repo_dir, self.name + ".git")
-        extract_issues(repo_path, self.jira_key, self.active_bugs + '2')
+        extract_issues(repo_path, self.jira_key, self.active_bugs)
 
     def init_version(self, project, bid, vid):
         pass
