@@ -108,7 +108,7 @@ my $GEN_BUILDFILE_DIR = "$PROJECT_DIR/build_files";
 -d $PROJECT_DIR or die "$PROJECT_DIR does not exist: $!";
 -d $PATCH_DIR or die "$PATCH_DIR does not exist: $!";
 
-system("mkdir -p $ANALYZER_OUTPUT $GEN_BUILDFILE_DIR");
+# system("mkdir -p $ANALYZER_OUTPUT $GEN_BUILDFILE_DIR");
 
 # Temporary directory
 my $TMP_DIR = Utils::get_tmp_dir();
@@ -139,11 +139,12 @@ sub _init_version {
     }
 
     system("mkdir -p $ANALYZER_OUTPUT/$bid");
-    if (-e "$work_dir/build.xml") {
-        my $cmd = " cd $work_dir" .
-                  " && java -jar $LIB_DIR/analyzer.jar $work_dir $ANALYZER_OUTPUT/$bid build.xml 2>&1";
-        # Utils::exec_cmd($cmd, "Run build-file analyzer on build.xml.");
-    } elsif (-e "$work_dir/pom.xml") {
+    # if (-e "$work_dir/build.xml") {
+    #     my $cmd = " cd $work_dir" .
+    #               " && java -jar $LIB_DIR/analyzer.jar $work_dir $ANALYZER_OUTPUT/$bid build.xml 2>&1";
+    #     # Utils::exec_cmd($cmd, "Run build-file analyzer on build.xml.");
+    # } els
+	if (-e "$work_dir/pom.xml") {
         # Run maven-ant plugin and overwrite the original build.xml whenever a maven build file exists
         my $cmd = " cd $work_dir" .
                   " && python $MVNPY_DIR/d4jchanges.py $work_dir 1.8" .
@@ -155,8 +156,8 @@ sub _init_version {
                   " && cp build.xml $GEN_BUILDFILE_DIR/$rev_id 2>&1";
         Utils::exec_cmd($cmd, "Convert Maven to Ant build file: " . $rev_id) or die;
 
-        $cmd = " cd $work_dir" .
-               " && java -jar $LIB_DIR/analyzer.jar $work_dir $ANALYZER_OUTPUT/$bid maven-build.xml 2>&1";
+        # $cmd = " cd $work_dir" .
+        #        " && java -jar $LIB_DIR/analyzer.jar $work_dir $ANALYZER_OUTPUT/$bid maven-build.xml 2>&1";
         # Utils::exec_cmd($cmd, "Run build-file analyzer on maven-ant.xml.") or die;
 	
         # Fix broken dependency links
@@ -216,7 +217,7 @@ foreach my $bid (@ids) {
     printf ("%4d: $project->{prog_name}\n", $bid);
 
     # Clean up previously generated data
-    system("rm -rf $ANALYZER_OUTPUT/${bid} $PATCH_DIR/${bid}.src.patch $PATCH_DIR/${bid}.test.patch");
+    # system("rm -rf $ANALYZER_OUTPUT/${bid} $PATCH_DIR/${bid}.src.patch $PATCH_DIR/${bid}.test.patch");
 
     # Populate the layout map and patches directory
     _bootstrap($project, $bid);
