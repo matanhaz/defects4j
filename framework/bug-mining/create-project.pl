@@ -128,36 +128,36 @@ system("mkdir -p $project_dir $core_dir $ISSUES_DIR $PATCH_DIR $FAILING_DIR $TRI
 # system("echo $deprecated_header > $project_dir/$BUGS_CSV_DEPRECATED");
 
 # Copy module template and set project id and name
-# open(IN, "<$module_template") or die "Cannot open template file: $!";
-# open(OUT, ">$module_file") or die "Cannot open module file: $!";
-# while(<IN>) {
-#     s/<PID>/$PID/g;
-#     s/<PROJECT_NAME>/$NAME/g;
-#     print(OUT $_);
-# }
-# close(IN);
-# close(OUT);
-# 
-# # Copy wrapper build file template and set project id
-# open(IN, "<$build_template") or die "Cannot open template file: $!";
-# open(OUT, ">$build_file") or die "Cannot open build file: $!";
-# while(<IN>) {
-#     s/<PID>/$PID/g;
-#     s/<PROJECT_NAME>/$NAME/g;
-#     print(OUT $_);
-# }
-# close(IN);
-# close(OUT);
-# 
-# # Copy patch build file and set project id
-# open(IN, "<$build_patch") or die "Cannot open build patch file: $!";
-# open(OUT, ">$build_patch_file") or die "Cannot open build patch file: $!";
-# while(<IN>) {
-#     s/<PROJECT_NAME>/$NAME/g;
-#     print(OUT $_);
-# }
-# close(IN);
-# close(OUT);
+open(IN, "<$module_template") or die "Cannot open template file: $!";
+open(OUT, ">$module_file") or die "Cannot open module file: $!";
+while(<IN>) {
+    s/<PID>/$PID/g;
+    s/<PROJECT_NAME>/$NAME/g;
+    print(OUT $_);
+}
+close(IN);
+close(OUT);
+
+# Copy wrapper build file template and set project id
+open(IN, "<$build_template") or die "Cannot open template file: $!";
+open(OUT, ">$build_file") or die "Cannot open build file: $!";
+while(<IN>) {
+    s/<PID>/$PID/g;
+    s/<PROJECT_NAME>/$NAME/g;
+    print(OUT $_);
+}
+close(IN);
+close(OUT);
+
+# Copy patch build file and set project id
+open(IN, "<$build_patch") or die "Cannot open build patch file: $!";
+open(OUT, ">$build_patch_file") or die "Cannot open build patch file: $!";
+while(<IN>) {
+    s/<PROJECT_NAME>/$NAME/g;
+    print(OUT $_);
+}
+close(IN);
+close(OUT);
 
 # Clone the repository
 system("mkdir -p $repo_dir && git clone --bare $URL $repo_dir/$NAME.git 2>&1"
