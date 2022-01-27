@@ -1,12 +1,14 @@
-import jira
-import git
-import time
-import re
-import os
 import json
+import os
+import re
+import time
 from datetime import datetime
-from pydriller import Repository
+
+import git
+import jira
 import pandas as pd
+from pydriller import Repository
+from subprocess import Popen, PIPE, run
 
 
 class Issue(object):
@@ -26,10 +28,12 @@ class Issue(object):
         return {'issue_id': self.issue_id, 'type': self.type, 'priority': self.priority, 'resolution': self.resolution}
 
 
-
 class JiraIssue(Issue):
     def __init__(self, issue, base_url):
-        super().__init__(issue.key.strip().split('-')[1], issue.fields.issuetype.name.lower(), JiraIssue.get_name_or_default(issue.fields.priority, 'minor'), JiraIssue.get_name_or_default(issue.fields.resolution, 'resolved'), base_url, datetime.strptime(issue.fields.created, "%Y-%m-%dT%H:%M:%S.%f%z"))
+        super().__init__(issue.key.strip().split('-')[1], issue.fields.issuetype.name.lower(),
+                         JiraIssue.get_name_or_default(issue.fields.priority, 'minor'),
+                         JiraIssue.get_name_or_default(issue.fields.resolution, 'resolved'), base_url,
+                         datetime.strptime(issue.fields.created, "%Y-%m-%dT%H:%M:%S.%f%z"))
         self.fields = {}
         for k, v in dict(issue.fields.__dict__).items():
             if k.startswith("customfield_") or k.startswith("__"):
@@ -58,14 +62,15 @@ class JiraIssue(Issue):
 
 def get_jira_issues(project_name, url="http://issues.apache.org/jira", bunch=100):
     jira_conn = jira.JIRA(url)
-    all_issues=[]
+    all_issues = []
     extracted_issues = 0
     sleep_time = 30
     while True:
         try:
-            issues = jira_conn.search_issues("project={0}".format(project_name), maxResults=bunch, startAt=extracted_issues)
+            issues = jira_conn.search_issues("project={0}".format(project_name), maxResults=bunch,
+                                             startAt=extracted_issues)
             all_issues.extend(issues)
-            extracted_issues=extracted_issues+bunch
+            extracted_issues = extracted_issues + bunch
             if len(issues) < bunch:
                 break
         except Exception as e:
@@ -74,6 +79,7 @@ def get_jira_issues(project_name, url="http://issues.apache.org/jira", bunch=100
                 raise e
             time.sleep(sleep_time)
     return list(map(lambda issue: JiraIssue(issue, url), all_issues))
+
 
 def _clean_commit_message(commit_message):
     if "git-svn-id" in commit_message:
@@ -123,7 +129,8 @@ class CommittedFile(object):
         self.is_relevant = False
         if pydriller_file is None:
             return
-        for c, b in list(map(lambda x: (x, list(filter(lambda y: x.name == y.name, pydriller_file.methods_before))) , pydriller_file.changed_methods)):
+        for c, b in list(map(lambda x: (x, list(filter(lambda y: x.name == y.name, pydriller_file.methods_before))),
+                             pydriller_file.changed_methods)):
             if not b:
                 self.is_relevant = True
             elif c.complexity != b[0].complexity and c.nloc != b[0].nloc:
@@ -131,7 +138,7 @@ class CommittedFile(object):
 
 
 def _get_commits_files(repo):
-    data = repo.git.log('--numstat','--pretty=format:"sha: %H"').split("sha: ")
+    data = repo.git.log('--numstat', '--pretty=format:"sha: %H"').split("sha: ")
     comms = {}
     for d in data[1:]:
         d = d.replace('"', '').replace('\n\n', '\n').split('\n')
@@ -153,7 +160,8 @@ def filter_commits(repo, commits):
         if not list(filter(lambda x: x.is_java and not x.is_test, commits[commit_sha])):
             continue
         c = next(Repository(repo.working_dir, single=commit_sha).traverse_commits())
-        committed = list(map(lambda f: CommittedFile(commit_sha, f.new_path, f.added_lines, f.deleted_lines, f), filter(lambda f: f.language_supported and f.new_path, c.modified_files)))
+        committed = list(map(lambda f: CommittedFile(commit_sha, f.new_path, f.added_lines, f.deleted_lines, f),
+                             filter(lambda f: f.language_supported and f.new_path, c.modified_files)))
         if not list(filter(lambda x: x.is_java and not x.is_test and x.is_relevant, committed)):
             continue
         rels.append(commit_sha)
@@ -171,7 +179,8 @@ class Commit(object):
         if files:
             self._files = files
         else:
-            self._files = list(map(lambda f: CommittedFile(self._commit_id, f, '0', '0'), git_commit.stats.files.keys()))
+            self._files = list(
+                map(lambda f: CommittedFile(self._commit_id, f, '0', '0'), git_commit.stats.files.keys()))
         self._methods = list()
         self._commit_date = time.mktime(git_commit.committed_datetime.timetuple())
         self._commit_formatted_date = datetime.utcfromtimestamp(self._commit_date).strftime('%Y-%m-%d %H:%M:%S')
@@ -194,6 +203,7 @@ class Commit(object):
 def _commits_and_issues(repo, jira_issues):
     issues = dict(map(lambda x: (x.issue_id, x), jira_issues))
     issues_dates = sorted(list(map(lambda x: (x, issues[x].creation_time), issues)), key=lambda x: x[1], reverse=True)
+
     def replace(chars_to_replace, replacement, s):
         temp_s = s
         for c in chars_to_replace:
@@ -248,5 +258,61 @@ def extract(repo_path, jira_key, out_csv):
     df.to_csv(out_csv, index=False)
 
 
+def layout(repo_path, commit_id):
+    java = set()
+    tests = set()
+    repo = git.Repo(repo_path)
+    files = repo.git.ls_tree("-r", "--name-only", commit_id).split()
+    for f in filter(lambda x: x.endswith('.java'), files):
+            if 'test' in f:
+                tests.add(os.path.dirname(f))
+            else:
+                java.add(os.path.dirname(f))
+    reduced_java = set()
+    s_j = min(list(map(lambda x: len(x), java)))
+    min_java_name = list(filter(lambda x: len(x) == s_j, java))[0]
+    reduced_tests = set()
+    s_t = min(list(map(lambda x: len(x), tests)))
+    min_test_name = list(filter(lambda x: len(x) == s_t, tests))[0]
+    for name in java:
+        if os.path.dirname(name) in java:
+            continue
+        if name != min_java_name and name[:s_j] == min_java_name:
+            continue
+        reduced_java.add(name)
+    for name in tests:
+        if os.path.dirname(name) in tests:
+            continue
+        if name != min_test_name and name[:s_t] == min_test_name:
+            continue
+        reduced_tests.add(name)
+    commond_java = os.path.commonpath(reduced_java)
+    if not commond_java:
+        commond_java = sorted(reduced_java, key=lambda x: len(x))[0]
+    commond_tests = os.path.commonpath(reduced_tests)
+    if not commond_tests:
+        commond_tests = sorted(reduced_tests, key=lambda x: len(x))[0]
+    return commond_java, commond_tests
+    # with open(out_file, 'w') as f:
+    #     f.writelines(map(lambda x: x + '\n', [commond_java, commond_tests]))
+
+
+def diff_on_layouts(repo_path, commit_a, commit_b, src_patch, test_patch):
+    java_a, test_a = layout(repo_path, commit_a)
+    java_b, test_b = layout(repo_path, commit_b)
+    assert java_a == java_b
+    assert test_a == test_b
+    diff_src = f"git diff --no-ext-diff --binary {commit_a} {commit_b} {java_a}"
+    diff_test = f"git diff --no-ext-diff --binary {commit_a} {commit_b} {test_a}"
+    print(diff_src)
+    with open(src_patch, 'w') as out:
+        run(diff_src, cwd=repo_path, stdout=out)
+    with open(test_patch, 'w') as out:
+        run(diff_test, cwd=repo_path, stdout=out)
+
+    # TODO: check patches are not empty
+
 if __name__ == "__main__":
-    extract(r"c:\temp\camel2", "CAMEL", r'c:\temp\active.csv')
+    # extract(r"c:\temp\camel2", "CAMEL", r'c:\temp\active.csv')
+    # layout(r"c:\temp\commons-codec", "d2f27093d7d95a07da901902f894d88b4ecc3e95")
+    diff_on_layouts(r"c:\temp\commons-codec", "d2f27093d7d95a07da901902f894d88b4ecc3e95", "1a4d9cc2572d220664f1b7c377cd318cd253052e", r'c:\temp\src.patch', r'c:\temp\test.patch')
