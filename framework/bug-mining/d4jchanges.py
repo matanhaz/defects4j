@@ -1,7 +1,7 @@
 import sys
 from xml.dom.minidom import parse
 from pom_file import Pom
-
+import os
 
 class Repo(object):
 
