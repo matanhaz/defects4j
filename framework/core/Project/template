@@ -91,18 +91,18 @@ sub _post_checkout {
 # the initialization of the project. Example uses are: converting and caching
 # build files or other time-consuming tasks, whose results should be cached.
 #
-sub initialize_revision {
-    my ($self, $rev_id, $vid) = @_;
-    $self->SUPER::initialize_revision($rev_id);
-
-    my $work_dir = $self->{prog_root};
-    # my $result = _ant_layout($work_dir) // _maven_layout($work_dir) // _layout_by_python($work_dir);
-    my $result = _layout_by_python($work_dir);
-    die "Unknown layout for revision: ${rev_id}" unless defined $result;
-
-    # $self->_add_to_layout_map($rev_id, $result->{src}, $result->{test});
-    # $self->_cache_layout_map(); # Force cache rebuild
-}
+# sub initialize_revision {
+#     my ($self, $rev_id, $vid) = @_;
+#     $self->SUPER::initialize_revision($rev_id);
+# 
+#     my $work_dir = $self->{prog_root};
+#     # my $result = _ant_layout($work_dir) // _maven_layout($work_dir) // _layout_by_python($work_dir);
+#     my $result = _layout_by_python($work_dir);
+#     die "Unknown layout for revision: ${rev_id}" unless defined $result;
+# 
+#     # $self->_add_to_layout_map($rev_id, $result->{src}, $result->{test});
+#     # $self->_cache_layout_map(); # Force cache rebuild
+# }
 
 #
 # Distinguish between project layouts and determine src and test directories.
