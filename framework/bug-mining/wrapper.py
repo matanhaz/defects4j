@@ -439,7 +439,7 @@ class Reproducer:
     def do_all(self):
         self.create_project()
         self.extract_issues()
-        self.get_diffs()
+        # self.get_diffs()
 
 
 def get_cmds(p, working_dir, ind):
