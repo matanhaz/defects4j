@@ -366,6 +366,7 @@ def get_cmds(p, working_dir, ind):
                   (['git', f'--git-dir={getters["a"]}', 'log', '--reverse' '>' f"{working_dir}//gitlog"], []),
                   # (['./initialize-project-and-collect-issues.pl'], ['p', 'n', 'r', 'g', 't', 'e', 'w']),
                   (['./vcs-log-xref.pl'], ['e', 'l', 'a', 'f', 'b']),
+                  (['cat', getters['b']], []),
                   (['python', './extractor.py'], ['a', 'w', 'b']),
                   (['./initialize-revisions.pl'], ['p', 'w', 'i']),
                   (['./analyze-project.pl'], ['p', 'w', 'g', 't', 'i']),
