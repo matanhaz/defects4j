@@ -18,7 +18,7 @@ class Repo(object):
     # Changes all the pom files in a module recursively
     def get_all_pom_paths(self, module=None):
         ans = []
-        inspected_module = self.repo_dir
+        inspected_module = self._repo_dir
         if module is not None:
             inspected_module = module
         pom_path = os.path.join(inspected_module, 'pom.xml')

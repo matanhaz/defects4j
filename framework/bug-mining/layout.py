@@ -2,11 +2,12 @@ import os
 import sys
 import csv
 
+
 def layout(repo_path, out_file):
 	java = set()
 	tests = set()
 	for root, dirs, files in os.walk(repo_path, topdown=False):
-		for name in filter(lambda x: x.endswith('.java'), files):
+		if filter(lambda x: x.endswith('.java'), files):
 			if 'test' in root:
 				tests.add(root[len(repo_path) + 1:])
 			else:
