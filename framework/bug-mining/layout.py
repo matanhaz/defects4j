@@ -7,7 +7,7 @@ def layout(repo_path, out_file):
 	java = set()
 	tests = set()
 	for root, dirs, files in os.walk(repo_path, topdown=False):
-		if filter(lambda x: x.endswith('.java'), files):
+		if list(filter(lambda x: x.endswith('.java'), files)):
 			if 'test' in root:
 				tests.add(root[len(repo_path) + 1:])
 			else:
