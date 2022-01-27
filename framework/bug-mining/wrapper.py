@@ -355,8 +355,8 @@ class Reproducer:
         os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
 
     def extract_issues(self):
-        repo_dir = os.path.join(self.repo_path, self.name + ".git")
-        extract_issues(repo_dir, self.jira_key, self.active_bugs + '2')
+        repo_path = os.path.join(self.repo_dir, self.name + ".git")
+        extract_issues(repo_path, self.jira_key, self.active_bugs + '2')
 
     def init_version(self, project, bid, vid):
         pass
