@@ -189,11 +189,11 @@ foreach my $bid (@ids) {
     printf ("%4d: $project->{prog_name}\n", $bid);
 
     # Skip existing entries
-    $sth->execute($PID, $bid);
-    if ($sth->rows !=0) {
-        printf("      -> Skipping (existing entry in $TAB_REV_PAIRS)\n");
-        next;
-    }
+    # $sth->execute($PID, $bid);
+    # if ($sth->rows !=0) {
+    #     printf("      -> Skipping (existing entry in $TAB_REV_PAIRS)\n");
+    #     next;
+    # }
 
     my %data;
     $data{$PROJECT} = $PID;
