@@ -457,7 +457,7 @@ class Reproducer:
             sf.set_compiler_version('1.8')
             os.system(f"cd {self.repo_dir}/{self.name}_init.git && mvn ant:ant -Doverwrite=true 2>&1 -Dhttps.protocols=TLSv1.2 -Dmaven.compile.source=1.8 -Dmaven.compile.target=1.8")
             fix_mvn_compiler_dir(repo.working_dir)
-            build_files_dir = os.path.join(self.gen_buildfile_dir, fix + '___')
+            build_files_dir = os.path.join(self.gen_buildfile_dir, fix)
             os.mkdir(build_files_dir)
             os.system(f"cd {self.repo_dir}/{self.name}_init.git && cp maven-build.* {build_files_dir}")
             os.system(f"cd {self.repo_dir}/{self.name}_init.git && cp build.xml {build_files_dir}")
@@ -493,8 +493,7 @@ def get_cmds(p, working_dir, ind):
                'a': f"{working_dir}//project_repos//{p}.git",
                'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv",
                'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': '', 'l': f"{working_dir}//gitlog"}
-    files_cmds = [(['./initialize-revisions.pl'], ['p', 'w', 'i']),
-                  (['./analyze-project.pl'], ['p', 'w', 'g', 't', 'i']),
+    files_cmds = [(['./analyze-project.pl'], ['p', 'w', 'g', 't', 'i']),
                   (['./get-trigger.pl'], ['p', 'w'])]
     for f in files_cmds:
         yield f[0] + reduce(list.__add__, list(map(lambda x: [f'-{x}', getters[x]], f[1])), [])
