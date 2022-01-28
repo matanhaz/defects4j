@@ -115,11 +115,6 @@ my $BID = $cmd_opts{b};
 my $BI = $cmd_opts{i};
 my $WORK_DIR = abs_path($cmd_opts{w});
 
-# Check format of target bug id
-if (defined $BID) {
-    $BID =~ /^(\d+)(:(\d+))?$/ or die "Wrong version id format ((\\d+)(:(\\d+))?): $BID!";
-}
-
 # DB_CSVs directory
 my $db_dir = $WORK_DIR;
 
@@ -362,16 +357,28 @@ sub _get_failing_tests {
 	  $project->apply_patch($root, $patch);
 	}
 
+	my $compile_cmd = " cd $project->{prog_root}" .
+					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8  compile 2>&1";
+	my $compile_tests_cmd_log = " cd $project->{prog_root}" .
+					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 compile-tests 2>&1 >> $WORK_DIR/compile_tests_trigger_log.log";
+
+	my $run_tests_log_cmd_1 = " cd $project->{prog_root}" .
+					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$FAILED_TESTS_FILE  run.dev.tests 2>&1 >> $WORK_DIR/failing_tests_logger.log";
+
     # Compile src and test
 	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
-    $project->compile() or die;
-	$project->compile_tests("$WORK_DIR/compile_tests_trigger_log.log");
+    # $project->compile() or die;
+    Utils::exec_cmd($compile_cmd, "compile here ()") or die;
+	# $project->compile_tests("$WORK_DIR/compile_tests_trigger_log.log");
+	Utils::exec_cmd($compile_tests_cmd_log, "Running ant compile compile_tests_cmd_log ()");
 	system("python fix_compile_errors.py $WORK_DIR/compile_tests_trigger_log.log $project->{prog_root} 2>&1");
 	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} exclude_tests 2>&1");
-    $project->compile_tests() or die;
+    # $project->compile_tests() or die;
+	Utils::exec_cmd($compile_tests_cmd_log, "Running ant compile compile_tests_cmd_log ()")  or die;
 
     # Run tests and get number of failing tests
-    $project->run_tests($FAILED_TESTS_FILE) or die;
+    # $project->run_tests($FAILED_TESTS_FILE) or die;
+    Utils::exec_cmd($run_tests_log_cmd_1, "Running ant compile cmd ()") or die;
     # Return failing tests
     return Utils::get_failing_tests($FAILED_TESTS_FILE);
 }
