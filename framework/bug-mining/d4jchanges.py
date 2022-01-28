@@ -3,8 +3,8 @@ from xml.dom.minidom import parse
 from pom_file import Pom
 import os
 
-class Repo(object):
 
+class SourceFixer(object):
     def __init__(self, repo_dir):
         self._repo_dir = repo_dir
         self.DEFAULT_ES_VERSION = '1.0.6'
@@ -41,5 +41,5 @@ class Repo(object):
 
 
 if __name__ == '__main__':
-    repo = Repo(sys.argv[1])
+    repo = SourceFixer(sys.argv[1])
     repo.set_compiler_version(sys.argv[2])

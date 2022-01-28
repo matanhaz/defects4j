@@ -14,6 +14,7 @@ import jira
 import pandas as pd
 from pydriller import Repository
 from subprocess import Popen, PIPE, run
+from d4jchanges import SourceFixer
 
 projects = {'distributedlog': ('https://github.com/apache/distributedlog', 'DL'),
             'maven-indexer': ('https://github.com/apache/maven-indexer', 'MINDEXER'),
@@ -356,6 +357,27 @@ def diff_on_layouts(repo_path, commit_a, commit_b, src_patch, test_patch):
 
     # TODO: check patches are not empty
 
+def fix_mvn_compiler(file_name):
+    with open(file_name) as f:
+        lines = f.readlines()
+    lines2 = []
+    for l in lines:
+        if l.startswith('maven.compile.source='):
+            l = 'maven.compile.source=1.7\n'
+        if l.startswith('maven.compile.target='):
+            l = 'maven.compile.target=1.7\n'
+        lines2.append(l)
+    with open(file_name,'w') as f:
+        f.writelines(lines2)
+
+
+def fix_mvn_compiler_dir(dir_name):
+    for root, _, files in os.walk(dir_name):
+        for name in files:
+            if name == 'maven-build.properties':
+                fix_mvn_compiler(os.path.join(root, name))
+
+
 class Reproducer:
     def __init__(self, p, working_dir, ind):
         # consts
@@ -426,17 +448,35 @@ class Reproducer:
         repo_path = os.path.join(self.repo_dir, self.name + ".git")
         extract_issues(repo_path, self.jira_key, self.active_bugs)
 
-    def init_version(self, project, bid, vid):
-        pass
+    def init_version(self):
+        repo = git.Repo.clone_from(f"{self.repo_dir}/{self.name}.git", f"{self.repo_dir}/{self.name}_init.git")
+        fix, buggy = self.get_commits()
+        repo.git.checkout(fix, force=True)
+        if 'pom.xml' in os.listdir(repo.working_dir):
+            sf = SourceFixer(repo.working_dir)
+            sf.set_compiler_version('1.8')
+            os.system(f"cd {self.repo_dir}/{self.name}_init.git && mvn ant:ant -Doverwrite=true 2>&1 -Dhttps.protocols=TLSv1.2 -Dmaven.compile.source=1.8 -Dmaven.compile.target=1.8")
+            fix_mvn_compiler_dir(repo.working_dir)
+            build_files_dir = os.path.join(self.gen_buildfile_dir, fix + '___')
+            os.mkdir(build_files_dir)
+            os.system(f"cd {self.repo_dir}/{self.name}_init.git && cp maven-build.* {build_files_dir}")
+            os.system(f"cd {self.repo_dir}/{self.name}_init.git && cp build.xml {build_files_dir}")
+            os.system(f"cd {self.repo_dir}/{self.name}_init.git && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml >> temp && mv temp maven-build.xml")
+            os.system(f"cd {self.repo_dir}/{self.name}_init.git && ant -Dmaven.repo.local=\"{os.path.join(self.project_dir, 'lib')}\" get-deps")
 
     def get_diffs(self):
         repo_path = os.path.abspath(os.path.join(self.repo_dir, self.name + "_real.git"))
-        df = pd.read_csv(self.active_bugs)
-        commit_a, commit_b = df[df['bug.id'] == int(self.ind)][['revision.id.fixed', 'revision.id.buggy']].values[0].tolist()
+        commit_a, commit_b = self.get_commits()
         print(repo_path)
         diff_on_layouts(repo_path, commit_a, commit_b,
                         os.path.join(self.patch_dir, self.ind + '.src.patch'),
                         os.path.join(self.patch_dir, self.ind + '.test.patch'))
+
+    def get_commits(self):
+        df = pd.read_csv(self.active_bugs)
+        fix, buggy = df[df['bug.id'] == int(self.ind)][['revision.id.fixed', 'revision.id.buggy']].values[
+            0].tolist()
+        return fix, buggy
 
     def do_all(self):
         self.create_project()
