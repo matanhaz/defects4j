@@ -266,17 +266,17 @@ sub _check_t2v2 {
     # Compile v2 ant t2
 	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
 	my $compile_cmd = " cd $project->{prog_root}" .
-					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8  compile 2>&1";
+					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8  compile 2>&1";
 	my $compile_tests_cmd = " cd $project->{prog_root}" .
-					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 compile-tests 2>&1";
+					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 compile-tests 2>&1";
 	my $compile_tests_cmd_log = " cd $project->{prog_root}" .
-					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 compile-tests 2>&1 >> $WORK_DIR/compile_tests_log.log";
+					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 compile-tests 2>&1 >> $WORK_DIR/compile_tests_log.log";
 	my $run_tests_log_cmd_1 = " cd $project->{prog_root}" .
-					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$WORK_DIR/failing_tests.log  run.dev.tests 2>&1 >> $WORK_DIR/failing_tests_logger.log";
+					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$WORK_DIR/failing_tests.log  run.dev.tests 2>&1 >> $WORK_DIR/failing_tests_logger.log";
 	my $run_tests_log_cmd_2 = " cd $project->{prog_root}" .
-					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$WORK_DIR/failing_tests_after_fix.log  run.dev.tests 2>&1 >> $WORK_DIR/failing_tests_logger_after_fix.log";
+					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$WORK_DIR/failing_tests_after_fix.log  run.dev.tests 2>&1 >> $WORK_DIR/failing_tests_logger_after_fix.log";
 	my $run_tests_log_cmd_3 = " cd $project->{prog_root}" .
-					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$project->{prog_root}/v2.fail  run.dev.tests 2>&1 >>$WORK_DIR/run_tests_log.log";
+					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$project->{prog_root}/v2.fail  run.dev.tests 2>&1 >>$WORK_DIR/run_tests_log.log";
     # my $ret = $project->compile();
     my $ret = Utils::exec_cmd($compile_cmd, "Running ant compile cmd ()");
 	_add_bool_result($data, $COMP_V2, $ret) or return 0;
