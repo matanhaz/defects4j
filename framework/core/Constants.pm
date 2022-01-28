@@ -49,7 +49,7 @@ our @ISA = qw(Exporter);
 my $dir = dirname(abs_path(__FILE__));
 
 # Enable debugging and verbose output
-our $DEBUG = $ENV{'D4J_DEBUG'} // 0;
+our $DEBUG = $ENV{'D4J_DEBUG'} // 1;
 
 =pod
 
