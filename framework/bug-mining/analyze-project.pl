@@ -175,6 +175,9 @@ my @ids = $project->get_bug_ids();
 #         @ids = grep { ($BID == $_) } @ids;
 #     }
 # }
+my $compile_log;
+my $compile_tests_log;
+my $run_tests_log_log;
 
 # if (defined $BI) {
 	printf("defined BI: %s \n", $BI);
@@ -275,12 +278,9 @@ sub _check_t2v2 {
 					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$WORK_DIR/failing_tests_after_fix.log  run.dev.tests 2>&1";
 	my $run_tests_log_cmd_3 = " cd $project->{prog_root}" .
 					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$project->{prog_root}/v2.fail  run.dev.tests 2>&1";
-	my $compile_log;
-	my $compile_tests_log;
-	my $run_tests_log_log;
     # my $ret = $project->compile();
     my $ret = Utils::exec_cmd($compile_cmd, "Running ant compile cmd ()", \$compile_log);
-    _add_bool_result($data, $COMP_V2, $ret) or return 0;
+	_add_bool_result($data, $COMP_V2, $ret) or return 0;
     # $project->compile_tests("$WORK_DIR/compile_tests_log.log");
     Utils::exec_cmd($compile_tests_cmd, "Running ant compile cmd ()", \$compile_tests_log);
 	open(OUT, ">>$WORK_DIR/compile_tests_log.log") or die "Cannot open log file: $!";
