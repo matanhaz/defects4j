@@ -482,6 +482,7 @@ class Reproducer:
         self.create_project()
         self.extract_issues()
         self.get_diffs()
+        self.init_version()
 
 
 def get_cmds(p, working_dir, ind):
