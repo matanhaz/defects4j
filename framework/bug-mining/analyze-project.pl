@@ -265,17 +265,47 @@ sub _check_t2v2 {
 
     # Compile v2 ant t2
 	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
-    my $ret = $project->compile();
+	my $compile_cmd = " cd $project->{prog_root}" .
+					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8  compile 2>&1"
+	my $compile_tests_cmd = " cd $project->{prog_root}" .
+					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 compile-tests 2>&1"
+	my $run_tests_log_cmd_1 = " cd $project->{prog_root}" .
+					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$WORK_DIR/failing_tests.log  run.dev.tests 2>&1"
+	my $run_tests_log_cmd_2 = " cd $project->{prog_root}" .
+					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$WORK_DIR/failing_tests_after_fix.log  run.dev.tests 2>&1"
+	my $run_tests_log_cmd_3 = " cd $project->{prog_root}" .
+					  " ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$project->{prog_root}/v2.fail  run.dev.tests 2>&1"
+	my $compile_log;
+	my $compile_tests_log;
+	my $run_tests_log_log;
+    # my $ret = $project->compile();
+    my $ret = Utils::exec_cmd($compile_cmd, "Running ant compile cmd ()", \$compile_log);
     _add_bool_result($data, $COMP_V2, $ret) or return 0;
-    $project->compile_tests("$WORK_DIR/compile_tests_log.log");
+    # $project->compile_tests("$WORK_DIR/compile_tests_log.log");
+    Utils::exec_cmd($compile_tests_cmd, "Running ant compile cmd ()", \$compile_tests_log);
+	open(OUT, ">>$WORK_DIR/compile_tests_log.log") or die "Cannot open log file: $!";
+	print(OUT "$compile_tests_log");
+	close(OUT);
+
 	system("python fix_compile_errors.py $WORK_DIR/compile_tests_log.log $project->{prog_root} 2>&1");
-    $ret = $project->compile_tests();
+    # $ret = $project->compile_tests();
+    $ret = Utils::exec_cmd($compile_tests_cmd, "Running ant compile cmd ()", \$compile_tests_log);
 	$project->fix_tests("${bid}f");
 	my $file2 = "$WORK_DIR/failing_tests.log"; `>$file2`;
 	my $file3 = "$WORK_DIR/failing_tests_after_fix.log"; `>$file2`;
-	$project->run_tests_and_log($file2, "$WORK_DIR/failing_tests_logger.log");
+	# $project->run_tests_and_log($file2, "$WORK_DIR/failing_tests_logger.log");
+    Utils::exec_cmd($run_tests_log_cmd_1, "Running ant compile cmd ()", \$run_tests_log_log);
+	open(OUT, ">>$WORK_DIR/failing_tests_logger.log") or die "Cannot open log file: $!";
+	print(OUT "$run_tests_log_log");
+	close(OUT);
+
 	system("python fix_compile_errors.py $WORK_DIR/compile_tests_log.log $project->{prog_root} 2>&1");
-	$project->run_tests_and_log($file3, "$WORK_DIR/failing_tests_logger_after_fix.log");
+	# $project->run_tests_and_log($file3, "$WORK_DIR/failing_tests_logger_after_fix.log");
+    Utils::exec_cmd($run_tests_log_cmd_1, "Running ant compile cmd ()", \$run_tests_log_log);
+	open(OUT, ">>$WORK_DIR/failing_tests_logger_after_fix.log") or die "Cannot open log file: $!";
+	print(OUT "$run_tests_log_log");
+	close(OUT);
+
 
     _add_bool_result($data, $COMP_T2V2, $ret) or return 0;
 
@@ -284,11 +314,17 @@ sub _check_t2v2 {
     while ($successful_runs < $TEST_RUNS && $run <= $MAX_TEST_RUNS) {
         # Automatically fix broken tests and recompile
         $project->fix_tests("${bid}f");
-        $project->compile_tests() or die;
+        # $project->compile_tests() or die;
+        Utils::exec_cmd($compile_tests_cmd, "Running ant compile cmd ()", \$compile_tests_log) or die;
 
         # Run t2 and get number of failing tests
         my $file = "$project->{prog_root}/v2.fail"; `>$file`;
-        $project->run_tests_and_log($file, "$WORK_DIR/run_tests_log.log") or last;
+        # $project->run_tests_and_log($file, "$WORK_DIR/run_tests_log.log") or last;
+		Utils::exec_cmd($run_tests_log_cmd_3, "Running ant compile cmd ()", \$run_tests_log_log) or last;
+		open(OUT, ">>$WORK_DIR/run_tests_log.log") or die "Cannot open log file: $!";
+		print(OUT "$run_tests_log_log");
+		close(OUT);
+
 
         # Filter out invalid test names, such as testEncode[0].
         # This problem impacts many Commons projects.
