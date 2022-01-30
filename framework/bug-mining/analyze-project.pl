@@ -301,7 +301,7 @@ sub _check_t2v2 {
     my $run = 1;
     while ($successful_runs < $TEST_RUNS && $run <= $MAX_TEST_RUNS) {
         # Automatically fix broken tests and recompile
-        $project->fix_tests("${bid}f");
+        # $project->fix_tests("${bid}f");
         # $project->compile_tests() or die;
         Utils::exec_cmd($compile_tests_cmd, "Running ant compile cmd ()") or die;
 
