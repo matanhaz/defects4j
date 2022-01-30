@@ -204,8 +204,8 @@ foreach my $bid (@ids) {
     # _check_diff($project, $bid, \%data) and
 	_add_bool_result(\%data, $COMP_V1, 1);
     _add_bool_result(\%data, $COMP_T2V1, 1);
-	# _add_bool_result(\%$data, $COMP_T2V2, 1);
-    _check_t2v2($project, $bid, \%data) or next;
+	_add_bool_result(\%$data, $COMP_T2V2, 1);
+    # _check_t2v2($project, $bid, \%data) or next;
 
     # Add data set to result file
     _add_row(\%data);
