@@ -358,12 +358,12 @@ sub _get_failing_tests {
 	}
 
 	my $compile_cmd = " cd $project->{prog_root}" .
-					  " && ant -q -Dbuild.compiler=javac1.8  compile 2>&1";
+					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8  compile 2>&1";
 	my $compile_tests_cmd_log = " cd $project->{prog_root}" .
-					  " && ant -q -Dbuild.compiler=javac1.8 compile-tests 2>&1 >> $WORK_DIR/compile_tests_trigger_log.log";
+					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 compile-tests 2>&1 >> $WORK_DIR/compile_tests_trigger_log.log";
 
 	my $run_tests_log_cmd_1 = " cd $project->{prog_root}" .
-					  " && ant -q  -Djunit.haltonfailure=no -Djunit.haltonerror=no -keep-going test 2>&1 >> $WORK_DIR/failing_tests_logger.log";
+					  " && ant -q -keep-going test 2>&1 >> $WORK_DIR/failing_tests_logger.log";
 
     # Compile src and test
 	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
