@@ -507,41 +507,41 @@ class Reproducer:
             f"cd {repo.working_dir} && ant -q -Dbuild.compiler=javac1.8  -keep-going test  2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
 
         # make sure there are no failing tests
-        #
-        # # apply patch
-        #
-        # os.system(
-        #     f"cd {repo.working_dir} && git apply  {os.path.join(self.patch_dir, self.ind + '.src.patch')} --whitespace=nowarn")
-        # os.system(
-        #     f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
-        # os.system(
-        #     f"cd {repo.working_dir} && ant -q -Dbuild.compiler=javac1.8  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
-        # # make sure there are failing tests
-        #
-        # os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} get_buggy_functions 2>&1")
-        # os.system(f"jar cvf {os.path.join(self.projects_dir, self.pid, 'jar_path.jar')} 2>&1")
-        # os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} call_graph 2>&1")
-        #
-        # # sanity trace
-        # os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} formatter 2>&1")
-        # os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} template 2>&1")
-        # os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} grabber 2>&1 &")
-        # time.sleep(20)
-        # os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
-        # os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
-        #
-        # # check if sanity file exists
-        # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} formatter 2>&1")
-        # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} template 2>&1")
-        # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} grabber 2>&1 &")
-        # time.sleep(20)
-        # os.system(
-        #     f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
-        # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
+
+        # apply patch
+
+        os.system(
+            f"cd {repo.working_dir} && git apply  {os.path.join(self.patch_dir, self.ind + '.src.patch')} --whitespace=nowarn")
+        os.system(
+            f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
+        os.system(
+            f"cd {repo.working_dir} && ant -q -Dbuild.compiler=javac1.8  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
+        # make sure there are failing tests
+
+        os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} get_buggy_functions 2>&1")
+        os.system(f"jar cvf {os.path.join(self.projects_dir, self.pid, 'jar_path.jar')} 2>&1")
+        os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} call_graph 2>&1")
+
+        # sanity trace
+        os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} formatter 2>&1")
+        os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} template 2>&1")
+        os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} grabber 2>&1 &")
+        time.sleep(20)
+        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
+        os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
+
+        # check if sanity file exists
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} formatter 2>&1")
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} template 2>&1")
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} grabber 2>&1 &")
+        time.sleep(20)
+        os.system(
+            f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
 
     def do_all(self):
         self.create_project()
