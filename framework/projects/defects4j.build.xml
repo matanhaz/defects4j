@@ -75,30 +75,9 @@ project-specific build file ("project_id"/"project_id".build.xml) for the
          This property file is automatically generated. -->
     <property file="${d4j.workdir}/${d4j.properties}"/>
 
-    <!-- Include build file that defines all export targets -->
-    <import file="${d4j.home}/framework/projects/defects4j.export.xml"/>
-
+    
     <!-- Include project-specific build file -->
     <import file="${d4j.dir.projects}/${d4j.project.id}/${d4j.project.id}.build.xml"/>
-
-
-<!--
-     Check whether all properties and paths are configured
--->
-    <target name="sanity.check" description="Check whether project version is correctly set up">
-        <fail unless="d4j.home" message="d4j.home is not set correctly" />
-        <fail unless="d4j.workdir" message="d4j.workdir is not set correctly" />
-        <fail unless="d4j.project.id" message="d4j.project.id is not set correctly" />
-        <fail unless="d4j.bug.id" message="d4j.bug.id is not set correctly" />
-        <fail unless="d4j.dir.src.classes" message="d4j.dir.src.classes is not set correctly" />
-        <fail unless="d4j.dir.src.tests" message="d4j.dir.src.tests is not set correctly" />
-        <fail unless="d4j.classes.modified" message="d4j.classes.modified is not set correctly" />
-        <fail unless="test.home" message="test.home is not set correctly" />
-        <fail unless="build.home" message="build.home is not set correctly" />
-        <fail unless="ant.refid:d4j.test.classpath" message="ant.refid:d4j.test.classpath is not set correctly" />
-        <fail unless="ant.refid:compile.classpath" message="ant.refid:compile.classpath is not set correctly" />
-        <fail unless="ant.refid:all.manual.tests"  message="ant.refid:all.manual.tests is not set correctly" />
-    </target>
 
 <!--
     Run developer-written tests
