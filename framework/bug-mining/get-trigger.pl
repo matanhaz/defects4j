@@ -474,12 +474,12 @@ sub get_buggy_functions_traces{
 	$project->apply_patch($root, $patch_file);
 			
 	my $compile_cmd = " cd $project->{prog_root}" .
-				  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8  compile 2>&1";
+				  " && ant -q -Dbuild.compiler=javac1.8  compile 2>&1";
 	my $compile_tests_cmd = " cd $project->{prog_root}" .
-					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 compile-tests 2>&1";
+					  " && ant -q -Dbuild.compiler=javac1.8 compile-tests 2>&1";
 
 	my $run_tests_cmd = " cd $project->{prog_root}" .
-					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -keep-going test 2>&1";
+					  " && ant -q -Dbuild.compiler=javac1.8 -keep-going test 2>&1";
 
 	
 	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} get_buggy_functions  2>&1");
