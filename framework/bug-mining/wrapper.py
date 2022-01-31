@@ -460,7 +460,7 @@ class Reproducer:
             os.mkdir(build_files_dir)
             os.system(f"cd {self.repo_dir}/{self.name}_init.git && cp maven-build.* {build_files_dir}")
             os.system(f"cd {self.repo_dir}/{self.name}_init.git && cp build.xml {build_files_dir}")
-            os.system(f"cd {self.repo_dir}/{self.name}_init.git && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml >> temp && mv temp maven-build.xml")
+            os.system(f"cd {self.repo_dir}/{self.name}_init.git && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml > temp && mv temp maven-build.xml")
             os.system(f"cd {self.repo_dir}/{self.name}_init.git && ant -Dmaven.repo.local=\"{os.path.join(self.project_dir, 'lib')}\" get-deps")
 
     def get_diffs(self):
@@ -486,11 +486,11 @@ class Reproducer:
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} fix_build 2>&1")
         # run fixed version and collect failed tests
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile 2>&1")
-        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 >> {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
+        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
         os.system(f"python fix_compile_errors.py {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')} {repo.working_dir} 2>&1")
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} exclude_tests 2>&1")
-        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 >> {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
-        os.system(f"cd {repo.working_dir} && ant -q -f {self.d4j_build_file} -Dd4j.home={self.base_dir} -Dd4j.dir.projects={self.projects_dir} -Dbasedir={repo.working_dir}  -Dbuild.compiler=javac1.8  -DOUTFILE={os.path.join(self.work_dir, 'test.run')}  run.dev.tests 2>&1 >> {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
+        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
+        os.system(f"cd {repo.working_dir} && ant -q -f {self.d4j_build_file} -Dd4j.home={self.base_dir} -Dd4j.dir.projects={self.projects_dir} -Dbasedir={repo.working_dir}  -Dbuild.compiler=javac1.8  -DOUTFILE={os.path.join(self.work_dir, 'test.run')}  run.dev.tests 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
 
         # collect failing_test
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} {os.path.join(self.work_dir, 'test.run')} collect_failed_tests 2>&1")
@@ -498,9 +498,9 @@ class Reproducer:
         os.system(
             f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} exclude_tests 2>&1")
         os.system(
-            f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 >> {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
+            f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
         os.system(
-            f"cd {repo.working_dir} && ant -q -f {self.d4j_build_file} -Dd4j.home={self.base_dir} -Dd4j.dir.projects={self.projects_dir} -Dbasedir={repo.working_dir}  -Dbuild.compiler=javac1.8  -DOUTFILE={os.path.join(self.work_dir, 'test.run')}  run.dev.tests 2>&1 >> {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
+            f"cd {repo.working_dir} && ant -q -f {self.d4j_build_file} -Dd4j.home={self.base_dir} -Dd4j.dir.projects={self.projects_dir} -Dbasedir={repo.working_dir}  -Dbuild.compiler=javac1.8  -DOUTFILE={os.path.join(self.work_dir, 'test.run')}  run.dev.tests 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
 
         # make sure there are no failing tests
 
@@ -509,9 +509,9 @@ class Reproducer:
         os.system(
             f"cd {repo.working_dir} && git apply  {os.path.join(self.patch_dir, self.ind + '.src.patch')} --whitespace=nowarn")
         os.system(
-            f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 >> {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
+            f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
         os.system(
-            f"cd {repo.working_dir} && ant -q -f {self.d4j_build_file} -Dd4j.home={self.base_dir} -Dd4j.dir.projects={self.projects_dir} -Dbasedir={repo.working_dir}  -Dbuild.compiler=javac1.8  -DOUTFILE={os.path.join(self.work_dir, 'test.run')}  run.dev.tests 2>&1 >> {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
+            f"cd {repo.working_dir} && ant -q -f {self.d4j_build_file} -Dd4j.home={self.base_dir} -Dd4j.dir.projects={self.projects_dir} -Dbasedir={repo.working_dir}  -Dbuild.compiler=javac1.8  -DOUTFILE={os.path.join(self.work_dir, 'test.run')}  run.dev.tests 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
         # make sure there are failing tests
 
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} get_buggy_functions 2>&1")
