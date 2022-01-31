@@ -349,7 +349,6 @@ def diff_on_layouts(repo_path, commit_a, commit_b, src_patch, test_patch):
     assert test_a == test_b
     diff_src = f"git diff --no-ext-diff --binary {commit_a} {commit_b} {java_a}".split()
     diff_test = f"git diff --no-ext-diff --binary {commit_a} {commit_b} {test_a}".split()
-    print(diff_src)
     with open(src_patch, 'w') as out:
         run(diff_src, cwd=repo_path, stdout=out)
     with open(test_patch, 'w') as out:
@@ -467,7 +466,6 @@ class Reproducer:
     def get_diffs(self):
         repo_path = os.path.abspath(os.path.join(self.repo_dir, self.name + "_real.git"))
         commit_a, commit_b = self.get_commits()
-        print(repo_path)
         diff_on_layouts(repo_path, commit_a, commit_b,
                         os.path.join(self.patch_dir, self.ind + '.src.patch'),
                         os.path.join(self.patch_dir, self.ind + '.test.patch'))
@@ -507,6 +505,9 @@ class Reproducer:
         # make sure there are no failing tests
 
         # apply patch
+
+        os.system(
+            f"cd {repo.working_dir} && git apply  {os.path.join(self.patch_dir, self.ind + '.src.patch')} --whitespace=nowarn")
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 >> {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
         os.system(
@@ -538,12 +539,12 @@ class Reproducer:
         os.system(
             f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
 
-
     def do_all(self):
         self.create_project()
         self.extract_issues()
         self.get_diffs()
         self.init_version()
+        self.collect_and_trace()
 
 
 def get_cmds(p, working_dir, ind):
@@ -554,8 +555,8 @@ def get_cmds(p, working_dir, ind):
                'a': f"{working_dir}//project_repos//{p}.git",
                'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv",
                'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': '', 'l': f"{working_dir}//gitlog"}
-    files_cmds = [(['./analyze-project.pl'], ['p', 'w', 'g', 't', 'i']),
-                  (['./get-trigger.pl'], ['p', 'w'])]
+    files_cmds = [(['./analyze-project.pl'], ['p', 'w', 'g', 't', 'i'])] # ,
+                  # (['./get-trigger.pl'], ['p', 'w'])]
     for f in files_cmds:
         yield f[0] + reduce(list.__add__, list(map(lambda x: [f'-{x}', getters[x]], f[1])), [])
 
