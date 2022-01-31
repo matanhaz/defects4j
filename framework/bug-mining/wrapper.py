@@ -519,7 +519,7 @@ class Reproducer:
         # make sure there are failing tests
 
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} get_buggy_functions 2>&1")
-        os.system(f"jar cvf {os.path.join(self.projects_dir, self.pid, 'jar_path.jar')} 2>&1")
+        os.system(f"jar cvf {os.path.join(self.work_dir, 'jar_path.jar')} 2>&1")
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} call_graph 2>&1")
 
         # sanity trace
