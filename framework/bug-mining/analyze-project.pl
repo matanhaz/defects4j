@@ -154,19 +154,16 @@ my $TEST_RUNS = 2;
 my $MAX_TEST_RUNS = 3;
 
 # Temporary directory
-my $TMP_DIR = Utils::get_tmp_dir();
-system("mkdir -p $TMP_DIR");
 
 # Set up project
-my $project = Project::create_project($PID);
-$project->{prog_root} = $TMP_DIR;
+# my $project = Project::create_project($PID);
+# $project->{prog_root} = $TMP_DIR;
 
 # Get database handle for results
 my $dbh = DB::get_db_handle($TAB_REV_PAIRS, $db_dir);
 my @COLS = DB::get_tab_columns($TAB_REV_PAIRS) or die;
 
 # Figure out which IDs to run script for
-my @ids = $project->get_bug_ids();
 # if (defined $BID) {
 #     if ($BID =~ /(\d+):(\d+)/) {
 #         @ids = grep { ($1 <= $_) && ($_ <= $2) } @ids;
@@ -176,17 +173,10 @@ my @ids = $project->get_bug_ids();
 #     }
 # }
 
-# if (defined $BI) {
-	printf("defined BI: %s \n", $BI);
-	if ($BI =~ /^\d+$/) {
-		@ids = grep { ($BI == $_) } @ids;
-	}
-# }
-print "@ids\n";
+my @ids = grep { ($BI == $_) } @ids;
 
-my $sth = $dbh->prepare("SELECT * FROM $TAB_REV_PAIRS WHERE $PROJECT=? AND $ID=?") or die $dbh->errstr;
+# my $sth = $dbh->prepare("SELECT * FROM $TAB_REV_PAIRS WHERE $PROJECT=? AND $ID=?") or die $dbh->errstr;
 foreach my $bid (@ids) {
-    printf ("%4d: $project->{prog_name}\n", $bid);
 
     # Skip existing entries
     # $sth->execute($PID, $bid);
@@ -211,183 +201,7 @@ foreach my $bid (@ids) {
     _add_row(\%data);
 }
 $dbh->disconnect();
-system("rm -rf $TMP_DIR");
 
-#
-# Check size of src diff, which is created by initialize-revisions.pl script,
-# for a given candidate bug (bid).
-#
-# Returns 1 on success, 0 otherwise
-#
-sub _check_diff {
-    my ($project, $bid, $data) = @_;
-
-    # Determine patch size for src and test patches (rev2 -> rev1)
-    my $patch_test = "$PATCHES_DIR/$bid.test.patch";
-    my $patch_src = "$PATCHES_DIR/$bid.src.patch";
-
-    if (!(-e $patch_test) || (-z $patch_test)) {
-        $data->{$DIFF_TEST} = 0;
-    } else {
-        my $diff = _read_file($patch_test);
-        die unless defined $diff;
-        $data->{$DIFF_TEST} = scalar(split("\n", $diff));
-    }
-
-    if (-z $patch_src) {
-        $data->{$DIFF_SRC} = 0;
-        return 0;
-    } else {
-        my $diff = _read_file($patch_src);
-        die unless defined $diff;
-        $data->{$DIFF_SRC} = scalar(split("\n", $diff)) or return 0;
-    }
-
-    return 1;
-}
-
-#
-# Check whether v2 and t2 can be compiled and export failing tests.
-#
-# Returns 1 on success, 0 otherwise
-#
-sub _check_t2v2 {
-    my ($project, $bid, $data) = @_;
-
-    # Lookup revision ids
-    my $v1 = $project->lookup("${bid}b");
-    my $v2 = $project->lookup("${bid}f");
-
-    # Clean previous results
-    `>$FAILING_DIR/$v2` if -e "$FAILING_DIR/$v2";
-
-    # Checkout v2
-    $project->checkout_vid("${bid}f", $TMP_DIR, 1) == 1 or die;
-
-    # Compile v2 ant t2
-	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
-	my $compile_cmd = " cd $project->{prog_root}" .
-					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8  compile 2>&1";
-	my $compile_tests_cmd = " cd $project->{prog_root}" .
-					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 compile-tests 2>&1";
-	my $compile_tests_cmd_log = " cd $project->{prog_root}" .
-					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 compile-tests 2>&1 >> $WORK_DIR/compile_tests_log.log";
-	my $run_tests_log_cmd_1 = " cd $project->{prog_root}" .
-					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$WORK_DIR/failing_tests.log  run.dev.tests 2>&1 >> $WORK_DIR/failing_tests_logger.log";
-	my $run_tests_log_cmd_2 = " cd $project->{prog_root}" .
-					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$WORK_DIR/failing_tests_after_fix.log  run.dev.tests 2>&1 >> $WORK_DIR/failing_tests_logger_after_fix.log";
-	my $run_tests_log_cmd_3 = " cd $project->{prog_root}" .
-					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -DOUTFILE=$project->{prog_root}/v2.fail  run.dev.tests 2>&1 >>$WORK_DIR/run_tests_log.log";
-    # my $ret = $project->compile();
-    my $ret = Utils::exec_cmd($compile_cmd, "Running ant compile cmd ()");
-	_add_bool_result($data, $COMP_V2, $ret) or return 0;
-    # $project->compile_tests("$WORK_DIR/compile_tests_log.log");
-    Utils::exec_cmd($compile_tests_cmd_log, "Running ant compile compile_tests_cmd_log ()");
-
-	system("python fix_compile_errors.py $WORK_DIR/compile_tests_log.log $project->{prog_root} 2>&1");
-    # $ret = $project->compile_tests();
-    $ret = Utils::exec_cmd($compile_tests_cmd, "Running ant compile cmd ()");
-	$project->fix_tests("${bid}f");
-	# $project->run_tests_and_log($file2, "$WORK_DIR/failing_tests_logger.log");
-    Utils::exec_cmd($run_tests_log_cmd_1, "Running ant compile cmd ()");
-
-	system("python fix_compile_errors.py $WORK_DIR/compile_tests_log.log $project->{prog_root} 2>&1");
-	# $project->run_tests_and_log($file3, "$WORK_DIR/failing_tests_logger_after_fix.log");
-    Utils::exec_cmd($run_tests_log_cmd_2, "Running ant compile cmd ()");
-
-
-    _add_bool_result($data, $COMP_T2V2, $ret) or return 0;
-
-    my $successful_runs = 0;
-    my $run = 1;
-    # while ($successful_runs < $TEST_RUNS && $run <= $MAX_TEST_RUNS) {
-    #     # Automatically fix broken tests and recompile
-    #     # $project->fix_tests("${bid}f");
-    #     # $project->compile_tests() or die;
-    #     Utils::exec_cmd($compile_tests_cmd, "Running ant compile cmd ()") or die;
-	# 
-    #     # Run t2 and get number of failing tests
-    #     my $file = "$project->{prog_root}/v2.fail"; `>$file`;
-    #     # $project->run_tests_and_log($file, "$WORK_DIR/run_tests_log.log") or last;
-	# 	Utils::exec_cmd($run_tests_log_cmd_3, "Running ant compile cmd ()") or last;
-	# 
-	# 
-    #     # Filter out invalid test names, such as testEncode[0].
-    #     # This problem impacts many Commons projects.
-    #     if(-e "$project->{prog_root}/v2.fail"){
-    #         rename("$project->{prog_root}/v2.fail", "$project->{prog_root}/v2.fail".'.bak');
-    #         open(IN, '<'."$project->{prog_root}/v2.fail".'.bak') or die $!;
-    #         open(OUT, '>'."$project->{prog_root}/v2.fail") or die $!;
-    #         while(<IN>) {
-    #             if($_ =~ /\-\-\-/){
-    #                 $_ =~ s/\[[0-9]\]//g;
-    #             }
-    #             print OUT $_;
-    #         }
-    #         close(IN);
-    #         close(OUT);
-    #     }
-	# 
-    #     # Get number of failing tests
-    #     my $list = Utils::get_failing_tests($file);
-    #     my $fail = scalar(@{$list->{"classes"}}) + scalar(@{$list->{"methods"}});
-	# 
-    #     if ($run == 1) {
-    #         $data->{$FAIL_T2V2} = $fail;
-    #     } else {
-    #         $data->{$FAIL_T2V2} += $fail;
-    #     }
-	# 
-    #     ++$successful_runs;
-	# 
-    #     # Append to log if there were (new) failing tests
-    #     unless ($fail == 0) {
-    #         open(OUT, ">>$FAILING_DIR/$v2") or die "Cannot write failing tests: $!";
-    #         print OUT "## $project->{prog_name}: $v2 ##\n";
-    #         close OUT;
-    #         system("cat $file >> $FAILING_DIR/$v2");
-    #         $successful_runs = 0;
-    #     }
-    #     ++$run;
-    # }
-    return 1;
-}
-
-#
-# Check whether t2 and v1 can be compiled
-#
-sub _check_t2v1 {
-    my ($project, $bid, $data) = @_;
-
-    # Lookup revision ids
-    # my $v1  = $project->lookup("${bid}b");
-    # my $v2  = $project->lookup("${bid}f");
-
-    # Checkout v1
-    # $project->checkout_vid("${bid}b", $TMP_DIR, 1) == 1 or die;
-
-    # Compile v1 and t2v1
-	# system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
-    # my $ret = $project->compile();
-	# $project->compile_tests("$WORK_DIR/compile_tests_a2_log.log");
-	# system("python fix_compile_errors.py $WORK_DIR/compile_tests_a2_log.log $project->{prog_root} 2>&1");
-	# $ret = $project->compile_tests();
-    _add_bool_result($data, $COMP_V1, 1);
-    _add_bool_result($data, $COMP_T2V1, 1);
-}
-
-#
-# Read a file line by line and return an array with all lines.
-#
-sub _read_file {
-    my $fn = shift;
-    printf("read_file:\n");
-    printf("read_file: %s\n", $fn);
-	open(FH, "<$fn") or confess "Could not open file: $!";
-    my @lines = <FH>;
-    close(FH);
-    return join('', @lines);
-}
 
 #
 # Insert boolean success into hash
