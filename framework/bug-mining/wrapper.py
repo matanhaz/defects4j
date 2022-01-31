@@ -440,7 +440,7 @@ class Reproducer:
                 dst_f.writelines(lines)
         os.makedirs(self.repo_dir, exist_ok=True)
         os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
-        # os.system(f"git clone {self.url} {self.repo_dir}/{self.name}_real.git")
+        os.system(f"git clone {self.url} {self.repo_dir}/{self.name}_real.git")
         # run(f"git clone {self.url} {os.path.abspath(self.repo_dir)}/{self.name}.git".split())
 
     def extract_issues(self):
@@ -448,7 +448,7 @@ class Reproducer:
         extract_issues(repo_path, self.jira_key, self.active_bugs)
 
     def init_version(self):
-        repo = git.Repo.clone_from(f"{self.repo_dir}/{self.name}.git", f"{self.repo_dir}/{self.name}_real.git")
+        repo = git.Repo(f"{self.repo_dir}/{self.name}_real.git")
         fix, buggy = self.get_commits()
         repo.git.checkout(fix, force=True)
         if 'pom.xml' in os.listdir(repo.working_dir):
