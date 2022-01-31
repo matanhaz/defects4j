@@ -500,7 +500,7 @@ class Reproducer:
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
         os.system(
-            f"cd {repo.working_dir} && ant -q -f {self.d4j_build_file} -Dd4j.home={self.base_dir} -Dd4j.dir.projects={self.projects_dir} -Dbasedir={repo.working_dir}  -Dbuild.compiler=javac1.8  -DOUTFILE={os.path.join(self.work_dir, 'test.run')}  run.dev.tests 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
+            f"cd {repo.working_dir} && ant -q -Dbuild.compiler=javac1.8  -keep-going test  2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
 
         # make sure there are no failing tests
 
@@ -511,7 +511,7 @@ class Reproducer:
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
         os.system(
-            f"cd {repo.working_dir} && ant -q -f {self.d4j_build_file} -Dd4j.home={self.base_dir} -Dd4j.dir.projects={self.projects_dir} -Dbasedir={repo.working_dir}  -Dbuild.compiler=javac1.8  -DOUTFILE={os.path.join(self.work_dir, 'test.run')}  run.dev.tests 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
+            f"cd {repo.working_dir} && ant -q -Dbuild.compiler=javac1.8  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
         # make sure there are failing tests
 
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} get_buggy_functions 2>&1")
