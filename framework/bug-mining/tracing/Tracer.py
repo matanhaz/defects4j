@@ -407,7 +407,7 @@ if __name__ == '__main__':
         t.execute_grabber_process()
     elif sys.argv[-1] == 'formatter':
         t.set_junit_formatter()
-    elif sys.argv[-1] == 'patch':
+    elif sys.argv[-1] == 'get_buggy_functions':
         t.get_buggy_functions()
     elif sys.argv[-1] == 'call_graph':
         t.create_call_graph()
