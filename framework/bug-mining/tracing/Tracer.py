@@ -314,19 +314,21 @@ class Tracer:
 
     def observe_tests(self):
         self.test_results = {}
-        trigger_tests = self.get_trigger_tests()
+        # trigger_tests = self.get_trigger_tests()
         for report in self.get_xml_files():
             try:
                 suite = JUnitXml.fromfile(report)
                 for case in suite:
                     test = TestResult(case, suite.name, report)
-                    test.set_failure(test.full_name.lower() in trigger_tests)
+                    # test.set_failure(test.full_name.lower() in trigger_tests)
                     self.test_results[test.full_name.lower()] = test
             except Exception as e:
                 print(e, report)
                 pass
         with open(self.path_to_tests_results, "w") as f:
             json.dump(list(map(lambda x: x.as_dict(), self.test_results.values())), f)
+        with open(self.tests_to_exclude_path, 'w') as f:
+            json.dump(list(map(lambda x: x.full_name, filter(lambda t: not t.is_passed(), self.test_results.values()))), f)
         return self.test_results
 
     def get_trigger_tests(self):
@@ -432,7 +434,7 @@ if __name__ == '__main__':
     elif sys.argv[-1] == 'call_graph':
         t.create_call_graph()
     elif sys.argv[-1] == 'collect_failed_tests':
-        t.collect_failed_tests(sys.argv[4])
+        t.observe_tests()
     elif sys.argv[-1] == 'exclude_tests':
         t.exclude_tests()
     elif sys.argv[-1] == 'fix_build':

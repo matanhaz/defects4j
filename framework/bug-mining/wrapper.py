@@ -497,7 +497,7 @@ class Reproducer:
         os.system(f"cd {repo.working_dir} && ant -q  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
 
         # collect failing_test
-        os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} {os.path.join(self.work_dir, 'test.run')} collect_failed_tests 2>&1")
+        os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} collect_failed_tests 2>&1")
 
         os.system(
             f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} exclude_tests 2>&1")
