@@ -126,6 +126,9 @@ class Tracer:
     def set_junit_formatter(self):
         self.set_junit_formatter_file(self.xml_path)
 
+    def set_junit_props(self):
+        self.set_junit_properties(self.xml_path)
+
     def collect_failed_tests(self, failed_tests_file):
         trigger_tests = []
         with open(failed_tests_file) as f:
@@ -185,6 +188,7 @@ class Tracer:
                 else:
                     formatter = et.SubElement(j, 'formatter')
                 formatter.attrib.update({'type': 'xml', 'usefile': 'true'})
+
                 jvmarg = list(filter(lambda x: x.tag == 'jvmarg', j.iter()))
                 if jvmarg:
                     jvmarg = jvmarg[0]
@@ -195,6 +199,20 @@ class Tracer:
                 jvmarg.attrib.update({'value': arg_line})
                 if self.tests_to_run or self.tests_to_exclude:
                     self.set_junit_tests(j)
+        element_tree.write(xml_path, xml_declaration=True)
+
+    def set_junit_properties(self, xml_path):
+        element_tree = et.parse(xml_path)
+        junit = list(filter(lambda x: x.tag == 'junit', element_tree.iter()))
+        if junit:
+            for j in junit:
+                j.attrib.update({'fork': 'true', 'forkmode': 'once', 'haltonerror': 'false', 'haltonfailure': 'false'})
+                formatter = list(filter(lambda x: x.tag == 'formatter', j.iter()))
+                if formatter:
+                    formatter = formatter[0]
+                else:
+                    formatter = et.SubElement(j, 'formatter')
+                formatter.attrib.update({'type': 'xml', 'usefile': 'true'})
         element_tree.write(xml_path, xml_declaration=True)
 
     def set_junit_tests(self, junit_element):
@@ -407,6 +425,8 @@ if __name__ == '__main__':
         t.execute_grabber_process()
     elif sys.argv[-1] == 'formatter':
         t.set_junit_formatter()
+    elif sys.argv[-1] == 'properties':
+        t.set_junit_props()
     elif sys.argv[-1] == 'get_buggy_functions':
         t.get_buggy_functions()
     elif sys.argv[-1] == 'call_graph':
