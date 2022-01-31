@@ -471,21 +471,7 @@ sub get_buggy_functions_traces{
     $project->{prog_root} = $root;
     $project->checkout_vid($vid, $root, 1) or die;
 	$project->apply_patch($root, $patch_file);
-	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} get_buggy_functions  2>&1");
-	open FILE, $BUGS_FILE or die "Cannot open bugs file ($BUGS_FILE): $!";
-    close FILE;
-	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
-	$project->compile() or die;
-	$project->compile_tests("$WORK_DIR/compile_tests_tracer_log.log");
-	system("python fix_compile_errors.py $WORK_DIR/compile_tests_tracer_log.log $project->{prog_root} 2>&1");
-    $project->compile_tests() or die;
-	system("jar cvf ${JAR_PATH} ${root} 2>&1");
-	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} call_graph 2>&1");
-	open FILE, $CALL_GRAPH_TESTS or die "Cannot open call graph tests ($CALL_GRAPH_TESTS): $!";
-    close FILE;
-	system("rm -f ${JAR_PATH} 2>&1");
-	
-		
+			
 	my $compile_cmd = " cd $project->{prog_root}" .
 				  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8  compile 2>&1";
 	my $compile_tests_cmd = " cd $project->{prog_root}" .
@@ -494,12 +480,23 @@ sub get_buggy_functions_traces{
 	my $run_tests_cmd = " cd $project->{prog_root}" .
 					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -keep-going test 2>&1";
 
+	
+	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} get_buggy_functions  2>&1");
+	open FILE, $BUGS_FILE or die "Cannot open bugs file ($BUGS_FILE): $!";
+    close FILE;
+	
     # Compile src and test
 	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
 	Utils::exec_cmd($compile_cmd, "Running ant compile cmd ()") or die;
 	Utils::exec_cmd($compile_tests_cmd, "Running ant compile cmd ()");
 	system("python fix_compile_errors.py $WORK_DIR/compile_tests_tracer_log.log $project->{prog_root} 2>&1");
     Utils::exec_cmd($compile_tests_cmd, "Running ant compile cmd ()") or die;
+	system("jar cvf ${JAR_PATH} ${root} 2>&1");
+	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} call_graph 2>&1");
+	open FILE, $CALL_GRAPH_TESTS or die "Cannot open call graph tests ($CALL_GRAPH_TESTS): $!";
+    close FILE;
+	system("rm -f ${JAR_PATH} 2>&1");
+
 	system("cd tracing && python Tracer.py ${root} sanity ${PID_DIR} formatter 2>&1");
 	system("cd tracing && python Tracer.py ${root} sanity ${PID_DIR} template  2>&1");
 	system("cd tracing && python Tracer.py ${root} sanity ${PID_DIR} grabber 2>&1 &");
@@ -510,22 +507,7 @@ sub get_buggy_functions_traces{
 	system(" cd tracing && python Tracer.py ${root} sanity ${PID_DIR} stop 2>&1");
 	
 	
-		
-	my $compile_cmd = " cd $project->{prog_root}" .
-				  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8  compile 2>&1";
-	my $compile_tests_cmd = " cd $project->{prog_root}" .
-					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 compile-tests 2>&1";
-
-	my $run_tests_cmd = " cd $project->{prog_root}" .
-					  " && ant -q -f $D4J_BUILD_FILE -Dd4j.home=$BASE_DIR -Dd4j.dir.projects=$PROJECTS_DIR -Dbasedir=$project->{prog_root}  -Dbuild.compiler=javac1.8 -keep-going test 2>&1";
-
-    # Compile src and test
-	system("cd tracing && python Tracer.py $project->{prog_root} full $PROJECTS_DIR/$PID fix_build 2>&1");
-	Utils::exec_cmd($compile_cmd, "Running ant compile cmd ()") or die;
-	Utils::exec_cmd($compile_tests_cmd, "Running ant compile cmd ()");
-	system("python fix_compile_errors.py $WORK_DIR/compile_tests_tracer_log.log $project->{prog_root} 2>&1");
-    Utils::exec_cmd($compile_tests_cmd, "Running ant compile cmd ()") or die;
-	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} formatter 2>&1");
+    system("cd tracing && python Tracer.py ${root} full ${PID_DIR} formatter 2>&1");
 	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} template  2>&1");
 	system("cd tracing && python Tracer.py ${root} full ${PID_DIR} grabber 2>&1 &");
 	sleep(20);
