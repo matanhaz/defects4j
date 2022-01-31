@@ -407,7 +407,7 @@ class Reproducer:
         self.name = p
         self.url = projects[self.p][0]
         self.jira_key = projects[p][1]
-        self.work_dir = working_dir
+        self.work_dir = os.path.abspath(working_dir)
         self.active_bugs = f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv"
         self.module_template = os.path.join(self.const_core_dir, "Project", "template")
         self.build_template = os.path.join(self.projects_dir, 'template.build.xml')
