@@ -85,6 +85,13 @@ class Tracer:
         self.path_to_classes_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"classes_{self.trace_type}"))
         self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_details_{self.trace_type}.json"))
         self.path_to_tests_results = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_results_{self.trace_type}.json"))
+        self.bugs_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'bugs.json'))
+        self.all_jar_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'jar_path.jar'))
+        self.call_graph_tests_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph_tests.json'))
+        self.call_graph_nodes_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph_nodes.json'))
+        self.tests_to_exclude_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'tests_to_exclude.json'))
+        self.tests_run_log = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'tests_run_log'))
+
         trigger_tests = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "trigger_tests"))
         self.path_to_trigger_tests = None
         if os.listdir(trigger_tests):
