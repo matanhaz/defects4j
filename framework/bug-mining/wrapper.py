@@ -440,7 +440,7 @@ class Reproducer:
                 dst_f.writelines(lines)
         os.makedirs(self.repo_dir, exist_ok=True)
         os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
-        os.system(f"git clone {self.url} {self.repo_dir}/{self.name}_real.git")
+        # os.system(f"git clone {self.url} {self.repo_dir}/{self.name}_real.git")
         # run(f"git clone {self.url} {os.path.abspath(self.repo_dir)}/{self.name}.git".split())
 
     def extract_issues(self):
@@ -448,20 +448,20 @@ class Reproducer:
         extract_issues(repo_path, self.jira_key, self.active_bugs)
 
     def init_version(self):
-        repo = git.Repo.clone_from(f"{self.repo_dir}/{self.name}.git", f"{self.repo_dir}/{self.name}_init.git")
+        repo = git.Repo.clone_from(f"{self.repo_dir}/{self.name}.git", f"{self.repo_dir}/{self.name}_real.git")
         fix, buggy = self.get_commits()
         repo.git.checkout(fix, force=True)
         if 'pom.xml' in os.listdir(repo.working_dir):
             sf = SourceFixer(repo.working_dir)
             sf.set_compiler_version('1.8')
-            os.system(f"cd {self.repo_dir}/{self.name}_init.git && mvn ant:ant -Doverwrite=true 2>&1 -Dhttps.protocols=TLSv1.2 -Dmaven.compile.source=1.8 -Dmaven.compile.target=1.8")
+            os.system(f"cd {self.repo_dir}/{self.name}_real.git && mvn ant:ant -Doverwrite=true 2>&1 -Dhttps.protocols=TLSv1.2 -Dmaven.compile.source=1.8 -Dmaven.compile.target=1.8")
             fix_mvn_compiler_dir(repo.working_dir)
             build_files_dir = os.path.join(self.gen_buildfile_dir, fix)
             os.mkdir(build_files_dir)
-            os.system(f"cd {self.repo_dir}/{self.name}_init.git && cp maven-build.* {build_files_dir}")
-            os.system(f"cd {self.repo_dir}/{self.name}_init.git && cp build.xml {build_files_dir}")
-            os.system(f"cd {self.repo_dir}/{self.name}_init.git && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml > temp && mv temp maven-build.xml")
-            os.system(f"cd {self.repo_dir}/{self.name}_init.git && ant -Dmaven.repo.local=\"{os.path.join(self.project_dir, 'lib')}\" get-deps")
+            os.system(f"cd {self.repo_dir}/{self.name}_real.git && cp maven-build.* {build_files_dir}")
+            os.system(f"cd {self.repo_dir}/{self.name}_real.git && cp build.xml {build_files_dir}")
+            os.system(f"cd {self.repo_dir}/{self.name}_real.git && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml > temp && mv temp maven-build.xml")
+            os.system(f"cd {self.repo_dir}/{self.name}_real.git && ant -Dmaven.repo.local=\"{os.path.join(self.project_dir, 'lib')}\" get-deps")
 
     def get_diffs(self):
         repo_path = os.path.abspath(os.path.join(self.repo_dir, self.name + "_real.git"))
@@ -485,7 +485,7 @@ class Reproducer:
         # todo the post checkout
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} fix_build 2>&1")
         # run fixed version and collect failed tests
-        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile 2>&1")
+        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile 2>&1 > /dev/null")
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
         os.system(f"python fix_compile_errors.py {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')} {repo.working_dir} 2>&1")
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} exclude_tests 2>&1")
