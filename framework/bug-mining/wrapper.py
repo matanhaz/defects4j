@@ -527,7 +527,7 @@ class Reproducer:
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} template 2>&1")
         # os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} grabber 2>&1 &")
         time.sleep(20)
-        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
+        # os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
         #
         # # check if sanity file exists
