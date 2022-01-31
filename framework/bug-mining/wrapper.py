@@ -490,6 +490,10 @@ class Reproducer:
         os.system(f"python fix_compile_errors.py {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')} {repo.working_dir} 2>&1")
         os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} exclude_tests 2>&1")
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
+
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} properties 2>&1")
+
         os.system(f"cd {repo.working_dir} && ant -q  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
 
         # collect failing_test
@@ -499,8 +503,6 @@ class Reproducer:
             f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} exclude_tests 2>&1")
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
-        os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} properties 2>&1")
         os.system(
             f"cd {repo.working_dir} && ant -q -Dbuild.compiler=javac1.8  -keep-going test  2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
 
