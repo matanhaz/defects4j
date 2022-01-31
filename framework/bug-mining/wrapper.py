@@ -429,7 +429,7 @@ class Reproducer:
 
     def create_project(self):
         for d in [self.project_dir, self.core_dir, self.issues_dir, self.patch_dir, self.failing_dir, self.trigger_dir,
-                  self.relevant_dir, self.mod_classes, self.rel_classes, self.analyzer_output, self.gen_buildfile_dir]:
+                  self.relevant_dir, self.mod_classes, self.rel_classes, self.analyzer_output, self.gen_buildfile_dir, self.work_dir]:
             os.makedirs(d, exist_ok=True)
         for src, dst in [(self.module_template, self.module_file), (self.build_template, self.build_file),
                          (self.build_patch, self.build_patch_file)]:
