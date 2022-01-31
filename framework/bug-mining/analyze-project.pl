@@ -156,7 +156,7 @@ my $MAX_TEST_RUNS = 3;
 # Temporary directory
 
 # Set up project
-# my $project = Project::create_project($PID);
+my $project = Project::create_project($PID);
 # $project->{prog_root} = $TMP_DIR;
 
 # Get database handle for results
@@ -172,8 +172,7 @@ my @COLS = DB::get_tab_columns($TAB_REV_PAIRS) or die;
 #         @ids = grep { ($BID == $_) } @ids;
 #     }
 # }
-
-my @ids = grep { ($BI == $_) } @ids;
+my @ids = grep { ($BI == $_) } $project->get_bug_ids();
 
 # my $sth = $dbh->prepare("SELECT * FROM $TAB_REV_PAIRS WHERE $PROJECT=? AND $ID=?") or die $dbh->errstr;
 foreach my $bid (@ids) {
