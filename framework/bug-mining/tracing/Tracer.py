@@ -1,12 +1,15 @@
-import xml.etree.cElementTree as et
-import os
-import sys
-import socket
 import json
-from junitparser import JUnitXml
+import os
+import socket
+import sys
+import xml.etree.cElementTree as et
 from subprocess import Popen, PIPE, run
+
 import networkx as nx
+from junitparser import JUnitXml
+
 from jcov_parser import JcovParser
+
 et.register_namespace('', "http://maven.apache.org/POM/4.0.0")
 et.register_namespace('xsi', "http://www.w3.org/2001/XMLSchema-instance")
 try:
@@ -56,7 +59,8 @@ class TestResult(object):
 
 class Tracer:
     JCOV_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "jcov.jar")
-    CALL_GRAPH_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "javacg-0.1-SNAPSHOT-static.jar")
+    CALL_GRAPH_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals",
+                                       "javacg-0.1-SNAPSHOT-static.jar")
 
     def __init__(self, repo_path, trace_type, pid_dir, bug_mining=None):
         self.classes_dir = None
@@ -75,32 +79,38 @@ class Tracer:
         if os.path.isfile(os.path.join(self.repo_path, 'maven-build.xml')):
             self.xml_path = os.path.join(self.repo_path, 'maven-build.xml')
         p = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        self.defects4j_build = os.path.join(os.path.dirname(p), 'projects', 'defects4j.build.xml')
         ind = 0
         if bug_mining is None:
             ind = list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0].split('_')[1]
-            bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0], 'framework', 'projects')
-        self.path_to_result_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"result_{self.trace_type}.xml"))
-        self.path_to_out_template = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"template_{self.trace_type}.xml"))
-        self.path_to_classes_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"classes_{self.trace_type}"))
-        self.path_to_tests_details = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_details_{self.trace_type}.json"))
-        self.path_to_tests_results = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_results_{self.trace_type}.json"))
+            bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0],
+                                      'framework', 'projects')
+        self.path_to_result_file = os.path.abspath(
+            os.path.join(bug_mining, os.listdir(bug_mining)[0], f"result_{self.trace_type}.xml"))
+        self.path_to_out_template = os.path.abspath(
+            os.path.join(bug_mining, os.listdir(bug_mining)[0], f"template_{self.trace_type}.xml"))
+        self.path_to_classes_file = os.path.abspath(
+            os.path.join(bug_mining, os.listdir(bug_mining)[0], f"classes_{self.trace_type}"))
+        self.path_to_tests_details = os.path.abspath(
+            os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_details_{self.trace_type}.json"))
+        self.path_to_tests_results = os.path.abspath(
+            os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_results_{self.trace_type}.json"))
         self.bugs_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'bugs.json'))
         self.all_jar_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'jar_path.jar'))
         self.call_graph_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph.gexf'))
-        self.call_graph_tests_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph_tests.json'))
-        self.call_graph_nodes_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph_nodes.json'))
-        self.tests_to_exclude_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'tests_to_exclude.json'))
+        self.call_graph_tests_path = os.path.abspath(
+            os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph_tests.json'))
+        self.call_graph_nodes_path = os.path.abspath(
+            os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph_nodes.json'))
+        self.tests_to_exclude_path = os.path.abspath(
+            os.path.join(bug_mining, os.listdir(bug_mining)[0], 'tests_to_exclude.json'))
         self.tests_run_log = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'tests_run_log'))
 
-        trigger_tests = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], "trigger_tests"))
-        self.path_to_trigger_tests = None
-        if os.listdir(trigger_tests):
-            self.path_to_trigger_tests = os.path.join(trigger_tests, os.listdir(trigger_tests)[0])
         if self.trace_type == 'sanity':
-            self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{self.trace_type}.json"))
+            self.matrix = os.path.abspath(
+                os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{self.trace_type}.json"))
         else:
-            self.matrix = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{ind}_{self.trace_type}.json"))
+            self.matrix = os.path.abspath(
+                os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{ind}_{self.trace_type}.json"))
         self.test_results = {}
         self.tests_to_run = None
         self.tests_to_exclude = None
@@ -146,8 +156,8 @@ class Tracer:
                 if '::' in trigger:
                     trigger = trigger.split('[')[0]
                     trigger = trigger.replace('::', '.')
-                # else:
-                #     trigger = trigger + '.NOTEST'
+                    # else:
+                    #     trigger = trigger + '.NOTEST'
                     if 'test' in trigger.lower():
                         trigger_tests.append(trigger)
         with open(self.tests_to_exclude_path, 'w') as f:
@@ -174,7 +184,7 @@ class Tracer:
         tests = list(set(map(lambda x: x.replace('.java', '').replace('**/', '').lower(), self.tests_to_exclude)))
         print(f"tests to remove {tests}")
         for root, _, files in os.walk(os.path.dirname(self.xml_path)):
-            for f in filter(lambda x: (x.endswith('.java') or x.endswith('.class') ) and 'test' in x.lower(), files):
+            for f in filter(lambda x: (x.endswith('.java') or x.endswith('.class')) and 'test' in x.lower(), files):
                 for t in tests:
                     if t in f.lower():
                         try:
@@ -203,7 +213,8 @@ class Tracer:
                 else:
                     jvmarg = et.SubElement(j, 'jvmarg')
                 arg_line = r'-javaagent:{JCOV_JAR_PATH}=grabber,port={PORT},include_list={CLASSES_FILE},template={OUT_TEMPLATE},type=method'.format(
-                    JCOV_JAR_PATH=Tracer.JCOV_JAR_PATH, PORT=self.agent_port, CLASSES_FILE=self.path_to_classes_file, OUT_TEMPLATE=self.path_to_out_template)
+                    JCOV_JAR_PATH=Tracer.JCOV_JAR_PATH, PORT=self.agent_port, CLASSES_FILE=self.path_to_classes_file,
+                    OUT_TEMPLATE=self.path_to_out_template)
                 jvmarg.attrib.update({'value': arg_line})
                 if self.tests_to_run or self.tests_to_exclude:
                     self.set_junit_tests(j)
@@ -249,7 +260,8 @@ class Tracer:
         return all_classes
 
     def template_creator_cmd_line(self):
-        cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'tmplgen', '-verbose', '-t', self.path_to_out_template, '-c', self.path_to_classes_file, '-type', 'method']
+        cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'tmplgen', '-verbose', '-t',
+                    self.path_to_out_template, '-c', self.path_to_classes_file, '-type', 'method']
         if self.classes_to_trace:
             for c in self.classes_to_trace:
                 cmd_line.extend(['-i', c])
@@ -257,8 +269,9 @@ class Tracer:
         return cmd_line
 
     def grabber_cmd_line(self):
-            cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'grabber', '-vv', '-port', self.agent_port, '-command_port', self.command_port, '-t', self.path_to_out_template, '-o', self.path_to_result_file]
-            return list(map(str, cmd_line))
+        cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'grabber', '-vv', '-port', self.agent_port,
+                    '-command_port', self.command_port, '-t', self.path_to_out_template, '-o', self.path_to_result_file]
+        return list(map(str, cmd_line))
 
     def check_if_grabber_is_on(self):
         import time
@@ -286,10 +299,13 @@ class Tracer:
 
     def stop_grabber(self):
         def make_nice_trace(t):
-            return list(map(lambda x: x.lower().replace("java.lang.", "").replace("java.io.", "").replace("java.util.", ""), t))
+            return list(
+                map(lambda x: x.lower().replace("java.lang.", "").replace("java.io.", "").replace("java.util.", ""), t))
 
-        Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-save", '-command_port', str(self.command_port)]).communicate()
-        Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-stop", '-command_port', str(self.command_port)]).communicate()
+        Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-save", '-command_port',
+               str(self.command_port)]).communicate()
+        Popen(["java", "-jar", Tracer.JCOV_JAR_PATH, "grabberManager", "-stop", '-command_port',
+               str(self.command_port)]).communicate()
         traces = list(JcovParser(None, [self.path_to_result_file], True, True).parse(False))[0].split_to_subtraces()
         trigger_tests = list(map(lambda x: x.lower(), self.get_trigger_tests()))
         relevant_traces = traces
@@ -298,10 +314,14 @@ class Tracer:
             if traces[t].get_trace():
                 tests_details.append((t, traces[t].get_trace(), 1 if t.lower().split('(')[0] in trigger_tests else 0))
         tests_names = set(list(map(lambda x: x[0], tests_details)) + list(map(lambda x: x[0].lower(), tests_details)))
-        fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 1, tests_details))), set())
+        fail_components = reduce(set.__or__, list(map(lambda x: set(x[1]), filter(lambda x: x[2] == 1, tests_details))),
+                                 set())
         all_components = reduce(set.__or__, list(map(lambda x: set(x[1]), tests_details)), set())
-        fail_components = set(filter(lambda x: not x.lower().split('.')[-2].endswith('test'), fail_components - tests_names))
-        optimized_tests = list(filter(lambda x: x[1], map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]), tests_details)))
+        fail_components = set(
+            filter(lambda x: not x.lower().split('.')[-2].endswith('test'), fail_components - tests_names))
+        optimized_tests = list(filter(lambda x: x[1],
+                                      map(lambda x: (x[0], make_nice_trace(list(set(x[1]) & fail_components)), x[2]),
+                                          tests_details)))
         components = reduce(set.__or__, list(map(lambda x: set(x[1]), optimized_tests)), set())
         bugs = []
         with open(self.bugs_file) as f:
@@ -336,7 +356,8 @@ class Tracer:
         with open(self.path_to_tests_results, "w") as f:
             json.dump(list(map(lambda x: x.as_dict(), self.test_results.values())), f)
         with open(self.tests_to_exclude_path, 'w') as f:
-            json.dump(list(map(lambda x: x.full_name, filter(lambda t: not t.is_passed(), self.test_results.values()))), f)
+            json.dump(list(map(lambda x: x.full_name, filter(lambda t: not t.is_passed(), self.test_results.values()))),
+                      f)
         return self.test_results
 
     def get_trigger_tests(self):
@@ -354,7 +375,10 @@ class Tracer:
     def create_call_graph(self):
         cmd = ["java", "-jar", Tracer.CALL_GRAPH_JAR_PATH, self.all_jar_path]
         edges = set()
-        edges = edges.union(set(str(Popen(cmd, stdout=PIPE).communicate()[0]).replace('(M)', '').replace('(I)', '').replace('(D)', '').replace('(S)', '').replace('(O)', '').replace('\\r', '').split('\\n')))
+        edges = edges.union(set(
+            str(Popen(cmd, stdout=PIPE).communicate()[0]).replace('(M)', '').replace('(I)', '').replace('(D)',
+                                                                                                        '').replace(
+                '(S)', '').replace('(O)', '').replace('\\r', '').split('\\n')))
         classes_edges = set()
         for v, u in list(filter(lambda x: x, map(lambda x: x[2:].split(), edges))):
             if ':' in v:
@@ -378,7 +402,7 @@ class Tracer:
                     u = ''
                     v = ''
             if v != u and v and u:
-                classes_edges.add((v,u))
+                classes_edges.add((v, u))
         g_forward = nx.DiGraph()
         g_forward.add_edges_from(classes_edges)
         nx.write_gexf(g_forward, self.call_graph_path)
@@ -386,7 +410,9 @@ class Tracer:
         with open(self.bugs_file) as f:
             bugs_classes = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), json.loads(f.read()))))
         trigger_tests_classes = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), self.get_trigger_tests())))
-        tests_classes = list(filter(lambda x: x.split('.')[-1].startswith('Test') or x.split('.')[-1].endswith('Test') or x.split('.')[-1].endswith('TestCase'), g_forward.nodes))
+        tests_classes = list(filter(
+            lambda x: x.split('.')[-1].startswith('Test') or x.split('.')[-1].endswith('Test') or x.split('.')[
+                -1].endswith('TestCase'), g_forward.nodes))
         relevant_tests = set()
         for t in tests_classes:
             for b in bugs_classes:
@@ -448,4 +474,3 @@ if __name__ == '__main__':
         t.fix_build()
     else:
         t.stop_grabber()
-
