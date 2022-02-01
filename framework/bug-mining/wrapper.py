@@ -407,7 +407,7 @@ def collect_failed_tests(failed_tests_file, proj_dir):
     return candidates
 
 
-def fix(candidates):
+def fix_candidates(candidates):
     for c in set(candidates):
         if 'test' in c.lower():
             try:
@@ -493,7 +493,7 @@ class Reproducer:
         candidates = get_candidates(os.path.join(self.work_dir, 'compile_tests_trigger_log.log'),
                                     repo.working_dir.split('pl')[0])
         failed_tests = collect_failed_tests(os.path.join(self.work_dir, 'failing_tests.log'), repo.working_dir.split('pl')[0])
-        fix(candidates + failed_tests)
+        fix_candidates(candidates + failed_tests)
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
 
