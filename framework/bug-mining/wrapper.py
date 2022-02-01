@@ -381,6 +381,16 @@ import os
 import sys
 
 
+def fix_build(dir):
+    build_xml = os.path.join(dir, 'build.xml')
+    if not os.path.exists(build_xml):
+        return
+    with open(build_xml) as f:
+        lines = list(map(lambda x: x.replace('compile.tests', 'compile-tests'), f.readlines()))
+    with open(build_xml, 'w') as f:
+        f.writelines(lines)
+
+
 def get_candidates(file_name, proj_dir):
     candidates = []
     with open(file_name) as f:
@@ -483,8 +493,7 @@ class Reproducer:
         fix, buggy = self.get_commits()
         repo.git.checkout(fix, force=True)
         # todo the post checkout
-        os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full fix_build 2>&1")
+        fix_build(repo.working_dir)
         # run fixed version and collect failed tests
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile 2>&1 > /dev/null")
         os.system(
