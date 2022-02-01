@@ -402,12 +402,10 @@ class Reproducer:
         for d in [self.project_dir, self.core_dir, self.patch_dir, self.work_dir]:
             os.makedirs(d, exist_ok=True)
         os.makedirs(self.repo_dir, exist_ok=True)
-        os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
         os.system(f"git clone {self.url} {self.repo_dir}/{self.name}_real.git")
-        # run(f"git clone {self.url} {os.path.abspath(self.repo_dir)}/{self.name}.git".split())
 
     def extract_issues(self):
-        repo_path = os.path.join(self.repo_dir, self.name + ".git")
+        repo_path = os.path.join(self.repo_dir, self.name + "_real.git")
         extract_issues(repo_path, self.jira_key, self.active_bugs)
 
     def init_version(self):
