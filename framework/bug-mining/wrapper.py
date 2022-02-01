@@ -553,11 +553,7 @@ class Reproducer:
         #
         # # check if sanity file exists
         # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full formatter 2>&1")
-        # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full template 2>&1")
-        # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full grabber 2>&1 &")
+        #     f"cd tracing && python Tracer.py {repo.working_dir} full triple 2>&1")
         # time.sleep(20)
         # os.system(
         #     f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
