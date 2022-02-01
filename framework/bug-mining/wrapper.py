@@ -1,20 +1,20 @@
-import os
-import sys
-from functools import reduce
-from subprocess import run
-from issues_extractor import extract_issues
 import json
 import os
+import os
 import re
+import sys
 import time
 from datetime import datetime
+from functools import reduce
+from subprocess import Popen, PIPE, run
+from subprocess import run
 
 import git
 import jira
 import pandas as pd
-from pydriller import Repository
-from subprocess import Popen, PIPE, run
 from d4jchanges import SourceFixer
+from issues_extractor import extract_issues
+from pydriller import Repository
 
 projects = {'distributedlog': ('https://github.com/apache/distributedlog', 'DL'),
             'maven-indexer': ('https://github.com/apache/maven-indexer', 'MINDEXER'),
@@ -302,17 +302,16 @@ projects = {'distributedlog': ('https://github.com/apache/distributedlog', 'DL')
             'commons-bcel': ('https://github.com/apache/commons-bcel', 'BCEL')}
 
 
-
 def layout(repo_path, commit_id):
     java = set()
     tests = set()
     repo = git.Repo(repo_path)
     files = repo.git.ls_tree("-r", "--name-only", commit_id).split()
     for f in filter(lambda x: x.endswith('.java'), files):
-            if 'test' in f:
-                tests.add(os.path.dirname(f))
-            else:
-                java.add(os.path.dirname(f))
+        if 'test' in f:
+            tests.add(os.path.dirname(f))
+        else:
+            java.add(os.path.dirname(f))
     reduced_java = set()
     s_j = min(list(map(lambda x: len(x), java)))
     min_java_name = list(filter(lambda x: len(x) == s_j, java))[0]
@@ -356,6 +355,7 @@ def diff_on_layouts(repo_path, commit_a, commit_b, src_patch, test_patch):
 
     # TODO: check patches are not empty
 
+
 def fix_mvn_compiler(file_name):
     with open(file_name) as f:
         lines = f.readlines()
@@ -366,7 +366,7 @@ def fix_mvn_compiler(file_name):
         if l.startswith('maven.compile.target='):
             l = 'maven.compile.target=1.7\n'
         lines2.append(l)
-    with open(file_name,'w') as f:
+    with open(file_name, 'w') as f:
         f.writelines(lines2)
 
 
@@ -383,14 +383,6 @@ class Reproducer:
         self.dir = os.path.abspath(os.path.dirname(__file__))
         self.script_dir = os.path.dirname(self.dir)
         self.projects_dir = os.path.join(self.script_dir, 'projects')
-        self.const_core_dir = os.path.join(self.script_dir, 'core')
-        self.lib_dir = os.path.join(self.script_dir, 'lib')
-        self.util_dir = os.path.join(self.script_dir, 'util')
-        self.base_dir = os.path.dirname(self.script_dir)
-        self.conts_repo_dir = os.path.join(self.base_dir, 'project_repos')
-        self.d4j_tmp_dir = '/tmp/versions'
-        self.major_root = os.path.join(self.base_dir, 'major')
-        self.d4j_build_file = os.path.join(self.projects_dir, 'defects4j.build.xml')
 
         # scripts cmds
         self.p = p
@@ -398,38 +390,16 @@ class Reproducer:
         self.working_dir = os.path.abspath(working_dir)
         self.project_dir = os.path.join(self.working_dir, 'framework', 'projects', self.pid)
         self.ind = ind
-        getters = {'p': projects[p][1].title(), 'r': projects[p][0], 'n': p, 'g': 'jira', 't': projects[p][1],
-                   'e': '"/({0}-\d+)/mi"'.format(projects[p][1]), 'w': working_dir, 'i': ind,
-                   'a': f"{working_dir}//project_repos//{p}.git",
-                   'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv",
-                   'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': '',
-                   'l': f"{working_dir}//gitlog"}
         self.name = p
         self.url = projects[self.p][0]
         self.jira_key = projects[p][1]
         self.work_dir = os.path.abspath(working_dir)
         self.active_bugs = f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv"
-        self.module_template = os.path.join(self.const_core_dir, "Project", "template")
-        self.build_template = os.path.join(self.projects_dir, 'template.build.xml')
-        self.build_file = os.path.join(self.project_dir, self.pid + '.build.xml')
-        self.build_patch = os.path.join(self.projects_dir, 'build.xml.patch')
-        self.build_patch_file = os.path.join(self.project_dir, 'build.xml.patch')
         self.repo_dir = os.path.join(self.working_dir, 'project_repos')
-        self.issues_dir = os.path.join(self.working_dir, 'issues')
         self.patch_dir = os.path.join(self.project_dir, 'patches')
-        self.failing_dir = os.path.join(self.project_dir, 'failing_tests')
-        self.trigger_dir = os.path.join(self.project_dir, 'trigger_tests')
-        self.relevant_dir = os.path.join(self.project_dir, 'relevant_tests')
-        self.mod_classes = os.path.join(self.project_dir, 'modified_classes')
-        self.rel_classes = os.path.join(self.project_dir, 'loaded_classes')
-        self.core_dir = os.path.join(self.working_dir, 'framework', 'core', 'Project')
-        self.module_file = os.path.join(self.core_dir, self.pid + '.pm')
-        self.analyzer_output = os.path.join(self.project_dir, 'analyzer_output')
-        self.gen_buildfile_dir = os.path.join(self.project_dir, 'build_files')
 
     def create_project(self):
-        for d in [self.project_dir, self.core_dir, self.issues_dir, self.patch_dir, self.failing_dir, self.trigger_dir,
-                  self.relevant_dir, self.mod_classes, self.rel_classes, self.analyzer_output, self.gen_buildfile_dir, self.work_dir]:
+        for d in [self.project_dir, self.core_dir, self.patch_dir, self.work_dir]:
             os.makedirs(d, exist_ok=True)
         os.makedirs(self.repo_dir, exist_ok=True)
         os.system(f"git clone --bare {self.url} {self.repo_dir}/{self.name}.git")
@@ -447,14 +417,13 @@ class Reproducer:
         if 'pom.xml' in os.listdir(repo.working_dir):
             sf = SourceFixer(repo.working_dir)
             sf.set_compiler_version('1.8')
-            os.system(f"cd {self.repo_dir}/{self.name}_real.git && mvn ant:ant -Doverwrite=true 2>&1 -Dhttps.protocols=TLSv1.2 -Dmaven.compile.source=1.8 -Dmaven.compile.target=1.8")
+            os.system(
+                f"cd {self.repo_dir}/{self.name}_real.git && mvn ant:ant -Doverwrite=true 2>&1 -Dhttps.protocols=TLSv1.2 -Dmaven.compile.source=1.8 -Dmaven.compile.target=1.8")
             fix_mvn_compiler_dir(repo.working_dir)
-            build_files_dir = os.path.join(self.gen_buildfile_dir, fix)
-            os.mkdir(build_files_dir)
-            os.system(f"cd {self.repo_dir}/{self.name}_real.git && cp maven-build.* {build_files_dir}")
-            os.system(f"cd {self.repo_dir}/{self.name}_real.git && cp build.xml {build_files_dir}")
-            os.system(f"cd {self.repo_dir}/{self.name}_real.git && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml > temp && mv temp maven-build.xml")
-            os.system(f"cd {self.repo_dir}/{self.name}_real.git && ant -Dmaven.repo.local=\"{os.path.join(self.project_dir, 'lib')}\" get-deps")
+            # os.system(
+            #     f"cd {self.repo_dir}/{self.name}_real.git && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml > temp && mv temp maven-build.xml")
+            os.system(
+                f"cd {self.repo_dir}/{self.name}_real.git && ant -Dmaven.repo.local=\"{os.path.join(self.project_dir, 'lib')}\" get-deps")
 
     def get_diffs(self):
         repo_path = os.path.abspath(os.path.join(self.repo_dir, self.name + "_real.git"))
@@ -476,20 +445,26 @@ class Reproducer:
         fix, buggy = self.get_commits()
         repo.git.checkout(fix, force=True)
         # todo the post checkout
-        os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} fix_build 2>&1")
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} fix_build 2>&1")
         # run fixed version and collect failed tests
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile 2>&1 > /dev/null")
-        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
-        os.system(f"python fix_compile_errors.py {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')} {repo.working_dir} 2>&1")
-        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
+        os.system(
+            f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
+        os.system(
+            f"python fix_compile_errors.py {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')} {repo.working_dir} 2>&1")
+        os.system(
+            f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
 
         os.system(
             f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} properties 2>&1")
 
-        os.system(f"cd {repo.working_dir} && ant -q  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
+        os.system(
+            f"cd {repo.working_dir} && ant -q  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
 
         # collect failing_test
-        os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} collect_failed_tests 2>&1")
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} collect_failed_tests 2>&1")
 
         os.system(
             f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} exclude_tests 2>&1")
@@ -512,17 +487,23 @@ class Reproducer:
         os.system(
             f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} collect_failed_tests 2>&1")
 
-        os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} get_buggy_functions 2>&1")
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} get_buggy_functions 2>&1")
         os.system(f"jar cvf {os.path.join(self.project_dir, 'jar_path.jar')} {repo.working_dir} 2>&1")
-        os.system(f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} call_graph 2>&1")
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} call_graph 2>&1")
 
         # sanity trace
-        os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} formatter 2>&1")
-        os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} template 2>&1")
-        os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} grabber 2>&1 &")
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} formatter 2>&1")
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} template 2>&1")
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} grabber 2>&1 &")
         time.sleep(20)
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
-        os.system(f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
+        os.system(
+            f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
         #
         # # check if sanity file exists
         # os.system(
@@ -548,21 +529,10 @@ class Reproducer:
 def get_cmds(p, working_dir, ind):
     reproducer = Reproducer(p, working_dir, ind)
     reproducer.do_all()
-    getters = {'p': projects[p][1].title(), 'r': projects[p][0], 'n': p, 'g': 'jira', 't': projects[p][1],
-               'e': '"/({0}-\d+)/mi"'.format(projects[p][1]), 'w': working_dir, 'i': ind,
-               'a': f"{working_dir}//project_repos//{p}.git",
-               'b': f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv",
-               'o': f"{working_dir}//issues", 'f': f"{working_dir}//issues.txt", 'q': '', 'l': f"{working_dir}//gitlog"}
-    files_cmds = [(['./analyze-project.pl'], ['p', 'w', 'g', 't', 'i'])] # ,
-                  # (['./get-trigger.pl'], ['p', 'w'])]
-    for f in files_cmds:
-        yield f[0] + reduce(list.__add__, list(map(lambda x: [f'-{x}', getters[x]], f[1])), [])
 
 
 if __name__ == '__main__':
     project_name = sys.argv[1]
     working_dir = sys.argv[2]
     ind = sys.argv[3]
-    with open('./run.sh', 'w') as f:
-        for c in get_cmds(project_name, working_dir, ind):
-            f.write(" ".join(c) + '\n')
+    get_cmds(project_name, working_dir, ind)
