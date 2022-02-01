@@ -377,6 +377,43 @@ def fix_mvn_compiler_dir(dir_name):
                 fix_mvn_compiler(os.path.join(root, name))
 
 
+import os
+import sys
+
+
+def get_candidates(file_name, proj_dir):
+    candidates = []
+    with open(file_name) as f:
+        for l in f.readlines():
+            if 'error' in l and '.java' in l:
+                if proj_dir in l:
+                    c = proj_dir + l.split(proj_dir)[1].split('.java')[0] + '.java'
+                    candidates.append(c)
+    return candidates
+
+def collect_failed_tests(failed_tests_file, proj_dir):
+    candidates = []
+    if not os.path.exists(failed_tests_file):
+        return []
+    with open(failed_tests_file) as f:
+        failed_tests = list(map(lambda x: x.split('::')[0].split('.')[-1], map(lambda x: x[4:-1], filter(lambda l: l.startswith('---'), f.readlines()))))
+    for root, _, files in os.walk(proj_dir):
+        for f in files:
+            for t in failed_tests:
+                if t.lower() in f.lower():
+                    candidates.append(os.path.join(root, f))
+    return candidates
+
+def fix(candidates):
+    for c in set(candidates):
+        if 'test' in c.lower():
+            try:
+                print(c)
+                os.remove(c)
+            except Exception as e:
+                print(e)
+
+
 class Reproducer:
     def __init__(self, p, working_dir, ind):
         # consts
@@ -449,8 +486,9 @@ class Reproducer:
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile 2>&1 > /dev/null")
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
-        os.system(
-            f"python fix_compile_errors.py {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')} {repo.working_dir} 2>&1")
+
+        fix(get_candidates(os.path.join(self.work_dir, 'compile_tests_trigger_log.log'), repo.working_dir.split('pl')[0]) + collect_failed_tests(
+            os.path.join(os.path.dirname(os.path.join(self.work_dir, 'compile_tests_trigger_log.log')), 'failing_tests.log'), repo.working_dir.split('pl')[0]))
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
 
