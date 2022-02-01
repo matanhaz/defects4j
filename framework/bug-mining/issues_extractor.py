@@ -255,9 +255,3 @@ def extract_issues(repo_path, jira_key, out_csv):
     lists = list(map(lambda b: [b[0] + 1] + b[1].get_list(), enumerate(buggy)))
     df = pd.DataFrame(lists, columns=['bug.id', 'revision.id.buggy', 'revision.id.fixed', 'report.id', 'report.url'])
     df.to_csv(out_csv, index=False)
-
-
-if __name__ == "__main__":
-    # extract(r"c:\temp\camel2", "CAMEL", r'c:\temp\active.csv')
-    # layout(r"c:\temp\commons-codec", "d2f27093d7d95a07da901902f894d88b4ecc3e95")
-    diff_on_layouts(r"c:\temp\commons-codec", "d2f27093d7d95a07da901902f894d88b4ecc3e95", "1a4d9cc2572d220664f1b7c377cd318cd253052e", r'c:\temp\src.patch', r'c:\temp\test.patch')
