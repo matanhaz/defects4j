@@ -472,6 +472,7 @@ class Reproducer:
             #     f"cd {self.repo_dir}/{self.name}_real.git && sed \'s\/https:\\/\\/oss\\.sonatype\\.org\\/content\\/repositories\\/snapshots\\//http:\\/\\/central\\.maven\\.org\\/maven2\\/\/g\' maven-build.xml > temp && mv temp maven-build.xml")
             os.system(
                 f"cd {self.repo_dir}/{self.name}_real.git && ant -Dmaven.repo.local=\"{os.path.join(self.project_dir, 'lib')}\" get-deps")
+        fix_build(repo.working_dir)
 
     def get_diffs(self):
         repo_path = os.path.abspath(os.path.join(self.repo_dir, self.name + "_real.git"))
@@ -490,10 +491,8 @@ class Reproducer:
         # run fixed version and collect failed tests
         repo_path = os.path.abspath(os.path.join(self.repo_dir, self.name + "_real.git"))
         repo = git.Repo(repo_path)
-        fix, buggy = self.get_commits()
-        repo.git.checkout(fix, force=True)
+        # repo.git.checkout(fix, force=True)
         # todo the post checkout
-        fix_build(repo.working_dir)
         # run fixed version and collect failed tests
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile 2>&1 > /dev/null")
         os.system(
@@ -501,7 +500,8 @@ class Reproducer:
 
         candidates = get_candidates(os.path.join(self.work_dir, 'compile_tests_trigger_log.log'),
                                     repo.working_dir.split('pl')[0])
-        failed_tests = collect_failed_tests(os.path.join(self.work_dir, 'failing_tests.log'), repo.working_dir.split('pl')[0])
+        failed_tests = collect_failed_tests(os.path.join(self.work_dir, 'failing_tests.log'),
+                                            repo.working_dir.split('pl')[0])
         fix_candidates(candidates + failed_tests)
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
