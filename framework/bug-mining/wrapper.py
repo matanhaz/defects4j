@@ -484,7 +484,7 @@ class Reproducer:
         repo.git.checkout(fix, force=True)
         # todo the post checkout
         os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} fix_build 2>&1")
+            f"cd tracing && python Tracer.py full {os.path.join(self.projects_dir, self.pid)} fix_build 2>&1")
         # run fixed version and collect failed tests
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile 2>&1 > /dev/null")
         os.system(
@@ -498,17 +498,17 @@ class Reproducer:
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
 
         os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} properties 2>&1")
+            f"cd tracing && python Tracer.py full {os.path.join(self.projects_dir, self.pid)} properties 2>&1")
 
         os.system(
             f"cd {repo.working_dir} && ant -q  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
 
         # collect failing_test
         os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} collect_failed_tests 2>&1")
+            f"cd tracing && python Tracer.py full {os.path.join(self.projects_dir, self.pid)} collect_failed_tests 2>&1")
 
         os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} exclude_tests 2>&1")
+            f"cd tracing && python Tracer.py full {os.path.join(self.projects_dir, self.pid)} exclude_tests 2>&1")
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
         os.system(
@@ -526,38 +526,38 @@ class Reproducer:
             f"cd {repo.working_dir} && ant -q -Dbuild.compiler=javac1.8  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
         # make sure there are failing tests
         os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} collect_failed_tests 2>&1")
+            f"cd tracing && python Tracer.py full {os.path.join(self.projects_dir, self.pid)} collect_failed_tests 2>&1")
 
         os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} get_buggy_functions 2>&1")
+            f"cd tracing && python Tracer.py full {os.path.join(self.projects_dir, self.pid)} get_buggy_functions 2>&1")
         os.system(f"jar cvf {os.path.join(self.project_dir, 'jar_path.jar')} {repo.working_dir} 2>&1")
         os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} call_graph 2>&1")
+            f"cd tracing && python Tracer.py full {os.path.join(self.projects_dir, self.pid)} call_graph 2>&1")
 
         # sanity trace
         os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} formatter 2>&1")
+            f"cd tracing && python Tracer.py sanity {os.path.join(self.projects_dir, self.pid)} formatter 2>&1")
         os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} template 2>&1")
+            f"cd tracing && python Tracer.py sanity {os.path.join(self.projects_dir, self.pid)} template 2>&1")
         os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} grabber 2>&1 &")
+            f"cd tracing && python Tracer.py sanity {os.path.join(self.projects_dir, self.pid)} grabber 2>&1 &")
         time.sleep(20)
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
         os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} sanity {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
+            f"cd tracing && python Tracer.py sanity {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
         #
         # # check if sanity file exists
         # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} formatter 2>&1")
+        #     f"cd tracing && python Tracer.py full {os.path.join(self.projects_dir, self.pid)} formatter 2>&1")
         # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} template 2>&1")
+        #     f"cd tracing && python Tracer.py full {os.path.join(self.projects_dir, self.pid)} template 2>&1")
         # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} grabber 2>&1 &")
+        #     f"cd tracing && python Tracer.py full {os.path.join(self.projects_dir, self.pid)} grabber 2>&1 &")
         # time.sleep(20)
         # os.system(
         #     f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
         # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
+        #     f"cd tracing && python Tracer.py full {os.path.join(self.projects_dir, self.pid)} stop 2>&1")
 
     def do_all(self):
         self.create_project()

@@ -63,15 +63,7 @@ class Tracer:
                                        "javacg-0.1-SNAPSHOT-static.jar")
 
     def __init__(self, repo_path, trace_type, pid_dir, bug_mining=None):
-        self.classes_dir = None
         self.trace_type = trace_type
-        self.pid_dir = pid_dir
-        self.bugs_file = os.path.join(self.pid_dir, 'bugs.json')
-        self.all_jar_path = os.path.join(self.pid_dir, 'jar_path.jar')
-        self.call_graph_tests_path = os.path.join(self.pid_dir, 'call_graph_tests.json')
-        self.call_graph_nodes_path = os.path.join(self.pid_dir, 'call_graph_nodes.json')
-        self.tests_to_exclude_path = os.path.join(self.pid_dir, 'tests_to_exclude.json')
-        self.tests_run_log = os.path.join(self.pid_dir, 'tests_run_log')
         self.command_port = 5552
         self.agent_port = 5551
         self.repo_path = repo_path
