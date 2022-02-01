@@ -391,18 +391,21 @@ def get_candidates(file_name, proj_dir):
                     candidates.append(c)
     return candidates
 
+
 def collect_failed_tests(failed_tests_file, proj_dir):
     candidates = []
     if not os.path.exists(failed_tests_file):
         return []
     with open(failed_tests_file) as f:
-        failed_tests = list(map(lambda x: x.split('::')[0].split('.')[-1], map(lambda x: x[4:-1], filter(lambda l: l.startswith('---'), f.readlines()))))
+        failed_tests = list(map(lambda x: x.split('::')[0].split('.')[-1],
+                                map(lambda x: x[4:-1], filter(lambda l: l.startswith('---'), f.readlines()))))
     for root, _, files in os.walk(proj_dir):
         for f in files:
             for t in failed_tests:
                 if t.lower() in f.lower():
                     candidates.append(os.path.join(root, f))
     return candidates
+
 
 def fix(candidates):
     for c in set(candidates):
@@ -487,8 +490,10 @@ class Reproducer:
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
 
-        fix(get_candidates(os.path.join(self.work_dir, 'compile_tests_trigger_log.log'), repo.working_dir.split('pl')[0]) + collect_failed_tests(
-            os.path.join(os.path.dirname(os.path.join(self.work_dir, 'compile_tests_trigger_log.log')), 'failing_tests.log'), repo.working_dir.split('pl')[0]))
+        fix(get_candidates(os.path.join(self.work_dir, 'compile_tests_trigger_log.log'),
+                           repo.working_dir.split('pl')[0]) + collect_failed_tests(
+            os.path.join(os.path.dirname(os.path.join(self.work_dir, 'compile_tests_trigger_log.log')),
+                         'failing_tests.log'), repo.working_dir.split('pl')[0]))
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
 
@@ -568,4 +573,3 @@ if __name__ == '__main__':
     ind = sys.argv[3]
     reproducer = Reproducer(project_name, working_dir, ind)
     reproducer.do_all()
-
