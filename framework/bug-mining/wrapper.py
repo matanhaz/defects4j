@@ -528,6 +528,6 @@ if __name__ == '__main__':
     project_name = sys.argv[1]
     working_dir = sys.argv[2]
     ind = sys.argv[3]
-    reproducer = Reproducer(p, working_dir, ind)
+    reproducer = Reproducer(project_name, working_dir, ind)
     reproducer.do_all()
 
