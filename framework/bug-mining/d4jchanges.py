@@ -1,7 +1,41 @@
 import sys
 from xml.dom.minidom import parse
-from pom_file import Pom
 import os
+import xml.etree.cElementTree as et
+from functools import reduce
+et.register_namespace('', "http://maven.apache.org/POM/4.0.0")
+et.register_namespace('xsi', "http://www.w3.org/2001/XMLSchema-instance")
+
+
+class Pom(object):
+    def __init__(self, pom_path):
+        self.pom_path = pom_path
+        self.element_tree = et.parse(self.pom_path)
+
+    @staticmethod
+    def get_children_by_name(element, name):
+        return list(filter(lambda e: e.tag.endswith(name), element.getchildren()))
+
+
+    def remove_elements_by_path(self, path):
+        elements = [self.element_tree.getroot()]
+        for name in path[:-1]:
+            elements = reduce(list.__add__, list(map(lambda elem: Pom.get_children_by_name(elem, name), elements)), [])
+        for element in elements:
+            for child in element.getchildren():
+                if child.tag.endswith(path[-1]):
+                    element.remove(child)
+
+    def remove_compiler_version(self, version='1.8'):
+        for p in ['maven.compile.source', 'maven.compile.target']:
+            self.remove_elements_by_path(['properties', p])
+        for e in ['source', 'target']:
+            self.remove_elements_by_path(['build', 'plugins', 'plugin'] + ["maven-compiler-plugin", "configuration", e])
+        self.save()
+
+
+    def save(self):
+        self.element_tree.write(self.pom_path, xml_declaration=True)
 
 
 class SourceFixer(object):
@@ -34,12 +68,7 @@ class SourceFixer(object):
                 ans.extend(self.get_all_pom_paths(full_path))
         return ans
 
-    def set_compiler_version(self, version='1.7'):
+    def remove_compiler_version(self):
         for pom_file in self.get_all_pom_paths(self._repo_dir):
             pom = Pom(pom_file)
-            pom.set_compiler_version(version=version)
-
-
-if __name__ == '__main__':
-    repo = SourceFixer(sys.argv[1])
-    repo.set_compiler_version(sys.argv[2])
+            pom.remove_compiler_version()

@@ -454,7 +454,7 @@ class Reproducer:
         repo.git.checkout(fix, force=True)
         if 'pom.xml' in os.listdir(repo.working_dir):
             sf = SourceFixer(repo.working_dir)
-            sf.set_compiler_version('1.8')
+            sf.remove_compiler_version()
             os.system(
                 f"cd {self.repo_dir}/{self.name}_real.git && mvn ant:ant -Doverwrite=true 2>&1 -Dhttps.protocols=TLSv1.2 -Dmaven.compile.source=1.8 -Dmaven.compile.target=1.8")
             fix_mvn_compiler_dir(repo.working_dir)
