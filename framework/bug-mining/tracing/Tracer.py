@@ -87,6 +87,7 @@ class Tracer:
         self.path_to_tests_results = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_results_{self.trace_type}.json"))
         self.bugs_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'bugs.json'))
         self.all_jar_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'jar_path.jar'))
+        self.call_graph_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph.gexf'))
         self.call_graph_tests_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph_tests.json'))
         self.call_graph_nodes_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph_nodes.json'))
         self.tests_to_exclude_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'tests_to_exclude.json'))
@@ -339,12 +340,9 @@ class Tracer:
         return self.test_results
 
     def get_trigger_tests(self):
-        if not os.path.exists(self.path_to_trigger_tests):
-            return []
-        with open(self.path_to_trigger_tests) as f:
-            trigger_tests = list(
-                map(lambda x: x[4:-1].replace('::', '.'), filter(lambda l: l.startswith('---'), f.readlines())))
-        return trigger_tests
+        with open(self.tests_to_exclude_path) as f:
+            exclude = json.loads(f.read())
+            return exclude
 
     def get_buggy_functions(self):
         bugs = list(set(map(lambda x: x.method_name_parameters.replace(',', ';'),
@@ -383,6 +381,7 @@ class Tracer:
                 classes_edges.add((v,u))
         g_forward = nx.DiGraph()
         g_forward.add_edges_from(classes_edges)
+        nx.write_gexf(g_forward, self.call_graph_path)
         bugs_classes = []
         with open(self.bugs_file) as f:
             bugs_classes = list(set(map(lambda x: '.'.join(x.split('.')[:-1]), json.loads(f.read()))))
@@ -400,6 +399,7 @@ class Tracer:
             os.remove(self.all_jar_path)
             return
         g2 = nx.DiGraph(g_forward)
+        nx.write_gexf(g2, self.call_graph_path + '2')
         relevant_nodes = set(relevant_tests)
         relevant_nodes.update(set(bugs_classes))
         for t in relevant_tests:
