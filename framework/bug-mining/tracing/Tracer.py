@@ -62,7 +62,7 @@ class Tracer:
     CALL_GRAPH_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals",
                                        "javacg-0.1-SNAPSHOT-static.jar")
 
-    def __init__(self, repo_path, trace_type, pid_dir, bug_mining=None):
+    def __init__(self, repo_path, trace_type, bug_mining=None):
         self.trace_type = trace_type
         self.command_port = 5552
         self.agent_port = 5551
@@ -444,8 +444,7 @@ class Tracer:
 
 
 if __name__ == '__main__':
-    t = Tracer(os.path.abspath(sys.argv[1]), sys.argv[2], sys.argv[3])
-    # t = Tracer(os.path.abspath(sys.argv[1]), sys.argv[2], sys.argv[3], r'C:\Users\User\Downloads\bug-mining (83)\bug-mining_189\framework\projects')
+    t = Tracer(os.path.abspath(sys.argv[1]), sys.argv[2])
     if sys.argv[-1] == 'template':
         t.execute_template_process()
     elif sys.argv[-1] == 'grabber':
