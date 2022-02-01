@@ -451,6 +451,10 @@ if __name__ == '__main__':
         t.execute_grabber_process()
     elif sys.argv[-1] == 'formatter':
         t.set_junit_formatter()
+    elif sys.argv[-1] == 'triple':
+        t.set_junit_formatter()
+        t.execute_template_process()
+        t.execute_grabber_process()
     elif sys.argv[-1] == 'properties':
         t.set_junit_props()
     elif sys.argv[-1] == 'get_buggy_functions':
