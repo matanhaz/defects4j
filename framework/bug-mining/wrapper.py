@@ -399,7 +399,7 @@ class Reproducer:
         self.patch_dir = os.path.join(self.project_dir, 'patches')
 
     def create_project(self):
-        for d in [self.project_dir, self.core_dir, self.patch_dir, self.work_dir]:
+        for d in [self.project_dir, self.patch_dir, self.work_dir]:
             os.makedirs(d, exist_ok=True)
         os.makedirs(self.repo_dir, exist_ok=True)
         os.system(f"git clone {self.url} {self.repo_dir}/{self.name}_real.git")
@@ -524,13 +524,10 @@ class Reproducer:
         self.collect_and_trace()
 
 
-def get_cmds(p, working_dir, ind):
-    reproducer = Reproducer(p, working_dir, ind)
-    reproducer.do_all()
-
-
 if __name__ == '__main__':
     project_name = sys.argv[1]
     working_dir = sys.argv[2]
     ind = sys.argv[3]
-    get_cmds(project_name, working_dir, ind)
+    reproducer = Reproducer(p, working_dir, ind)
+    reproducer.do_all()
+
