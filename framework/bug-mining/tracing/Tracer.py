@@ -433,6 +433,10 @@ class Tracer:
             json.dump(list(relevant_nodes), f)
         os.remove(self.all_jar_path)
 
+    def triple(self):
+        self.set_junit_formatter()
+        self.execute_template_process()
+        self.execute_grabber_process()
 
 if __name__ == '__main__':
     t = Tracer(os.path.abspath(sys.argv[1]), sys.argv[2])

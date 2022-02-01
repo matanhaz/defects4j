@@ -1,8 +1,3 @@
-import json
-import os
-import os
-import re
-import sys
 import time
 from datetime import datetime
 from functools import reduce
@@ -10,11 +5,10 @@ from subprocess import Popen, PIPE, run
 from subprocess import run
 
 import git
-import jira
 import pandas as pd
 from d4jchanges import SourceFixer
 from issues_extractor import extract_issues
-from pydriller import Repository
+from Tracer import Tracer
 
 projects = {'distributedlog': ('https://github.com/apache/distributedlog', 'DL'),
             'maven-indexer': ('https://github.com/apache/maven-indexer', 'MINDEXER'),
@@ -506,18 +500,15 @@ class Reproducer:
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
 
-        os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full properties 2>&1")
+        Tracer(os.path.abspath(repo.working_dir), 'full').set_junit_props()
 
         os.system(
             f"cd {repo.working_dir} && ant -q  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
 
         # collect failing_test
-        os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full collect_failed_tests 2>&1")
+        Tracer(os.path.abspath(repo.working_dir), 'full').observe_tests()
 
-        os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full exclude_tests 2>&1")
+        Tracer(os.path.abspath(repo.working_dir), 'full').exclude_tests()
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
         os.system(
@@ -534,31 +525,24 @@ class Reproducer:
         os.system(
             f"cd {repo.working_dir} && ant -q -Dbuild.compiler=javac1.8  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
         # make sure there are failing tests
-        os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full collect_failed_tests 2>&1")
+        Tracer(os.path.abspath(repo.working_dir), 'full').observe_tests()
 
-        os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full get_buggy_functions 2>&1")
+        Tracer(os.path.abspath(repo.working_dir), 'full').get_buggy_functions()
         os.system(f"jar cvf {os.path.join(self.project_dir, 'jar_path.jar')} {repo.working_dir} 2>&1")
-        os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} full call_graph 2>&1")
+        Tracer(os.path.abspath(repo.working_dir), 'full').create_call_graph()
 
         # sanity trace
-        os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} sanity triple 2>&1")
+        Tracer(os.path.abspath(repo.working_dir), 'sanity').triple()
         time.sleep(20)
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
-        os.system(
-            f"cd tracing && python Tracer.py {repo.working_dir} sanity stop 2>&1")
+        Tracer(os.path.abspath(repo.working_dir), 'sanity').stop_grabber()
         #
         # # check if sanity file exists
-        # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full triple 2>&1")
+        # Tracer(os.path.abspath(repo.working_dir), 'full').triple()
         # time.sleep(20)
         # os.system(
         #     f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
-        # os.system(
-        #     f"cd tracing && python Tracer.py {repo.working_dir} full stop 2>&1")
+        # Tracer(os.path.abspath(repo.working_dir), 'full').stop_grabber()
 
     def do_all(self):
         self.create_project()
