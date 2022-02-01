@@ -76,33 +76,23 @@ class Tracer:
             ind = list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0].split('_')[1]
             bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0],
                                       'framework', 'projects')
-        self.path_to_result_file = os.path.abspath(
-            os.path.join(bug_mining, os.listdir(bug_mining)[0], f"result_{self.trace_type}.xml"))
-        self.path_to_out_template = os.path.abspath(
-            os.path.join(bug_mining, os.listdir(bug_mining)[0], f"template_{self.trace_type}.xml"))
-        self.path_to_classes_file = os.path.abspath(
-            os.path.join(bug_mining, os.listdir(bug_mining)[0], f"classes_{self.trace_type}"))
-        self.path_to_tests_details = os.path.abspath(
-            os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_details_{self.trace_type}.json"))
-        self.path_to_tests_results = os.path.abspath(
-            os.path.join(bug_mining, os.listdir(bug_mining)[0], f"test_results_{self.trace_type}.json"))
-        self.bugs_file = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'bugs.json'))
-        self.all_jar_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'jar_path.jar'))
-        self.call_graph_path = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph.gexf'))
-        self.call_graph_tests_path = os.path.abspath(
-            os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph_tests.json'))
-        self.call_graph_nodes_path = os.path.abspath(
-            os.path.join(bug_mining, os.listdir(bug_mining)[0], 'call_graph_nodes.json'))
-        self.tests_to_exclude_path = os.path.abspath(
-            os.path.join(bug_mining, os.listdir(bug_mining)[0], 'tests_to_exclude.json'))
-        self.tests_run_log = os.path.abspath(os.path.join(bug_mining, os.listdir(bug_mining)[0], 'tests_run_log'))
+        self.path_to_result_file = os.path.abspath(f"result_{self.trace_type}.xml")
+        self.path_to_out_template = os.path.abspath(f"template_{self.trace_type}.xml")
+        self.path_to_classes_file = os.path.abspath(f"classes_{self.trace_type}")
+        self.path_to_tests_details = os.path.abspath(f"test_details_{self.trace_type}.json")
+        self.path_to_tests_results = os.path.abspath(f"test_results_{self.trace_type}.json")
+        self.bugs_file = os.path.abspath( 'bugs.json')
+        self.all_jar_path = os.path.abspath( 'jar_path.jar')
+        self.call_graph_path = os.path.abspath( 'call_graph.gexf')
+        self.call_graph_tests_path = os.path.abspath('call_graph_tests.json')
+        self.call_graph_nodes_path = os.path.abspath('call_graph_nodes.json')
+        self.tests_to_exclude_path = os.path.abspath('tests_to_exclude.json')
+        self.tests_run_log = os.path.abspath( 'tests_run_log')
 
         if self.trace_type == 'sanity':
-            self.matrix = os.path.abspath(
-                os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{self.trace_type}.json"))
+            self.matrix = os.path.abspath(f"matrix_{self.trace_type}.json")
         else:
-            self.matrix = os.path.abspath(
-                os.path.join(bug_mining, os.listdir(bug_mining)[0], f"matrix_{ind}_{self.trace_type}.json"))
+            self.matrix = os.path.abspath(f"matrix_{ind}_{self.trace_type}.json")
         self.test_results = {}
         self.tests_to_run = None
         self.tests_to_exclude = None
