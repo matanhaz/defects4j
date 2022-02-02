@@ -62,7 +62,7 @@ class Tracer:
     CALL_GRAPH_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals",
                                        "javacg-0.1-SNAPSHOT-static.jar")
 
-    def __init__(self, repo_path, trace_type, bug_mining=None):
+    def __init__(self, repo_path, trace_type, ind=0):
         self.trace_type = trace_type
         self.command_port = 5552
         self.agent_port = 5551
@@ -70,12 +70,6 @@ class Tracer:
         self.xml_path = os.path.join(self.repo_path, 'build.xml')
         if os.path.isfile(os.path.join(self.repo_path, 'maven-build.xml')):
             self.xml_path = os.path.join(self.repo_path, 'maven-build.xml')
-        p = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        ind = 0
-        if bug_mining is None:
-            ind = list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0].split('_')[1]
-            bug_mining = os.path.join(p, list(filter(lambda x: x.startswith('bug-mining'), os.listdir(p)))[0],
-                                      'framework', 'projects')
         self.path_to_result_file = os.path.abspath(f"result_{self.trace_type}.xml")
         self.path_to_out_template = os.path.abspath(f"template_{self.trace_type}.xml")
         self.path_to_classes_file = os.path.abspath(f"classes_{self.trace_type}")

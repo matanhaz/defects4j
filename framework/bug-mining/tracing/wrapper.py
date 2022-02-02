@@ -500,15 +500,15 @@ class Reproducer:
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
 
-        Tracer(os.path.abspath(repo.working_dir), 'full').set_junit_props()
+        Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).set_junit_props()
 
         os.system(
             f"cd {repo.working_dir} && ant -q  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
 
         # collect failing_test
-        Tracer(os.path.abspath(repo.working_dir), 'full').observe_tests()
+        Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).observe_tests()
 
-        Tracer(os.path.abspath(repo.working_dir), 'full').exclude_tests()
+        Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).exclude_tests()
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
         os.system(
@@ -525,24 +525,24 @@ class Reproducer:
         os.system(
             f"cd {repo.working_dir} && ant -q -Dbuild.compiler=javac1.8  -keep-going test 2>&1 > {os.path.join(self.work_dir, 'failing_tests_logger.log')}")
         # make sure there are failing tests
-        Tracer(os.path.abspath(repo.working_dir), 'full').observe_tests()
+        Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).observe_tests()
 
-        Tracer(os.path.abspath(repo.working_dir), 'full').get_buggy_functions()
+        Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).get_buggy_functions()
         os.system(f"jar cvf {os.path.join(self.project_dir, 'jar_path.jar')} {repo.working_dir} 2>&1")
-        Tracer(os.path.abspath(repo.working_dir), 'full').create_call_graph()
+        Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).create_call_graph()
 
         # sanity trace
-        Tracer(os.path.abspath(repo.working_dir), 'sanity').triple()
+        Tracer(os.path.abspath(repo.working_dir), 'sanity', self.ind).triple()
         time.sleep(20)
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
-        Tracer(os.path.abspath(repo.working_dir), 'sanity').stop_grabber()
+        Tracer(os.path.abspath(repo.working_dir), 'sanity', self.ind).stop_grabber()
         #
         # # check if sanity file exists
-        # Tracer(os.path.abspath(repo.working_dir), 'full').triple()
+        # Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).triple()
         # time.sleep(20)
         # os.system(
         #     f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
-        # Tracer(os.path.abspath(repo.working_dir), 'full').stop_grabber()
+        # Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).stop_grabber()
 
     def do_all(self):
         self.create_project()
