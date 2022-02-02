@@ -439,7 +439,8 @@ class Reproducer:
         self.jira_key = projects[p][1]
         self.work_dir = os.path.abspath(working_dir)
         self.active_bugs = f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv"
-        self.repo_dir = os.path.join(self.working_dir, 'project_repos')
+        # self.repo_dir = os.path.join(self.working_dir, 'project_repos')
+        self.repo_dir = os.path.join('project_repos')
         self.patch_dir = os.path.join(self.project_dir, 'patches')
 
     def create_project(self):
