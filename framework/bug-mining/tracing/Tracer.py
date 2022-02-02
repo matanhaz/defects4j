@@ -81,13 +81,13 @@ class Tracer:
         self.path_to_classes_file = os.path.abspath(f"classes_{self.trace_type}")
         self.path_to_tests_details = os.path.abspath(f"test_details_{self.trace_type}.json")
         self.path_to_tests_results = os.path.abspath(f"test_results_{self.trace_type}.json")
-        self.bugs_file = os.path.abspath( 'bugs.json')
-        self.all_jar_path = os.path.abspath( 'jar_path.jar')
-        self.call_graph_path = os.path.abspath( 'call_graph.gexf')
+        self.bugs_file = os.path.abspath('bugs.json')
+        self.all_jar_path = os.path.abspath('jar_path.jar')
+        self.call_graph_path = os.path.abspath('call_graph.gexf')
         self.call_graph_tests_path = os.path.abspath('call_graph_tests.json')
         self.call_graph_nodes_path = os.path.abspath('call_graph_nodes.json')
         self.tests_to_exclude_path = os.path.abspath('tests_to_exclude.json')
-        self.tests_run_log = os.path.abspath( 'tests_run_log')
+        self.tests_run_log = os.path.abspath('tests_run_log')
 
         if self.trace_type == 'sanity':
             self.matrix = os.path.abspath(f"matrix_{self.trace_type}.json")
@@ -427,6 +427,7 @@ class Tracer:
         self.set_junit_formatter()
         self.execute_template_process()
         self.execute_grabber_process()
+
 
 if __name__ == '__main__':
     t = Tracer(os.path.abspath(sys.argv[1]), sys.argv[2])
