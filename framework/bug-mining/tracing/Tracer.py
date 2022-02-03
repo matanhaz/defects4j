@@ -76,7 +76,6 @@ class Tracer:
         self.path_to_tests_details = os.path.abspath(f"test_details_{self.trace_type}.json")
         self.path_to_tests_results = os.path.abspath(f"test_results_{self.trace_type}.json")
         self.bugs_file = os.path.abspath('bugs.json')
-        self.all_jar_path = os.path.abspath('jar_path.jar')
         self.call_graph_path = os.path.abspath('call_graph.gexf')
         self.call_graph_tests_path = os.path.abspath('call_graph_tests.json')
         self.call_graph_nodes_path = os.path.abspath('call_graph_nodes.json')
@@ -137,10 +136,9 @@ class Tracer:
                     if 'test' in trigger.lower():
                         trigger_tests.append(trigger)
         with open(self.tests_to_exclude_path, 'w') as f:
-            json.dump(trigger_tests, f)
+            json.dump(list(set(trigger_tests)), f)
         with open(self.tests_run_log, 'w') as f:
             f.writelines(lines)
-        print(f'collected tests {trigger_tests}')
 
     def exclude_tests(self):
         if not self.tests_to_exclude:
@@ -332,7 +330,7 @@ class Tracer:
         with open(self.path_to_tests_results, "w") as f:
             json.dump(list(map(lambda x: x.as_dict(), self.test_results.values())), f)
         with open(self.tests_to_exclude_path, 'w') as f:
-            json.dump(list(map(lambda x: x.full_name, filter(lambda t: not t.is_passed(), self.test_results.values()))),
+            json.dump(list(set(map(lambda x: x.full_name, filter(lambda t: not t.is_passed(), self.test_results.values())))),
                       f)
         return self.test_results
 
@@ -348,8 +346,8 @@ class Tracer:
             with open(self.bugs_file, "w") as f:
                 json.dump(bugs, f)
 
-    def create_call_graph(self):
-        cmd = ["java", "-jar", Tracer.CALL_GRAPH_JAR_PATH, self.all_jar_path]
+    def create_call_graph(self, jar_path):
+        cmd = ["java", "-jar", Tracer.CALL_GRAPH_JAR_PATH, jar_path]
         edges = set()
         edges = edges.union(set(
             str(Popen(cmd, stdout=PIPE).communicate()[0]).replace('(M)', '').replace('(I)', '').replace('(D)',
@@ -398,7 +396,6 @@ class Tracer:
                     relevant_tests.add(t)
                     break
         if not set(trigger_tests_classes).intersection(relevant_tests):
-            os.remove(self.all_jar_path)
             return
         g2 = nx.DiGraph(g_forward)
         nx.write_gexf(g2, self.call_graph_path + '2')
@@ -415,7 +412,6 @@ class Tracer:
             json.dump(list(relevant_tests), f)
         with open(self.call_graph_nodes_path, "w") as f:
             json.dump(list(relevant_nodes), f)
-        os.remove(self.all_jar_path)
 
     def triple(self):
         self.set_junit_formatter()

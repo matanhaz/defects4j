@@ -439,9 +439,9 @@ class Reproducer:
         self.jira_key = projects[p][1]
         self.work_dir = os.path.abspath(working_dir)
         self.active_bugs = f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv"
-        # self.repo_dir = os.path.join(self.working_dir, 'project_repos')
         self.repo_dir = os.path.abspath(os.path.join('project_repos'))
-        self.repo_path = os.path.join(self.repo_dir, self.name + "_real.git")
+        self.repo_path = os.path.join(self.repo_dir, self.name)
+        self.out_jar_path = os.path.join(self.repo_dir, "jar_path.jar")
         self.patch_dir = os.path.join(self.project_dir, 'patches')
 
     def create_project(self):
@@ -527,8 +527,8 @@ class Reproducer:
         Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).observe_tests()
 
         Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).get_buggy_functions()
-        os.system(f"jar cvf {os.path.join(self.project_dir, 'jar_path.jar')} {repo.working_dir} 2>&1")
-        Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).create_call_graph()
+        os.system(f"jar cvf {self.out_jar_path} {repo.working_dir} 2>&1")
+        Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).create_call_graph(self.out_jar_path)
 
         # sanity trace
         Tracer(os.path.abspath(repo.working_dir), 'sanity', self.ind).triple()
