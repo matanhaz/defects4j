@@ -80,6 +80,7 @@ class Tracer:
         self.call_graph_tests_path = os.path.abspath('call_graph_tests.json')
         self.call_graph_nodes_path = os.path.abspath('call_graph_nodes.json')
         self.tests_to_exclude_path = os.path.abspath('tests_to_exclude.json')
+        self.trigger_tests_path = os.path.abspath('trigger_tests.json')
         self.tests_run_log = os.path.abspath('tests_run_log')
 
         if self.trace_type == 'sanity':
@@ -96,7 +97,7 @@ class Tracer:
         if os.path.exists(self.tests_to_exclude_path):
             with open(self.tests_to_exclude_path) as f:
                 exclude = json.loads(f.read())
-            self.tests_to_exclude = list(map(lambda t: f"**/{t.split('.')[-2]}.java", exclude))
+            self.tests_to_exclude = list(set(map(lambda t: f"**/{t.split('.')[-2]}.java", exclude)))
         bugs = []
         if not os.path.exists(self.bugs_file):
             return
@@ -111,10 +112,10 @@ class Tracer:
             relevant_nodes = json.loads(f.read())
         if self.trace_type == 'sanity':
             self.classes_to_trace = bugs + tests_classes
-            self.tests_to_run = list(map(lambda t: f"**/{t.split('.')[-1]}.java", tests_classes))
+            self.tests_to_run = list(set(map(lambda t: f"**/{t.split('.')[-1]}.java", tests_classes)))
         elif self.trace_type == 'full':
             self.classes_to_trace = list(set(relevant_nodes))
-            self.tests_to_run = list(map(lambda t: f"**/{t.split('.')[-1]}.java", relevant_tests))
+            self.tests_to_run = list(set(map(lambda t: f"**/{t.split('.')[-1]}.java", relevant_tests)))
 
     def set_junit_formatter(self):
         self.set_junit_formatter_file(self.xml_path)
@@ -122,23 +123,23 @@ class Tracer:
     def set_junit_props(self):
         self.set_junit_properties(self.xml_path)
 
-    def collect_failed_tests(self, failed_tests_file):
-        trigger_tests = []
-        with open(failed_tests_file) as f:
-            lines = list(f.readlines())
-            for ind, line in filter(lambda l: l[1].startswith('---'), enumerate(lines)):
-                trigger = line[4:-1]
-                if '::' in trigger:
-                    trigger = trigger.split('[')[0]
-                    trigger = trigger.replace('::', '.')
-                    # else:
-                    #     trigger = trigger + '.NOTEST'
-                    if 'test' in trigger.lower():
-                        trigger_tests.append(trigger)
-        with open(self.tests_to_exclude_path, 'w') as f:
-            json.dump(list(set(trigger_tests)), f)
-        with open(self.tests_run_log, 'w') as f:
-            f.writelines(lines)
+    # def collect_failed_tests(self, failed_tests_file):
+    #     trigger_tests = []
+    #     with open(failed_tests_file) as f:
+    #         lines = list(f.readlines())
+    #         for ind, line in filter(lambda l: l[1].startswith('---'), enumerate(lines)):
+    #             trigger = line[4:-1]
+    #             if '::' in trigger:
+    #                 trigger = trigger.split('[')[0]
+    #                 trigger = trigger.replace('::', '.')
+    #                 # else:
+    #                 #     trigger = trigger + '.NOTEST'
+    #                 if 'test' in trigger.lower():
+    #                     trigger_tests.append(trigger)
+    #     with open(self.tests_to_exclude_path, 'w') as f:
+    #         json.dump(list(set(trigger_tests)), f)
+    #     with open(self.tests_run_log, 'w') as f:
+    #         f.writelines(lines)
 
     def exclude_tests(self):
         if not self.tests_to_exclude:
@@ -213,6 +214,7 @@ class Tracer:
         for b in batchtest:
             fileset = list(filter(lambda x: x.tag == 'fileset', b.iter()))[0]
             includes = list(filter(lambda x: x.tag == 'include', fileset.iter()))
+            excludes = list(filter(lambda x: x.tag == 'exclude', fileset.iter()))
             for i in includes:
                 fileset.remove(i)
             if self.tests_to_run:
@@ -236,9 +238,9 @@ class Tracer:
     def template_creator_cmd_line(self):
         cmd_line = ["java", '-Xms2g', '-jar', Tracer.JCOV_JAR_PATH, 'tmplgen', '-verbose', '-t',
                     self.path_to_out_template, '-c', self.path_to_classes_file, '-type', 'method']
-        if self.classes_to_trace:
-            for c in self.classes_to_trace:
-                cmd_line.extend(['-i', c])
+        # if self.classes_to_trace:
+        #     for c in self.classes_to_trace:
+        #         cmd_line.extend(['-i', c])
         cmd_line.extend(self.get_classes_path())
         return cmd_line
 
@@ -259,7 +261,6 @@ class Tracer:
             return False
 
     def execute_template_process(self):
-        print(self.template_creator_cmd_line())
         run(self.template_creator_cmd_line())
         for path in [self.path_to_classes_file, self.path_to_out_template]:
             if path:
@@ -316,26 +317,27 @@ class Tracer:
 
     def observe_tests(self):
         self.test_results = {}
-        # trigger_tests = self.get_trigger_tests()
         for report in self.get_xml_files():
             try:
                 suite = JUnitXml.fromfile(report)
                 for case in suite:
                     test = TestResult(case, suite.name, report)
-                    # test.set_failure(test.full_name.lower() in trigger_tests)
                     self.test_results[test.full_name.lower()] = test
             except Exception as e:
                 print(e, report)
                 pass
         with open(self.path_to_tests_results, "w") as f:
             json.dump(list(map(lambda x: x.as_dict(), self.test_results.values())), f)
-        with open(self.tests_to_exclude_path, 'w') as f:
-            json.dump(list(set(map(lambda x: x.full_name, filter(lambda t: not t.is_passed(), self.test_results.values())))),
-                      f)
+        tests = list(set(map(lambda x: x.full_name, filter(lambda t: not t.is_passed(), self.test_results.values()))))
+        with open(self.trigger_tests_path, 'w') as f:
+            json.dump(tests, f)
+        if not os.path.exists(self.tests_to_exclude_path):
+            with open(self.tests_to_exclude_path, 'w') as f:
+                json.dump(tests, f)
         return self.test_results
 
     def get_trigger_tests(self):
-        with open(self.tests_to_exclude_path) as f:
+        with open(self.trigger_tests_path) as f:
             exclude = json.loads(f.read())
             return exclude
 

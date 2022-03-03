@@ -3,6 +3,8 @@ from datetime import datetime
 from functools import reduce
 from subprocess import Popen, PIPE, run
 from subprocess import run
+import os
+import sys
 
 import git
 import pandas as pd
@@ -369,10 +371,6 @@ def fix_mvn_compiler_dir(dir_name):
         for name in files:
             if name == 'maven-build.properties':
                 fix_mvn_compiler(os.path.join(root, name))
-
-
-import os
-import sys
 
 
 def fix_build(dir):
