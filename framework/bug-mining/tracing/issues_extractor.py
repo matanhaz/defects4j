@@ -248,6 +248,8 @@ def _commits_and_issues(repo, jira_issues):
 
 
 def extract_issues(repo_path, jira_key, out_csv):
+    if os.path.exists(out_csv):
+        return
     issues = get_jira_issues(jira_key)
     commits = _commits_and_issues(git.Repo(repo_path), issues)
     issued_ = list(filter(lambda c: c.issue is not None, commits))

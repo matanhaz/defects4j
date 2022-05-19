@@ -383,34 +383,19 @@ def fix_build(dir):
         f.writelines(lines)
 
 
-def get_candidates(file_name, proj_dir):
-    candidates = []
+def collect_files_with_compilations_errors(file_name, proj_dir):
+    files = []
     with open(file_name) as f:
         for l in f.readlines():
             if 'error' in l and '.java' in l:
                 if proj_dir in l:
                     c = proj_dir + l.split(proj_dir)[1].split('.java')[0] + '.java'
-                    candidates.append(c)
-    return candidates
+                    files.append(c)
+    return files
 
 
-def collect_failed_tests(failed_tests_file, proj_dir):
-    candidates = []
-    if not os.path.exists(failed_tests_file):
-        return []
-    with open(failed_tests_file) as f:
-        failed_tests = list(map(lambda x: x.split('::')[0].split('.')[-1],
-                                map(lambda x: x[4:-1], filter(lambda l: l.startswith('---'), f.readlines()))))
-    for root, _, files in os.walk(proj_dir):
-        for f in files:
-            for t in failed_tests:
-                if t.lower() in f.lower():
-                    candidates.append(os.path.join(root, f))
-    return candidates
-
-
-def fix_candidates(candidates):
-    for c in set(candidates):
+def fix_compilation_errors(files):
+    for c in set(files):
         if 'test' in c.lower():
             try:
                 print(c)
@@ -420,25 +405,16 @@ def fix_candidates(candidates):
 
 
 class Reproducer:
-    def __init__(self, p, working_dir, ind):
-        # consts
-        self.dir = os.path.abspath(os.path.dirname(__file__))
-        self.script_dir = os.path.dirname(self.dir)
-        self.projects_dir = os.path.join(self.script_dir, 'projects')
+    def __init__(self, project_name, working_dir, ind):
 
-        # scripts cmds
-        self.p = p
-        self.pid = projects[p][1].title()
-        self.working_dir = os.path.abspath(working_dir)
-        self.project_dir = os.path.join(self.working_dir, 'framework', 'projects', self.pid)
+        self.jira_key = projects[project_name][1]
+        self.project_dir = os.path.join(os.path.abspath(working_dir), 'framework', 'projects', self.jira_key.title())
         self.ind = ind
-        self.name = p
-        self.url = projects[self.p][0]
-        self.jira_key = projects[p][1]
+        self.url = projects[project_name][0]
         self.work_dir = os.path.abspath(working_dir)
-        self.active_bugs = f"{working_dir}//framework//projects//{projects[p][1].title()}//active-bugs.csv"
+        self.active_bugs = f"{working_dir}//framework//projects//{projects[project_name][1].title()}//active-bugs.csv"
         self.repo_dir = os.path.abspath(os.path.join('project_repos'))
-        self.repo_path = os.path.join(self.repo_dir, self.name)
+        self.repo_path = os.path.join(self.repo_dir, project_name)
         self.out_jar_path = os.path.join(self.repo_dir, "jar_path.jar")
         self.patch_dir = os.path.join(self.project_dir, 'patches')
 
@@ -485,15 +461,12 @@ class Reproducer:
         # repo.git.checkout(fix, force=True)
         # todo the post checkout
         # run fixed version and collect failed tests
-        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile 2>&1 > /dev/null")
+        os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile 2>&1")
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
 
-        candidates = get_candidates(os.path.join(self.work_dir, 'compile_tests_trigger_log.log'),
-                                    repo.working_dir.split('pl')[0])
-        failed_tests = collect_failed_tests(os.path.join(self.work_dir, 'failing_tests.log'),
-                                            repo.working_dir.split('pl')[0])
-        fix_candidates(candidates + failed_tests)
+        fix_compilation_errors(collect_files_with_compilations_errors(os.path.join(self.work_dir, 'compile_tests_trigger_log.log'),
+                                                                      repo.working_dir))
         os.system(
             f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  compile-tests 2>&1 > {os.path.join(self.work_dir, 'compile_tests_trigger_log.log')}")
 
