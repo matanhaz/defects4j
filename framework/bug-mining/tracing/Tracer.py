@@ -64,6 +64,7 @@ class Tracer:
     JCOV_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals", "jcov.jar")
     CALL_GRAPH_JAR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "externals",
                                        "javacg-0.1-SNAPSHOT-static.jar")
+    TRACER_INFO = os.path.join(os.path.dirname(os.path.realpath(__file__)), "tracer_info")
 
     def __init__(self, repo_path, trace_type, ind=0):
         self.trace_type = trace_type
@@ -73,25 +74,25 @@ class Tracer:
         self.xml_path = os.path.join(self.repo_path, 'build.xml')
         if os.path.isfile(os.path.join(self.repo_path, 'maven-build.xml')):
             self.xml_path = os.path.join(self.repo_path, 'maven-build.xml')
-        if not os.path.exists(os.path.abspath('..\\tracer_info')):
-            os.mkdir(os.path.abspath('..\\tracer_info'))
-        self.path_to_result_file = os.path.abspath(f"..\\tracer_info\\result_{self.trace_type}.xml")
-        self.path_to_out_template = os.path.abspath(f"..\\tracer_info\\template_{self.trace_type}.xml")
-        self.path_to_classes_file = os.path.abspath(f"..\\tracer_info\\classes_{self.trace_type}")
-        self.path_to_tests_details = os.path.abspath(f"..\\tracer_info\\test_details_{self.trace_type}.json")
-        self.path_to_tests_results = os.path.abspath(f"..\\tracer_info\\test_results_{self.trace_type}.json")
-        self.bugs_file = os.path.abspath('..\\tracer_info\\bugs.json')
-        self.call_graph_path = os.path.abspath('..\\tracer_info\\call_graph.gexf')
-        self.call_graph_tests_path = os.path.abspath('..\\tracer_info\\call_graph_tests.json')
-        self.call_graph_nodes_path = os.path.abspath('..\\tracer_info\\call_graph_nodes.json')
-        self.tests_to_exclude_path = os.path.abspath('..\\tracer_info\\tests_to_exclude.json')
-        self.trigger_tests_path = os.path.abspath('..\\tracer_info\\trigger_tests.json')
-        self.tests_run_log = os.path.abspath('..\\tracer_info\\tests_run_log')
+        if not os.path.exists(Tracer.TRACER_INFO):
+            os.mkdir(Tracer.TRACER_INFO)
+        self.path_to_result_file = os.path.join(Tracer.TRACER_INFO, f"result_{self.trace_type}.xml")
+        self.path_to_out_template = os.path.join(Tracer.TRACER_INFO, f"template_{self.trace_type}.xml")
+        self.path_to_classes_file = os.path.join(Tracer.TRACER_INFO, f"classes_{self.trace_type}")
+        self.path_to_tests_details = os.path.join(Tracer.TRACER_INFO, f"test_details_{self.trace_type}.json")
+        self.path_to_tests_results = os.path.join(Tracer.TRACER_INFO, f"test_results_{self.trace_type}.json")
+        self.bugs_file = os.path.join(Tracer.TRACER_INFO, 'bugs.json')
+        self.call_graph_path = os.path.join(Tracer.TRACER_INFO, 'call_graph.gexf')
+        self.call_graph_tests_path = os.path.join(Tracer.TRACER_INFO, 'call_graph_tests.json')
+        self.call_graph_nodes_path = os.path.join(Tracer.TRACER_INFO, 'call_graph_nodes.json')
+        self.tests_to_exclude_path = os.path.join(Tracer.TRACER_INFO, 'tests_to_exclude.json')
+        self.trigger_tests_path = os.path.join(Tracer.TRACER_INFO, 'trigger_tests.json')
+        self.tests_run_log = os.path.join(Tracer.TRACER_INFO, 'tests_run_log')
 
         if self.trace_type == 'sanity':
-            self.matrix = os.path.abspath(f"tracer_info\\matrix_{self.trace_type}.json")
+            self.matrix = os.path.join(Tracer.TRACER_INFO, f"matrix_{self.trace_type}.json")
         else:
-            self.matrix = os.path.abspath(f"tracer_info\\matrix_{ind}_{self.trace_type}.json")
+            self.matrix = os.path.join(Tracer.TRACER_INFO, f"matrix_{ind}_{self.trace_type}.json")
         self.test_results = {}
         self.tests_to_run = None
         self.tests_to_exclude = None
