@@ -405,6 +405,8 @@ def fix_compilation_errors(files):
 
 
 class Reproducer:
+    ACTIVE_BUGS = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "active-bugs.csv")
+
     def __init__(self, project_name, working_dir, ind):
 
         self.jira_key = projects[project_name][1]
@@ -412,7 +414,6 @@ class Reproducer:
         self.ind = ind
         self.url = projects[project_name][0]
         self.work_dir = os.path.abspath(working_dir)
-        self.active_bugs = f"{working_dir}//framework//active-bugs.csv"
         self.repo_dir = os.path.abspath(os.path.join('project_repos'))
         self.repo_path = os.path.join(self.repo_dir, project_name)
         self.out_jar_path = os.path.join(self.repo_dir, "jar_path.jar")
@@ -425,7 +426,7 @@ class Reproducer:
         os.system(f"git clone {self.url} {self.repo_path}")
 
     def extract_issues(self):
-        extract_issues(self.repo_path, self.jira_key, self.active_bugs)
+        extract_issues(self.repo_path, self.jira_key, Reproducer.ACTIVE_BUGS)
 
     def init_version(self):
         repo = git.Repo(self.repo_path)
@@ -450,7 +451,7 @@ class Reproducer:
                         os.path.join(self.patch_dir, self.ind + '.test.patch'))
 
     def get_commits(self):
-        df = pd.read_csv(self.active_bugs)
+        df = pd.read_csv(Reproducer.ACTIVE_BUGS)
         fix, buggy = df[df['bug.id'] == int(self.ind)][['revision.id.fixed', 'revision.id.buggy']].values[
             0].tolist()
         return fix, buggy
