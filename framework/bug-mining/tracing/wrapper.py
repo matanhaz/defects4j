@@ -412,7 +412,7 @@ class Reproducer:
         self.ind = ind
         self.url = projects[project_name][0]
         self.work_dir = os.path.abspath(working_dir)
-        self.active_bugs = f"{working_dir}//framework//projects//{projects[project_name][1].title()}//active-bugs.csv"
+        self.active_bugs = f"{working_dir}//framework//active-bugs.csv"
         self.repo_dir = os.path.abspath(os.path.join('project_repos'))
         self.repo_path = os.path.join(self.repo_dir, project_name)
         self.out_jar_path = os.path.join(self.repo_dir, "jar_path.jar")
