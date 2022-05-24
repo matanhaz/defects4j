@@ -295,7 +295,11 @@ projects = {'distributedlog': ('https://github.com/apache/distributedlog', 'DL')
             'james-postage': ('https://github.com/apache/james-postage', 'POSTAGE'),
             'jackrabbit-ocm': ('https://github.com/apache/jackrabbit-ocm', 'OCM'),
             'commons-exec': ('https://github.com/apache/commons-exec', 'EXEC'),
-            'commons-bcel': ('https://github.com/apache/commons-bcel', 'BCEL')}
+            'commons-bcel': ('https://github.com/apache/commons-bcel', 'BCEL'),
+            'ely': ('https://github.com/wildfly-security/wildfly-elytron.git', 'ELY'),
+            'wfarq': ('https://github.com/wildfly/wildfly-arquillian.git', 'WFARQ'),
+            'amqp': ('https://github.com/spring-projects/spring-amqp.git', 'AMQP'),
+            'batch': ('https://github.com/spring-projects/spring-batch.git', 'BATCH')}
 
 
 def layout(repo_path, commit_id):
