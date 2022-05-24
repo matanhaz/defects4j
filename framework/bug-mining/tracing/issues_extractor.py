@@ -61,6 +61,10 @@ class JiraIssue(Issue):
 
 
 def get_jira_issues(project_name, url="http://issues.apache.org/jira", bunch=100):
+    if project_name in ['ELY','WFARQ']:
+        url = "https://issues.redhat.com"
+    elif project_name in ['AMWP','BATCH','DATACMNS', 'DATAGRAPH']:
+        url = "https://jira.spring.io"
     jira_conn = jira.JIRA(url)
     all_issues = []
     extracted_issues = 0
