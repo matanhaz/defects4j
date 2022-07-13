@@ -59,6 +59,38 @@ class JiraIssue(Issue):
             return val.name.lower()
         return default
 
+    
+class GithubIssue(Issue):
+    def __init__(self, issue, base_url):
+        super().__init__(str(issue.number), "Bug", 'minor','resolved', base_url,
+                         issue.created_at)
+        # self.fields = {}
+        # for k, v in dict(issue.fields.__dict__).items():
+        #     if k.startswith("customfield_") or k.startswith("__"):
+        #         continue
+        #     if type(v) in [str, type(None), type(0), type(0.1)]:
+        #         self.fields[k] = str(v)
+        #     elif hasattr(v, 'name'):
+        #         self.fields[k] = v.name.replace('\n', '').replace(';', '.,')
+        #     elif type(v) in [list, tuple]:
+        #         lst = []
+        #         for item in v:
+        #             if type(item) in [str]:
+        #                 lst.append(item)
+        #             elif hasattr(item, 'name'):
+        #                 lst.append(item.name)
+        #         self.fields[k] = "@@@".join(lst)
+        # for k in self.fields:
+        #     self.fields[k] = ' '.join(self.fields[k].split())    
+    
+def get_github_issues(project_name, url="http://issues.apache.org/jira", bunch=100):
+
+    g = Github("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")
+
+    repo = g.get_repo("FasterXML/jackson-databind")
+    open_issues = repo.get_issues(state='closed'
+                                  )
+    return list(map(lambda issue: GithubIssue(issue, url), open_issues))    
 
 def get_jira_issues(project_name, url="http://issues.apache.org/jira", bunch=100):
     if project_name in ['ELY','WFARQ']:
@@ -254,7 +286,10 @@ def _commits_and_issues(repo, jira_issues):
 def extract_issues(repo_path, jira_key, out_csv):
     if os.path.exists(out_csv):
         return
-    issues = get_jira_issues(jira_key)
+    if '/' in jira_key:
+        issues = get_github_issues(jira_key)
+    else:
+        issues = get_jira_issues(jira_key)
     commits = _commits_and_issues(git.Repo(repo_path), issues)
     issued_ = list(filter(lambda c: c.issue is not None, commits))
     buggy = list(filter(lambda c: c.issue.type.lower() == 'bug', issued_))
