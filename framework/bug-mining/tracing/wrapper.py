@@ -299,7 +299,10 @@ projects = {'distributedlog': ('https://github.com/apache/distributedlog', 'DL')
             'ely': ('https://github.com/wildfly-security/wildfly-elytron.git', 'ELY'),
             'wfarq': ('https://github.com/wildfly/wildfly-arquillian.git', 'WFARQ'),
             'amqp': ('https://github.com/spring-projects/spring-amqp.git', 'AMQP'),
-            'batch': ('https://github.com/spring-projects/spring-batch.git', 'BATCH')}
+            'batch': ('https://github.com/spring-projects/spring-batch.git', 'BATCH'),
+            
+            
+             'jackson-databind':('','FasterXML/jackson-databind')}
 
 
 def layout(repo_path, commit_id):
