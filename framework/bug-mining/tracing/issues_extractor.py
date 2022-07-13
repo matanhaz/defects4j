@@ -9,6 +9,7 @@ import jira
 import pandas as pd
 from pydriller import Repository
 from subprocess import Popen, PIPE, run
+from github import Github
 
 
 class Issue(object):
