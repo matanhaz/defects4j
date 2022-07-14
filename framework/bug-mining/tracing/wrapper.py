@@ -302,7 +302,7 @@ projects = {'distributedlog': ('https://github.com/apache/distributedlog', 'DL')
             'batch': ('https://github.com/spring-projects/spring-batch.git', 'BATCH'),
             
             
-             'jackson-databind':('','FasterXML/jackson-databind')}
+             'jackson-databind':('https://github.com/FasterXML/jackson-databind.git','FasterXML/jackson-databind')}
 
 
 def layout(repo_path, commit_id):
