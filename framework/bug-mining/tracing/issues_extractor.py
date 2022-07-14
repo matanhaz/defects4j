@@ -86,9 +86,9 @@ class GithubIssue(Issue):
     
 def get_github_issues(project_name, url="http://issues.apache.org/jira", bunch=100):
 
-    g = Github("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")
+    g = Github(os.environ['ACCESS_KEY'])
 
-    repo = g.get_repo("FasterXML/jackson-databind")
+    repo = g.get_repo(project_name)
     open_issues = repo.get_issues(state='closed'
                                   )
     return list(map(lambda issue: GithubIssue(issue, url), open_issues))    
