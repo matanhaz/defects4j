@@ -254,7 +254,9 @@ def _commits_and_issues(repo, jira_issues):
         for word in text.split():
             if word.isdigit():
                 if word in issues_ids:
-                    return word
+                    if commit_text.lower().index(word) == 0 or commit_text.lower()[commit_text.lower().index(word) - 1] in "#-{[(":
+                    #     if commit_text.lower()[commit_text.lower().index(f'-{word}') + 1] in ":])} .":
+                        return word
         return "0"
 
     commits = []
@@ -267,7 +269,7 @@ def _commits_and_issues(repo, jira_issues):
             commits.append(commit)
             continue
         try:
-            commit_text = _clean_commit_message(git_commit.message)
+            commit_text = _clean_commit_message(git_commit.summary)
         except Exception as e:
             continue
         ind = 0
@@ -296,4 +298,13 @@ def extract_issues(repo_path, jira_key, out_csv):
     buggy = list(filter(lambda c: c.issue.type.lower() == 'bug', issued_))
     lists = list(map(lambda b: [b[0] + 1] + b[1].get_list(), enumerate(buggy)))
     df = pd.DataFrame(lists, columns=['bug.id', 'revision.id.buggy', 'revision.id.fixed', 'report.id', 'report.url'])
-    df.to_csv(out_csv, index=False)
+    extra_df = df.copy()
+    for report, df_report in df.groupby('report.id'):
+        if df_report.shape[0] == 1:
+            continue
+        for i in range(df_report.shape[0]):
+            for j in range(i + 1, df_report.shape[0]):
+                i_series = df_report.iloc[i].copy()
+                i_series['revision.id.fixed'] = df_report.iloc[j]['revision.id.fixed']
+                extra_df = extra_df.append(i_series)
+    extra_df.to_csv(out_csv, index=False)
