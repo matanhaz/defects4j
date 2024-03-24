@@ -306,6 +306,8 @@ class Tracer:
                                           tests_details)))
         components = reduce(set.__or__, list(map(lambda x: set(x[1]), optimized_tests)), set())
         bugs = []
+        if not components:
+            return
         with open(self.bugs_file) as f:
             bugs_all_comps = list(set(map(lambda x: x.lower(), set(json.loads(f.read())))) & all_components)
             bugs = list(set(bugs_all_comps) & components)
