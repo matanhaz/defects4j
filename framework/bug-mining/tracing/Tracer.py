@@ -83,6 +83,7 @@ class Tracer:
         self.path_to_tests_details = os.path.join(self.tracer_info, f"test_details_{self.trace_type}.json")
         self.path_to_tests_results = os.path.join(self.tracer_info, f"test_results_{self.trace_type}.json")
         self.bugs_file = os.path.join(self.tracer_info, 'bugs.json')
+        self.bugs_all_comps = os.path.join(self.tracer_info, 'bugs_all_comps.json')
         self.call_graph_path = os.path.join(self.tracer_info, 'call_graph.gexf')
         self.call_graph_tests_path = os.path.join(self.tracer_info, 'call_graph_tests.json')
         self.call_graph_nodes_path = os.path.join(self.tracer_info, 'call_graph_nodes.json')
@@ -315,7 +316,9 @@ class Tracer:
             json.dump(optimized_tests, f)
         with open(self.path_to_tests_details + '2', "w") as f:
             json.dump(tests_details, f)
-        if bugs_all_comps:
+        with open(self.bugs_all_comps, "w") as f:
+            json.dump(bugs, f)
+        if bugs:
             write_json_planning_file(self.matrix, optimized_tests, bugs)
 
     def get_xml_files(self):
