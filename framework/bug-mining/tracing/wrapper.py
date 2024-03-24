@@ -516,9 +516,12 @@ class Reproducer:
         Tracer(os.path.abspath(repo.working_dir), 'sanity', self.ind).triple()
         time.sleep(20)
         os.system(f"cd {repo.working_dir} && ant -q  -Dbuild.compiler=javac1.8  -keep-going test 2>&1")
-        Tracer(os.path.abspath(repo.working_dir), 'sanity', self.ind).stop_grabber()
+        t = Tracer(os.path.abspath(repo.working_dir), 'sanity', self.ind)
+        t.stop_grabber()
 
         # check if sanity file exists
+        if not os.path.exists(t.matrix):
+            return
         Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).triple()
         time.sleep(20)
         os.system(
