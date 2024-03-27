@@ -251,6 +251,8 @@ def _commits_and_issues(repo, jira_issues):
         text = replace("[]?#,:(){}'\"", "", commit_text.lower())
         text = replace("-_.=", " ", text)
         text = text.replace('bug', '').replace('fix', '')
+        print("text is:", text)
+        print("issues ids is:", issues_ids)
         for word in text.split():
             if word.isdigit():
                 if word in issues_ids:
