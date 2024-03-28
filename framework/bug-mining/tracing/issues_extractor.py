@@ -256,9 +256,9 @@ def _commits_and_issues(repo, jira_issues):
         for word in text.split():
             if word.isdigit():
                 if word in issues_ids:
-                    print("text is:", text)
-                    print("commit is:", commit_text)
-                    print("word is:", word)
+                    # print("text is:", text)
+                    # print("commit is:", commit_text)
+                    # print("word is:", word)
                     if commit_text.lower().find(word) == -1:
                         continue
                     if commit_text.lower().index(word) == 0 or commit_text.lower()[commit_text.lower().index(word) - 1] in "#-{[(":
