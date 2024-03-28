@@ -259,6 +259,8 @@ def _commits_and_issues(repo, jira_issues):
                     print("text is:", text)
                     print("commit is:", commit_text)
                     print("word is:", word)
+                    if commit_text.lower().find(word) == -1:
+                        continue
                     if commit_text.lower().index(word) == 0 or commit_text.lower()[commit_text.lower().index(word) - 1] in "#-{[(":
                     #     if commit_text.lower()[commit_text.lower().index(f'-{word}') + 1] in ":])} .":
                         return word
