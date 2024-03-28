@@ -251,11 +251,13 @@ def _commits_and_issues(repo, jira_issues):
         text = replace("[]?#,:(){}'\"", "", commit_text.lower())
         text = replace("-_.=", " ", text)
         text = text.replace('bug', '').replace('fix', '')
-        print("text is:", text)
-        print("issues ids is:", issues_ids)
+
+
         for word in text.split():
             if word.isdigit():
                 if word in issues_ids:
+                    print("text is:", text)
+                    print("word is:", word)
                     if commit_text.lower().index(word) == 0 or commit_text.lower()[commit_text.lower().index(word) - 1] in "#-{[(":
                     #     if commit_text.lower()[commit_text.lower().index(f'-{word}') + 1] in ":])} .":
                         return word
