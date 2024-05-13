@@ -520,8 +520,8 @@ class Reproducer:
         t.stop_grabber()
 
         # check if sanity file exists
-        if not os.path.exists(t.matrix):
-            return
+        # if not os.path.exists(t.matrix):
+        #     return
         Tracer(os.path.abspath(repo.working_dir), 'full', self.ind).triple()
         time.sleep(20)
         os.system(
